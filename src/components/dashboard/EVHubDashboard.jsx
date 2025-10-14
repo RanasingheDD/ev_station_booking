@@ -51,7 +51,7 @@ export default function EVHubDashboard() {
           {/* Vehicle Section */}
           <div className="w-2/3">
             <img
-              src="https://tesla-cdn.thron.com/delivery/public/image/tesla/9a34a33f-fd2f-4ee2-a260-b9d2e72f91f4/bvlatuR/std/2880x1800/Desktop-ModelY"
+              src="/car01.png"
               alt="Tesla Model Y"
               className="rounded-xl w-full object-cover"
             />
