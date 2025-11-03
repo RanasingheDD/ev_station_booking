@@ -1,4 +1,5 @@
 import React from "react";
+// import car01 from './components/assets/car01.png'
 import { Battery, Car, Zap, Clock, Settings, MapPin, Power } from "lucide-react";
 
 const EVHubDashboard: React.FC = () => {
