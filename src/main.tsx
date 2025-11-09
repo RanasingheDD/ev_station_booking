@@ -14,6 +14,7 @@ import App from './App'
 import SignUp from './components/Registration/Registration'
 import Login from './components/login/login'
 import Dashboard from './components/dashboard/EVHubDashboard'
+// import AboutUs from './components/home/about'
 
 const router = createBrowserRouter([
   {
