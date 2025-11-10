@@ -84,7 +84,7 @@ const EVHubAccount: React.FC = () => {
           <img
             src={userDetails.avatar}
             alt="User"
-            className="w-20 h-20 rounded-full border border-gray-600 mb-4"
+            className="w-60 h-60 rounded-full border border-gray-600 mb-4 mx-auto"
           />
           <p className="text-gray-500">Name</p>
           <p className="font-semibold mb-2">{userDetails.name}</p>
@@ -95,7 +95,7 @@ const EVHubAccount: React.FC = () => {
           <p className="text-gray-500">Email</p>
           <p className="font-semibold">{userDetails.email}</p>
 
-          <button className="mt-6 bg-[#00d084] text-black px-4 py-2 rounded-md font-semibold hover:bg-[#00b06f] transition">
+          <button className="mt-6 bg-[#00d084] text-black px-4 py-2 rounded-md font-semibold hover:bg-[#00b06f] transition block mx-auto">
             More Info
           </button>
         </div>
