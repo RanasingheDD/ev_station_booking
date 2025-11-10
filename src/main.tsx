@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './App.css'
-import { createBrowserRouter, RouterProvider,} from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider,} from 'react-router-dom'
 
 // Public pages
 import App from './App'
@@ -18,11 +18,11 @@ import Layout from './components/Layout/SideBarLayout'
 import Account from './components/pages/EVHubAccount'
 
 
-// PrivateRoute Component
-// const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
-//   const isAuthenticated = localStorage.getItem('auth') === 'true'
-//   return isAuthenticated ? element : <Navigate to="/login" replace />
-// }
+//PrivateRoute Component
+const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
+  const isAuthenticated = localStorage.getItem('auth') === 'true'
+  return isAuthenticated ? element : <Navigate to="/login" replace />
+}
 
 // Router
 const router = createBrowserRouter([
