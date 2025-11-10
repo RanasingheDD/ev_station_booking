@@ -1,5 +1,4 @@
-Deployment : https://vercel.com/ranasinghedds-projects/ev-hub 
-
+Deployment : https://ev-hub-gold.vercel.app/
 
 
 # React + TypeScript + Vite
