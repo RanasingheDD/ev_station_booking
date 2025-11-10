@@ -13,8 +13,9 @@ import Login from './components/login/login'
 
 // Private pages
 import Dashboard from './components/pages/EVHubDashboard'
-//import Stations from './components/pages/EVHubStations'
-//import Layout from './components/Layout/SideBarLayout'
+import Stations from './components/pages/EVHubStations'
+import Layout from './components/Layout/SideBarLayout'
+import Account from './components/pages/EVHubAccount'
 
 
 // PrivateRoute Component
@@ -29,35 +30,18 @@ const router = createBrowserRouter([
   { path: '/', element: <App /> },
   { path: '/signup', element: <SignUp /> },
   { path: '/login', element: <Login /> },
+  
 
   // Private routes wrapped in Layout
   {
     path: '/',
-    element: <App />,
-  },
-  // {
-  //   path: '/about',
-  //   element: <AboutUs />,
-  // },
-  // {
-  //   path: '/partners',
-  //   element: <Partners />,
-  // },
-  // {
-  //   path: '/contact',
-  //   element: <ContactUs />,
-  // },
-  {
-    path: '/signup',
-    element: <SignUp />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/dashboard',
-    element:<Dashboard/>
+    element: <PrivateRoute element={<Layout />} />,
+    children: [
+      { path: 'dashboard', element: <Dashboard /> },
+      { path: 'stations', element: <Stations /> },
+      { path: '/account', element: <Account /> },
+      // Add more private pages here
+    ],
   },
 ])
 
