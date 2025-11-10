@@ -5,7 +5,7 @@ import { createBrowserRouter, Navigate, RouterProvider,} from 'react-router-dom'
 
 // Public pages
 import App from './App'
-//import AboutUs from './components/home/about'
+import AboutUs from './components/home/about'
 // import Partners from './pages/Partners'
 // import ContactUs from './pages/ContactUs'
 import SignUp from './components/Registration/Registration'
@@ -30,6 +30,7 @@ const router = createBrowserRouter([
   { path: '/', element: <App /> },
   { path: '/signup', element: <SignUp /> },
   { path: '/login', element: <Login /> },
+  { path: '/about', element: <AboutUs /> },
   
 
   // Private routes wrapped in Layout
