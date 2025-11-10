@@ -5,7 +5,7 @@ import { createBrowserRouter, Navigate, RouterProvider,} from 'react-router-dom'
 
 // Public pages
 import App from './App'
-// import AboutUs from './pages/AboutUs'
+//import AboutUs from './components/home/about'
 // import Partners from './pages/Partners'
 // import ContactUs from './pages/ContactUs'
 import SignUp from './components/Registration/Registration'
