@@ -1,44 +1,9 @@
 import React from "react";
-// import car01 from './components/assets/car01.png'
-import {  Car,  Power } from "lucide-react";
-// Battery,Zap, Clock, Settings, MapPin,
+import { Power } from "lucide-react";
 
 const EVHubDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0B0F19] text-gray-200 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#0E1424] p-6 flex flex-col justify-between">
-        <div>
-          <h1 className="text-green-400 font-bold text-2xl mb-10">⚡ EV HUB</h1>
-          <ul className="space-y-6">
-            <li className="text-green-400 font-semibold cursor-pointer">Dashboard</li>
-            <li className="hover:text-green-400 cursor-pointer">Stations</li>
-            <li className="hover:text-green-400 cursor-pointer">My Trips</li>
-            <li className="hover:text-green-400 cursor-pointer">Account</li>
-            <li className="hover:text-green-400 cursor-pointer">Subscription</li>
-          </ul>
-        </div>
-
-        <div>
-          <h2 className="text-gray-400 text-sm mb-4">My Cars</h2>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between bg-[#161B2E] p-3 rounded-lg">
-              <div>
-                <h3 className="text-white font-semibold">Tesla Model Y</h3>
-                <p className="text-xs text-gray-400">85% | 260 miles</p>
-              </div>
-              <Car className="text-green-400" />
-            </div>
-            <div className="flex items-center justify-between bg-[#161B2E] p-3 rounded-lg">
-              <div>
-                <h3 className="text-white font-semibold">Nissan Leaf</h3>
-                <p className="text-xs text-gray-400">76% | 210 miles</p>
-              </div>
-              <Car className="text-green-400" />
-            </div>
-          </div>
-        </div>
-      </aside>
 
       {/* Main Content */}
       <main className="flex-1 p-8">

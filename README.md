@@ -1,3 +1,10 @@
+Deployment : https://ev-hub-gold.vercel.app/
+
+Template : https://preview.codecanyon.net/item/ev-hub-charging-station-booking-react-admin-ui-dashboard-web-app-template/full_screen_preview/49171856
+
+Figma : https://www.figma.com/design/SwMS0bltdn0ZAxzCPYa2m7/Full-Stack-Project?node-id=0-1&p=f&t=fK28vq6Md1TqJLUI-0
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
