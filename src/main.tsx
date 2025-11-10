@@ -1,49 +1,41 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './App.css'
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 
-// Import main app and pages
+// Public pages
 import App from './App'
-// import AboutUs from './pages/AboutUs'
-// import Partners from './pages/Partners'
-// import ContactUs from './pages/ContactUs'
 import SignUp from './components/Registration/Registration'
 import Login from './components/login/login'
-import Dashboard from './components/dashboard/EVHubDashboard'
-// import AboutUs from './components/home/about'
 
+// Private pages
+import Dashboard from './components/pages/EVHubDashboard'
+import Stations from './components/pages/EVHubStations'
+import Layout from './components/Layout/SideBarLayout'
+
+
+// PrivateRoute Component
+const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
+  const isAuthenticated = localStorage.getItem('auth') === 'true'
+  return isAuthenticated ? element : <Navigate to="/login" replace />
+}
+
+// Router
 const router = createBrowserRouter([
+  // Public
+  { path: '/', element: <App /> },
+  { path: '/signup', element: <SignUp /> },
+  { path: '/login', element: <Login /> },
+
+  // Private routes wrapped in Layout
   {
     path: '/',
-    element: <App />,
-  },
-  // { newcommented
-  //   path: '/about',
-  //   element: <AboutUs />,
-  // },
-  // {
-  //   path: '/partners',
-  //   element: <Partners />,
-  // },
-  // {
-  //   path: '/contact',
-  //   element: <ContactUs />,
-  // },
-  {
-    path: '/signup',
-    element: <SignUp />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/dashboard',
-    element:<Dashboard/>
+    element: <PrivateRoute element={<Layout />} />,
+    children: [
+      { path: 'dashboard', element: <Dashboard /> },
+      { path: 'stations', element: <Stations /> },
+      // Add more private pages here
+    ],
   },
 ])
 
