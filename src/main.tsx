@@ -8,7 +8,7 @@ import {
 
 // Import main app and pages
 import App from './App'
-// import AboutUs from './pages/AboutUs'
+import AboutUs from './components/home/about'
 // import Partners from './pages/Partners'
 // import ContactUs from './pages/ContactUs'
 import SignUp from './components/Registration/Registration'
@@ -21,10 +21,10 @@ const router = createBrowserRouter([
     path: '/',
     element: <App />,
   },
-  // {
-  //   path: '/about',
-  //   element: <AboutUs />,
-  // },
+   {
+    path: '/about',
+    element: <AboutUs />,
+  },
   // {
   //   path: '/partners',
   //   element: <Partners />,

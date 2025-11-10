@@ -3,8 +3,8 @@
 // import EVRegistration from './components/login/login';
 import Navbar from './components/navbar/navbar';
 import TopHome from './components/home/topHome';
-import AboutUs from './components/home/about'
-import Footer from './components/footer/footer'
+import AboutUs from './components/home/about';
+import Footer from './components/footer/footer';
 
 
 const App: React.FC = () => {
