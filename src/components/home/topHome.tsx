@@ -22,12 +22,16 @@ export default function HeroLanding(): React.ReactElement {
           <h1 className="text-4xl md:text-6xl font-extrabold text-emerald-300 leading-tight mb-8">
             The World biggest EV <br /> Charging booking platform
           </h1>
-          <button className="px-10 py-4 text-lg font-semibold bg-emerald-400 text-gray-900 rounded-full hover:bg-emerald-300 transition-transform transform hover:scale-105 shadow-xl">
-            Join with Us
-          </button>
-           <Link to="/dashboard"><button className="px-10 py-4 text-lg font-semibold bg-emerald-400 text-gray-900 rounded-full hover:bg-emerald-300 transition-transform transform hover:scale-105 shadow-xl">
-            Dashboard
-          </button></Link>
+          <div className="flex gap-6 justify-center mt-8">
+            <button className="px-10 py-4 text-lg font-semibold bg-emerald-400 text-gray-900 rounded-full hover:bg-emerald-300 transition-transform transform hover:scale-105 shadow-xl">
+              Join with Us
+            </button>
+            <Link to="/dashboard">
+              <button className="px-10 py-4 text-lg font-semibold bg-emerald-400 text-gray-900 rounded-full hover:bg-emerald-300 transition-transform transform hover:scale-105 shadow-xl">
+               Dashboard
+              </button>
+            </Link>
+          </div>
         </div>
       </section>
     </div>
