@@ -1,4 +1,4 @@
-Deployment : https://ev-hub-gold.vercel.app/
+Deployment : https://ev-station-booking.vercel.app
 
 Template : https://preview.codecanyon.net/item/ev-hub-charging-station-booking-react-admin-ui-dashboard-web-app-template/full_screen_preview/49171856
 
