@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Power, X } from "lucide-react";
+import { X } from "lucide-react";
 
 const EVHubDashboard: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
