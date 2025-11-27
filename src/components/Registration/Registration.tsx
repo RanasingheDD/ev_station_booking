@@ -52,6 +52,8 @@ const Registration: React.FC = () => {
 
     if (response.ok) {
       showNotification("Registration successful!", "success");
+    } else if (response.status === 409) {
+      showNotification("Email already exists!", "error");
     } else {
       showNotification("Registration failed!", "error");
     }
