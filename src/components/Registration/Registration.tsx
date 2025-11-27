@@ -30,38 +30,39 @@ const Registration: React.FC = () => {
   };
 
   const handleSubmit = async (e: any) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const payload = {
-    fullName: form.fullName,
-    username: form.username,
-    email: form.email,
-    password: form.password,
-    address: form.address,
-    mobile: Number(form.mobile),
-    role: "USER",
-    evIds: []
-  };
+    const payload = {
+      fullName: form.fullName,
+      username: form.username,
+      email: form.email,
+      password: form.password,
+      address: form.address,
+      mobile: Number(form.mobile),
+      role: "USER",
+      evIds: []
+    };
 
-  try {
-    const response = await fetch("http://localhost:8080/api/users/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const response = await fetch("http://localhost:8080/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (response.ok) {
-      showNotification("Registration successful!", "success");
-    } else if (response.status === 409) {
-      showNotification("Email already exists!", "error");
-    } else {
-      showNotification("Registration failed!", "error");
+      if (response.ok) {
+        showNotification("Registration successful!", "success");
+      } else if (response.status === 409) {
+        showNotification("Email already exists!", "error");
+      } else {
+        showNotification("Registration failed!", "error");
+      }
+    } catch (error) {
+      console.error(error);
+      showNotification("Server error!", "error");
     }
-  } catch (error) {
-    console.error(error);
-    showNotification("Server error!", "error");
-  }
-};
+  };
+  
   return (
     <div className="min-h-screen bg-[#0B0F19] flex flex-col justify-between">
       <div className="flex flex-col items-center justify-center flex-grow px-6 py-10">
