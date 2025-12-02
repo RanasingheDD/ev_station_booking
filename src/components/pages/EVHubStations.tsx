@@ -1,7 +1,43 @@
 import React from "react";
+import { useEffect, useState } from "react";
 import { MapPin, Search, Battery, Zap, Clock, TrendingUp } from "lucide-react";
+import EVMap from "./EVMap";
+
+
 
 const Stations: React.FC = () => {
+  const [place, setPlace] = useState("Detecting location...");
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        // Reverse Geocoding API (OpenStreetMap free)
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${"6.053254644587544"}&lon=${"80.50530092142688"}`
+        );
+        
+        const data = await res.json();
+
+        // const city =
+        //   data.address.city ||
+        //   data.address.town ||
+        //   data.address.village ||
+        //   data.address.state_district;
+
+        // const country = data.address.country;
+
+        setPlace(`${data.display_name}`);
+      },
+      () => {
+        setPlace("Location permission denied");
+      }
+    );
+  }, []);
+
+
   return (
     <div className="flex-1 bg-[#0B0F19] text-gray-200 p-8 overflow-y-auto">
       {/* Header */}
@@ -21,15 +57,18 @@ const Stations: React.FC = () => {
         </div>
       </div>
 
+      
       {/* Location Map Section */}
       <div className="bg-[#101726] rounded-2xl p-6 mb-8">
         <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
-          <MapPin className="text-green-400 w-5 h-5" /> New York, United States of America
+          <MapPin className="text-green-400 w-5 h-5" /> {place}
         </h3>
-        <div className="bg-[#161B2E] rounded-xl h-64 flex items-center justify-center text-gray-500">
-          🗺️ Map Placeholder (embed Mapbox/Leaflet here)
+
+        <div className="bg-[#161B2E] rounded-xl h-98 overflow-hidden">
+          <EVMap />
         </div>
       </div>
+
 
       {/* Station Cards */}
       <div className="grid grid-cols-3 gap-6">

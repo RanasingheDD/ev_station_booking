@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mail, Lock, User, Fullscreen } from "lucide-react";
+import { Mail, Lock, User} from "lucide-react";
 
 const Registration: React.FC = () => {
 
