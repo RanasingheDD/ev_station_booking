@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { Mail, Lock } from "lucide-react"
-import { useNavigate } from 'react-router-dom'
+// import { useNavigate } from 'react-router-dom'
 
 export default function Login(): React.ReactElement {
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
@@ -21,9 +21,12 @@ export default function Login(): React.ReactElement {
 
       const data = await response.json()
 
+      
+
       // Save user info in localStorage
-      localStorage.setItem("user", JSON.stringify(data))
-      navigate("/dashboard") // redirect to account/dashboard page
+      localStorage.setItem("token", data.token)
+      // navigate("/dashboard") // redirect to account/dashboard page
+      window.location.href = "/dashboard"; 
     } catch (error) {
       console.error(error)
       alert("Login failed! Check your email/password.")

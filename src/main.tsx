@@ -20,8 +20,8 @@ import Account from './components/pages/EVHubAccount'
 
 //PrivateRoute Component
 const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
-  const isAuthenticated = localStorage.getItem('auth') === 'true'
-  return isAuthenticated ? element : <Navigate to="/login" replace />
+  const token = localStorage.getItem("token");
+  return token ? element : <Navigate to="/login" replace />
 }
 
 // Router
@@ -40,7 +40,7 @@ const router = createBrowserRouter([
     children: [
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'stations', element: <Stations /> },
-      { path: '/account', element: <Account /> },
+      { path: 'account', element: <Account /> },
       // Add more private pages here
     ],
   },

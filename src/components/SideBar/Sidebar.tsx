@@ -1,10 +1,14 @@
 import React from "react";
 import { Car } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import LogoutButton from "../logout/LogoutButton";
+
+
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
 
   // Helper function to check if the current path is active
   const isActive = (path: string) => location.pathname === path;
@@ -61,8 +65,11 @@ const Sidebar: React.FC = () => {
         >
           Subscription
         </li>
+         <li className={`cursor-pointer hover:text-green-400 `}>
+         <LogoutButton />
+        </li>
       </ul>
-
+          
       </div>
 
       {/* Bottom Section */}

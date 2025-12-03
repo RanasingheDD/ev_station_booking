@@ -9,4 +9,9 @@ export default defineConfig({
     tailwindcss()
   ],
   base: "/", // ✅ Ensures correct path resolution on deployment
+  // server: {
+  //   proxy: {
+  //     '/api': 'http://localhost:8080',
+  //   },
+  // },
 })

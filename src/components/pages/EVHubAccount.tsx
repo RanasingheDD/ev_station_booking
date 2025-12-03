@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Edit2, Bell, Search, Lock, Trash2, Shield, Laptop } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Snackbar, Alert } from "@mui/material";
+import useAuth from "../hooks/useAuth";
 
 interface UserDetails {
   username: string;
@@ -11,6 +12,7 @@ interface UserDetails {
 }
 
 const EVHubAccount: React.FC = () => {
+  useAuth();
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);

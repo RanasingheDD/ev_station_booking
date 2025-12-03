@@ -2,10 +2,11 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { MapPin, Search, Battery, Zap, Clock, TrendingUp } from "lucide-react";
 import EVMap from "./EVMap";
-
+import useAuth from "../hooks/useAuth";
 
 
 const Stations: React.FC = () => {
+  useAuth();
   const [place, setPlace] = useState("Detecting location...");
 
   useEffect(() => {
