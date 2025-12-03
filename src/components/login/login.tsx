@@ -1,11 +1,16 @@
 import React, { useState } from 'react'
 import { Mail, Lock } from "lucide-react"
-// import { useNavigate } from 'react-router-dom'
+import {useLocation, useNavigate } from 'react-router-dom'
 
 export default function Login(): React.ReactElement {
-  // const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const from = location.state?.from?.pathname || "/";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,13 +25,11 @@ export default function Login(): React.ReactElement {
       if (!response.ok) throw new Error("Invalid credentials")
 
       const data = await response.json()
-
-      
-
       // Save user info in localStorage
       localStorage.setItem("token", data.token)
-      // navigate("/dashboard") // redirect to account/dashboard page
-      window.location.href = "/dashboard"; 
+      localStorage.setItem("username", data.username);
+      // Redirect to previous page or dashboard
+      navigate(from, { replace: true }); 
     } catch (error) {
       console.error(error)
       alert("Login failed! Check your email/password.")
