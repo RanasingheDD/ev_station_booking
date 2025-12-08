@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Edit2, Bell, Search, Lock, Trash2, Shield, Laptop } from "lucide-react";
+import { Edit2, Bell, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Snackbar, Alert } from "@mui/material";
 import useAuth from "../hooks/useAuth";
@@ -22,17 +22,6 @@ const EVHubAccount: React.FC = () => {
     location: "",
   });
 
-  const openEditModal = () => {
-    if (userDetails) {
-      setEditForm({
-        username: userDetails.username,
-        email: userDetails.email,
-        location: userDetails.location,
-      });
-    }
-    
-    setIsEditOpen(true);
-  };
   // Fetch user info from localStorage
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -58,11 +47,12 @@ const EVHubAccount: React.FC = () => {
           );
           const data = await res.json();
           const city =
-            data.address.city || data.address.town || data.address.village || data.display_name;
+            data.address.city ||
+            data.address.town ||
+            data.address.village ||
+            data.display_name;
 
-          setUserDetails((prev) =>
-            prev ? { ...prev, location: city } : prev
-          );
+          setUserDetails((prev) => (prev ? { ...prev, location: city } : prev));
           setEditForm((prev) => ({ ...prev, location: city }));
         } catch (err) {
           console.error("Failed to fetch location:", err);
@@ -70,7 +60,6 @@ const EVHubAccount: React.FC = () => {
       });
     }
   }, []);
-
 
   const handleSaveProfile = async () => {
     if (!userDetails) return;
@@ -83,11 +72,14 @@ const EVHubAccount: React.FC = () => {
 
     // Update backend
     try {
-      const response = await fetch(`http://localhost:8080/api/users/${userDetails.email}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedUser),
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/users/${userDetails.email}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedUser),
+        }
+      );
 
       if (!response.ok) {
         console.error("Backend update failed:", response.statusText);
@@ -97,7 +89,10 @@ const EVHubAccount: React.FC = () => {
     }
   };
 
-  const handleCloseSnackbar = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleCloseSnackbar = (
+    _event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
     if (reason === "clickaway") return;
     setOpenSnackbar(false);
   };
@@ -158,7 +153,9 @@ const EVHubAccount: React.FC = () => {
           <p className="text-gray-500">Username</p>
           <p className="font-semibold mb-2">{userDetails.username}</p>
           <p className="text-gray-500">Location</p>
-          <p className="font-semibold mb-2">{userDetails?.location || "Fetching location..."}</p>
+          <p className="font-semibold mb-2">
+            {userDetails?.location || "Fetching location..."}
+          </p>
           <p className="text-gray-500">Email</p>
           <p className="font-semibold">{userDetails.email}</p>
         </div>
@@ -191,21 +188,27 @@ const EVHubAccount: React.FC = () => {
                   type="text"
                   name="username"
                   value={editForm.username}
-                  onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, username: e.target.value })
+                  }
                   className="w-full bg-[#141a25] p-2 rounded text-gray-200 focus:outline-none"
                 />
                 <input
                   type="email"
                   name="email"
                   value={editForm.email}
-                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, email: e.target.value })
+                  }
                   className="w-full bg-[#141a25] p-2 rounded text-gray-200 focus:outline-none"
                 />
                 <input
                   type="text"
                   name="location"
                   value={editForm.location}
-                  onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, location: e.target.value })
+                  }
                   className="w-full bg-[#141a25] p-2 rounded text-gray-200 focus:outline-none"
                 />
               </div>
@@ -236,7 +239,11 @@ const EVHubAccount: React.FC = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: "100%" }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
           Profile updated successfully!
         </Alert>
       </Snackbar>
