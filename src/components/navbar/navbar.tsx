@@ -8,8 +8,9 @@ export default function Navbar(): React.ReactElement {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
-    navigate("/login", { replace: true });
-    window.location.reload(); // quick hack to update navbar
+    // navigate("/login", { replace: true });
+     // quick hack to update navbar
+      window.location.reload();
   };
 
   return (
