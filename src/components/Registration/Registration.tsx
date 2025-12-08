@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Mail, Lock, User} from "lucide-react";
+import { Mail, Lock, User } from "lucide-react";
+import { API_URL } from "../../config/api_config";
 
 const Registration: React.FC = () => {
-
   function showNotification(message: string | null, type: string) {
     const box = document.createElement("div");
     box.className = "notification";
@@ -40,11 +40,11 @@ const Registration: React.FC = () => {
       address: form.address,
       mobile: Number(form.mobile),
       role: "USER",
-      evIds: []
+      evIds: [],
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/users/register", {
+      const response = await fetch(API_URL + "/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -62,12 +62,11 @@ const Registration: React.FC = () => {
       showNotification("Server error!", "error");
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-[#0B0F19] flex flex-col justify-between">
       <div className="flex flex-col items-center justify-center flex-grow px-6 py-10">
         <div className="bg-[#0E1424] p-10 rounded-2xl shadow-lg w-full max-w-md border border-[#1A2236]">
-
           <h1 className="text-green-400 font-bold text-3xl text-center mb-2">
             ⚡ EV HUB
           </h1>
@@ -76,10 +75,11 @@ const Registration: React.FC = () => {
           </p>
 
           <form className="space-y-5" onSubmit={handleSubmit}>
-
             {/* Full Name */}
             <div>
-              <label className="text-gray-300 text-sm block mb-2">Full Name</label>
+              <label className="text-gray-300 text-sm block mb-2">
+                Full Name
+              </label>
               <div className="flex items-center bg-[#101726] p-3 rounded-lg">
                 <User className="text-gray-500 mr-2" size={18} />
                 <input
@@ -95,7 +95,9 @@ const Registration: React.FC = () => {
 
             {/* Address */}
             <div>
-              <label className="text-gray-300 text-sm block mb-2">Address</label>
+              <label className="text-gray-300 text-sm block mb-2">
+                Address
+              </label>
               <div className="flex items-center bg-[#101726] p-3 rounded-lg">
                 <User className="text-gray-500 mr-2" size={18} />
                 <input
@@ -111,7 +113,9 @@ const Registration: React.FC = () => {
 
             {/* Mobile No */}
             <div>
-              <label className="text-gray-300 text-sm block mb-2">Mobile No</label>
+              <label className="text-gray-300 text-sm block mb-2">
+                Mobile No
+              </label>
               <div className="flex items-center bg-[#101726] p-3 rounded-lg">
                 <User className="text-gray-500 mr-2" size={18} />
                 <input
@@ -127,7 +131,9 @@ const Registration: React.FC = () => {
 
             {/* Username */}
             <div>
-              <label className="text-gray-300 text-sm block mb-2">Username</label>
+              <label className="text-gray-300 text-sm block mb-2">
+                Username
+              </label>
               <div className="flex items-center bg-[#101726] p-3 rounded-lg">
                 <User className="text-gray-500 mr-2" size={18} />
                 <input
@@ -159,7 +165,9 @@ const Registration: React.FC = () => {
 
             {/* Password */}
             <div>
-              <label className="text-gray-300 text-sm block mb-2">Password</label>
+              <label className="text-gray-300 text-sm block mb-2">
+                Password
+              </label>
               <div className="flex items-center bg-[#101726] p-3 rounded-lg">
                 <Lock className="text-gray-500 mr-2" size={18} />
                 <input
@@ -180,7 +188,6 @@ const Registration: React.FC = () => {
               Register
             </button>
           </form>
-
         </div>
       </div>
 
