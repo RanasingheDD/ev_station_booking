@@ -1,40 +1,39 @@
-import React, { useState } from 'react'
-import { Mail, Lock } from "lucide-react"
-import {useLocation, useNavigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { Mail, Lock } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Login(): React.ReactElement {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  
   const location = useLocation();
   const navigate = useNavigate();
 
   const from = location.state?.from?.pathname || "/";
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
       const response = await fetch("http://localhost:8080/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-      })
+      });
 
-      if (!response.ok) throw new Error("Invalid credentials")
+      if (!response.ok) throw new Error("Invalid credentials");
 
-      const data = await response.json()
+      const data = await response.json();
       // Save user info in localStorage
-      localStorage.setItem("token", data.token)
+      localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.username);
       // Redirect to previous page or dashboard
-      navigate(from, { replace: true }); 
+      navigate(from, { replace: true });
     } catch (error) {
-      console.error(error)
-      alert("Login failed! Check your email/password.")
+      console.error(error);
+      alert("Login failed! Check your email/password.");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#0B0F19] flex flex-col justify-between">
@@ -64,7 +63,9 @@ export default function Login(): React.ReactElement {
             </div>
 
             <div>
-              <label className="text-gray-300 text-sm block mb-2">Password</label>
+              <label className="text-gray-300 text-sm block mb-2">
+                Password
+              </label>
               <div className="flex items-center bg-[#101726] p-3 rounded-lg">
                 <Lock className="text-gray-500 mr-2" size={18} />
                 <input
@@ -88,5 +89,5 @@ export default function Login(): React.ReactElement {
         </div>
       </div>
     </div>
-  )
+  );
 }
