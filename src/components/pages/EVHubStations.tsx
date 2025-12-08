@@ -1,18 +1,15 @@
 import React from "react";
-import { MapPin, Search, Battery, Zap, Clock, TrendingUp } from "lucide-react";
-<<<<<<< Updated upstream
-
-const Stations: React.FC = () => {
-=======
+import { useState } from "react";
 import EVMap from "./EVMap";
 import useAuth from "../hooks/useAuth";
 import useLocation from "../hooks/useLocation";
+import { MapPin, Search, Battery, Zap, Clock, TrendingUp } from "lucide-react";
+
 
 const Stations: React.FC = () => {
   useAuth();
   const place = useLocation();
 
->>>>>>> Stashed changes
   return (
     <div className="flex-1 bg-[#0B0F19] text-gray-200 p-8 overflow-y-auto">
       {/* Header */}
@@ -35,14 +32,12 @@ const Stations: React.FC = () => {
       {/* Location Map Section */}
       <div className="bg-[#101726] rounded-2xl p-6 mb-8">
         <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
-<<<<<<< Updated upstream
-          <MapPin className="text-green-400 w-5 h-5" /> New York, United States of America
-=======
           <MapPin className="text-green-400 w-5 h-5" /> {place.place}
->>>>>>> Stashed changes
+
         </h3>
-        <div className="bg-[#161B2E] rounded-xl h-64 flex items-center justify-center text-gray-500">
-          🗺️ Map Placeholder (embed Mapbox/Leaflet here)
+
+        <div className="bg-[#161B2E] rounded-xl h-98 overflow-hidden">
+          <EVMap />
         </div>
       </div>
 
@@ -51,10 +46,16 @@ const Stations: React.FC = () => {
         {/* Tesla Station */}
         <div className="bg-[#161B2E] p-5 rounded-xl border border-green-400/40 hover:border-green-400 transition">
           <p className="text-gray-400 text-sm mb-1">1.5 miles</p>
-          <h3 className="text-white text-lg font-semibold mb-2">Tesla Station</h3>
+          <h3 className="text-white text-lg font-semibold mb-2">
+            Tesla Station
+          </h3>
           <div className="flex justify-between text-sm mb-3">
-            <p>Type: <span className="text-green-400">DC</span></p>
-            <p>Price: <span className="text-green-400">$0.6/kW</span></p>
+            <p>
+              Type: <span className="text-green-400">DC</span>
+            </p>
+            <p>
+              Price: <span className="text-green-400">$0.6/kW</span>
+            </p>
           </div>
           <p className="text-gray-400 text-sm">Slot Available: 5</p>
         </div>
@@ -62,10 +63,16 @@ const Stations: React.FC = () => {
         {/* Super Charger */}
         <div className="bg-[#161B2E] p-5 rounded-xl border border-transparent hover:border-green-400 transition">
           <p className="text-gray-400 text-sm mb-1">2.3 miles</p>
-          <h3 className="text-white text-lg font-semibold mb-2">Super Charger</h3>
+          <h3 className="text-white text-lg font-semibold mb-2">
+            Super Charger
+          </h3>
           <div className="flex justify-between text-sm mb-3">
-            <p>Type: <span className="text-green-400">DC</span></p>
-            <p>Price: <span className="text-green-400">$0.8/kW</span></p>
+            <p>
+              Type: <span className="text-green-400">DC</span>
+            </p>
+            <p>
+              Price: <span className="text-green-400">$0.8/kW</span>
+            </p>
           </div>
           <p className="text-gray-400 text-sm">Slot Available: 9</p>
         </div>
@@ -73,10 +80,16 @@ const Stations: React.FC = () => {
         {/* Shell Station */}
         <div className="bg-[#161B2E] p-5 rounded-xl border border-transparent hover:border-green-400 transition">
           <p className="text-gray-400 text-sm mb-1">3.1 miles</p>
-          <h3 className="text-white text-lg font-semibold mb-2">Shell Station</h3>
+          <h3 className="text-white text-lg font-semibold mb-2">
+            Shell Station
+          </h3>
           <div className="flex justify-between text-sm mb-3">
-            <p>Type: <span className="text-green-400">DC</span></p>
-            <p>Price: <span className="text-green-400">$1.3/kW</span></p>
+            <p>
+              Type: <span className="text-green-400">DC</span>
+            </p>
+            <p>
+              Price: <span className="text-green-400">$1.3/kW</span>
+            </p>
           </div>
           <p className="text-gray-400 text-sm">Slot Available: 4</p>
         </div>
