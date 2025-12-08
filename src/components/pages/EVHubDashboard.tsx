@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
+// import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
+
 
 const EVHubDashboard: React.FC = () => {
+  useAuth();
+  // const navigate = useNavigate(); 
   const [showModal, setShowModal] = useState(false);
 
   // EV Form State
@@ -9,9 +14,40 @@ const EVHubDashboard: React.FC = () => {
   const [regNo, setRegNo] = useState("");
   const [battery, setBattery] = useState("");
   const [speed, setSpeed] = useState("");
+  
+//   React.useEffect(() => {
+//   const verifySession = async () => {
+//     const token = localStorage.getItem("token");
+//     if (!token) {
+//       return navigate("/login");
+//     }
+
+//     try {
+//       const response = await fetch("http://localhost:8080/api/auth/check", {
+//         headers: {
+//           Authorization: "Bearer " + token,
+//         },
+//       });
+
+//       if (response.status === 401) {
+//         localStorage.removeItem("token");
+//         alert("Session expired. Please log in again.");
+//         navigate("/login");
+//       }
+//     } catch (error) {
+//       console.error("Failed to verify session", error);
+//       localStorage.removeItem("token");
+//       navigate("/login");
+//     }
+//   };
+
+//   verifySession();
+// }, []);
+
 
   const handleAddEV = (e: React.FormEvent) => {
     e.preventDefault();
+    
 
     const newEV = {
       evName,

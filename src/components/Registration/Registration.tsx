@@ -1,21 +1,82 @@
-import React from "react";
-import { Mail, Lock, User } from "lucide-react";
+import React, { useState } from "react";
+import { Mail, Lock, User} from "lucide-react";
 
 const Registration: React.FC = () => {
+
+  function showNotification(message: string | null, type: string) {
+    const box = document.createElement("div");
+    box.className = "notification";
+    box.style.background = type === "success" ? "#28a745" : "#dc3545";
+    box.textContent = message;
+
+    document.body.appendChild(box);
+
+    setTimeout(() => box.remove(), 3000);
+  }
+  const [form, setForm] = useState({
+    fullName: "",
+    address: "",
+    mobile: "",
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e: any) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    const payload = {
+      fullName: form.fullName,
+      username: form.username,
+      email: form.email,
+      password: form.password,
+      address: form.address,
+      mobile: Number(form.mobile),
+      role: "USER",
+      evIds: []
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        showNotification("Registration successful!", "success");
+      } else if (response.status === 409) {
+        showNotification("Email already exists!", "error");
+      } else {
+        showNotification("Registration failed!", "error");
+      }
+    } catch (error) {
+      console.error(error);
+      showNotification("Server error!", "error");
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-[#0B0F19] flex flex-col justify-between">
-      {/* Main Content */}
       <div className="flex flex-col items-center justify-center flex-grow px-6 py-10">
         <div className="bg-[#0E1424] p-10 rounded-2xl shadow-lg w-full max-w-md border border-[#1A2236]">
-          {/* Title */}
-          <h1 className="text-green-400 font-bold text-3xl text-center mb-2 flex justify-center items-center">
+
+          <h1 className="text-green-400 font-bold text-3xl text-center mb-2">
             ⚡ EV HUB
           </h1>
           <p className="text-gray-400 text-center mb-8">
             Create your EV Hub account
           </p>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
+
             {/* Full Name */}
             <div>
               <label className="text-gray-300 text-sm block mb-2">Full Name</label>
@@ -23,7 +84,9 @@ const Registration: React.FC = () => {
                 <User className="text-gray-500 mr-2" size={18} />
                 <input
                   type="text"
+                  name="fullName"
                   placeholder="John Doe"
+                  onChange={handleChange}
                   className="bg-transparent focus:outline-none text-white w-full"
                   required
                 />
@@ -37,7 +100,9 @@ const Registration: React.FC = () => {
                 <User className="text-gray-500 mr-2" size={18} />
                 <input
                   type="text"
+                  name="address"
                   placeholder="Address"
+                  onChange={handleChange}
                   className="bg-transparent focus:outline-none text-white w-full"
                   required
                 />
@@ -50,8 +115,10 @@ const Registration: React.FC = () => {
               <div className="flex items-center bg-[#101726] p-3 rounded-lg">
                 <User className="text-gray-500 mr-2" size={18} />
                 <input
-                  type="text"
-                  placeholder="+94 71 234 5678"
+                  type="number"
+                  name="mobile"
+                  placeholder="0712345678"
+                  onChange={handleChange}
                   className="bg-transparent focus:outline-none text-white w-full"
                   required
                 />
@@ -65,7 +132,9 @@ const Registration: React.FC = () => {
                 <User className="text-gray-500 mr-2" size={18} />
                 <input
                   type="text"
+                  name="username"
                   placeholder="johndoe123"
+                  onChange={handleChange}
                   className="bg-transparent focus:outline-none text-white w-full"
                   required
                 />
@@ -79,7 +148,9 @@ const Registration: React.FC = () => {
                 <Mail className="text-gray-500 mr-2" size={18} />
                 <input
                   type="email"
+                  name="email"
                   placeholder="you@example.com"
+                  onChange={handleChange}
                   className="bg-transparent focus:outline-none text-white w-full"
                   required
                 />
@@ -93,43 +164,26 @@ const Registration: React.FC = () => {
                 <Lock className="text-gray-500 mr-2" size={18} />
                 <input
                   type="password"
+                  name="password"
                   placeholder="••••••••"
+                  onChange={handleChange}
                   className="bg-transparent focus:outline-none text-white w-full"
                   required
                 />
               </div>
             </div>
 
-            {/* Register Button */}
             <button
               type="submit"
               className="w-full bg-green-500 hover:bg-green-600 transition-colors text-white py-3 rounded-lg font-semibold"
             >
               Register
             </button>
-
-            {/* Footer Links */}
-            <div className="flex justify-between text-sm mt-4 text-gray-400">
-              <button
-                type="button"
-                onClick={() => alert('Already have an account?')}
-                className="hover:text-green-400"
-              >
-                Already have an account?
-              </button>
-              <button
-                type="button"
-                onClick={() => alert('Terms & Conditions')}
-                className="hover:text-green-400"
-              >
-                Terms & Conditions
-              </button>
-            </div>
           </form>
+
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="bg-white/5 py-3 flex justify-center items-center">
         <p className="text-white text-sm font-medium">
           © <span className="text-green-400 font-semibold">NextGen</span>

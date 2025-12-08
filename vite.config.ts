@@ -3,6 +3,16 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  base: "/",
-});
+
+  plugins: [
+    react(),
+    tailwindcss()
+  ],
+  base: "/", // ✅ Ensures correct path resolution on deployment
+  // server: {
+  //   proxy: {
+  //     '/api': 'http://localhost:8080',
+  //   },
+  // },
+})
+
