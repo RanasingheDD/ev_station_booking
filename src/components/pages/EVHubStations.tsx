@@ -1,12 +1,14 @@
 import React from "react";
 import { useState } from "react";
-import { MapPin, Search, Battery, Zap, Clock, TrendingUp } from "lucide-react";
 import EVMap from "./EVMap";
 import useAuth from "../hooks/useAuth";
+import useLocation from "../hooks/useLocation";
+import { MapPin, Search, Battery, Zap, Clock, TrendingUp } from "lucide-react";
+
 
 const Stations: React.FC = () => {
   useAuth();
-  const [place] = useState("Detecting location...");
+  const place = useLocation();
 
   return (
     <div className="flex-1 bg-[#0B0F19] text-gray-200 p-8 overflow-y-auto">
@@ -30,7 +32,8 @@ const Stations: React.FC = () => {
       {/* Location Map Section */}
       <div className="bg-[#101726] rounded-2xl p-6 mb-8">
         <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
-          <MapPin className="text-green-400 w-5 h-5" /> {place}
+          <MapPin className="text-green-400 w-5 h-5" /> {place.place}
+
         </h3>
 
         <div className="bg-[#161B2E] rounded-xl h-98 overflow-hidden">
