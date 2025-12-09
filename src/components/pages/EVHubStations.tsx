@@ -1,17 +1,8 @@
 import React from "react";
-<<<<<<< Updated upstream
-import { useState } from "react";
-import EVMap from "./EVMap";
-import useAuth from "../hooks/useAuth";
-import useLocation from "../hooks/useLocation";
-import { MapPin, Search, Battery, Zap, Clock, TrendingUp } from "lucide-react";
-
-=======
 import { MapPin, Search, Battery, Zap, Clock, TrendingUp } from "lucide-react";
 import EVMap from "./EVMap";
 import useAuth from "../hooks/useAuth";
 import useLocation from "../hooks/useLocation";
->>>>>>> Stashed changes
 
 const Stations: React.FC = () => {
   useAuth();
@@ -39,11 +30,7 @@ const Stations: React.FC = () => {
       {/* Location Map Section */}
       <div className="bg-[#101726] rounded-2xl p-6 mb-8">
         <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
-          <MapPin className="text-green-400 w-5 h-5" /> {place.place}
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
+          <MapPin className="text-green-400 w-5 h-5" /> {place}
         </h3>
 
         <div className="bg-[#161B2E] rounded-xl h-98 overflow-hidden">
