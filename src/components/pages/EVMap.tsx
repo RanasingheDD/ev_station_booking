@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import L from "leaflet";
 import useLocation from "../hooks/useLocation";
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 interface EVStation {
   id: number;
@@ -11,6 +14,7 @@ interface EVStation {
 }
 
 export default function EVMap() {
+  const { place, coords, error } = useLocation();
 
   const { place, coords, error } = useLocation();
 
@@ -25,7 +29,10 @@ export default function EVMap() {
   }
 }, [coords, error]);
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
   const initMap = (lat: number, lng: number) => {
 
@@ -36,9 +43,13 @@ export default function EVMap() {
     // User marker
     L.marker([lat, lng])
       .addTo(map)
+<<<<<<< Updated upstream
 
       .bindPopup(`📍 You are here<br>${place}`)
 
+=======
+      .bindPopup(`📍 You are here<br>${place}`)
+>>>>>>> Stashed changes
       .openPopup();
 
     fetchEVStations(map, lat, lng);
@@ -58,9 +69,13 @@ export default function EVMap() {
         station.longitude
       );
 
+<<<<<<< Updated upstream
 
       if (distance <= 1000) {
 
+=======
+      if (distance <= 1000) {
+>>>>>>> Stashed changes
         L.marker([station.latitude, station.longitude])
           .addTo(map)
           .bindPopup(`
