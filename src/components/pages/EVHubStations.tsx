@@ -1,28 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { MapPin, Search, Battery, Zap, Clock, TrendingUp } from "lucide-react";
 import EVMap from "./EVMap";
 import useAuth from "../hooks/useAuth";
-import {
-  fetchStations,
-  type DisplayStation,
-} from "../../services/station_service";
+import useLocation from "../hooks/useLocation";
 
 const Stations: React.FC = () => {
   useAuth();
+  const place = useLocation();
 
-  const [place, setPlace] = useState("Detecting location...");
-  const [stations, setStations] = useState<DisplayStation[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadStations = async () => {
-      const data = await fetchStations();
-      setStations(data);
-      setLoading(false);
-    };
-
-    loadStations();
-  }, []);
 
   return (
     <div className="flex-1 bg-[#0B0F19] text-gray-200 p-8 overflow-y-auto">

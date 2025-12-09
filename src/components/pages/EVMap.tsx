@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import L from "leaflet";
+import useLocation from "../hooks/useLocation";
+
 
 interface EVStation {
   id: number;
@@ -10,14 +12,21 @@ interface EVStation {
 
 export default function EVMap() {
 
+
+  const { place, coords, error } = useLocation();
+
+
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        initMap(position.coords.latitude, position.coords.longitude);
-      },
-      () => alert("Location permission required")
-    );
-  }, []);
+  if (error) {
+    alert(error);
+    return;
+  }
+
+  if (coords.lat && coords.lng) {
+    initMap(coords.lat, coords.lng);
+  }
+}, [coords, error]);
+
 
   const initMap = (lat: number, lng: number) => {
 
@@ -28,7 +37,7 @@ export default function EVMap() {
     // User marker
     L.marker([lat, lng])
       .addTo(map)
-      .bindPopup("📍 You are here")
+      .bindPopup(`📍 You are here<br>${place}`)
       .openPopup();
 
     fetchEVStations(map, lat, lng);
@@ -48,7 +57,9 @@ export default function EVMap() {
         station.longitude
       );
 
-      if (distance <= 10) {
+
+      if (distance <= 1000) {
+
         L.marker([station.latitude, station.longitude])
           .addTo(map)
           .bindPopup(`

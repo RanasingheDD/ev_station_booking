@@ -67,7 +67,24 @@ const EVHubDashboard: React.FC = () => {
     const [mileage, setMileage] = useState("");
 
 
-  const handleAddEV = (e: React.FormEvent) => {
+    // Old EV fields (required for your newEV object)
+    const [evName, setEvName] = useState("");
+    const [regNo, setRegNo] = useState("");
+    const [battery, setBattery] = useState("");
+    const [speed, setSpeed] = useState("");
+
+    // New EV fields
+    const [make, setMake] = useState("");
+    const [model, setModel] = useState("");
+    const [year, setYear] = useState("");
+    const [maxChargeKw, setMaxChargeKw] = useState("");
+    const [vin, setVin] = useState("");
+    const [nickname, setNickname] = useState("");
+    const [color, setColor] = useState("");
+    const [mileage, setMileage] = useState("");
+
+
+  const handleAddEV = async (e: React.FormEvent) => {
     e.preventDefault();
     
 
@@ -88,7 +105,31 @@ const EVHubDashboard: React.FC = () => {
 
     console.log("New EV Added:", newEV);
 
-    setShowModal(false);
+      try {
+      const response = await fetch("http://localhost:8080/api/evs/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newEV),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add EV");
+      }
+
+      const data = await response.json();
+      console.log("EV saved to database:", data);
+
+      // Close modal
+      setShowModal(false);
+
+      // OPTIONAL: clear input fields
+      // setEvName(""); setRegNo(""); ...
+
+    } catch (error) {
+      console.error("Error saving EV:", error);
+    }
   };
 
   return (
@@ -125,7 +166,7 @@ const EVHubDashboard: React.FC = () => {
                 <X size={22} />
               </button>
 
-              <h3 className="text-xl text-white font-semibold mb-6">
+              <h3 className="text-xl text-white font-semibold mb-2">
                 Add New EV
               </h3>
 
@@ -216,7 +257,7 @@ const EVHubDashboard: React.FC = () => {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex justify-end gap-4 mt-6">
+                <div className="flex justify-end gap-4 mt-2">
                   <button
                     onClick={() => setShowModal(false)}
                     type="button"
