@@ -1,8 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function LogoutButton() {
   const navigate = useNavigate();
-  
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
 
   const handleLogout = async () => {
 
@@ -12,7 +13,9 @@ export default function LogoutButton() {
     localStorage.removeItem("username");
 
     // Redirect to login
-    navigate("/login");
+    //navigate("/login");
+    navigate(from, { replace: true }); 
+    // window.location.reload();
   };
 
   return (

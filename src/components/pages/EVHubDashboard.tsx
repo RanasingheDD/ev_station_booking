@@ -57,6 +57,26 @@ const EVHubDashboard: React.FC = () => {
     const [make, setMake] = useState("");
     const [model, setModel] = useState("");
     const [year, setYear] = useState("");
+    const [batteryKWh, setBatteryKWh] = useState("");
+    const [maxChargeKw, setMaxChargeKw] = useState("");
+    const [connectorTypes, setConnectorTypes] = useState("");
+    const [vin, setVin] = useState("");
+    const [licensePlate, setLicensePlate] = useState("");
+    const [nickname, setNickname] = useState("");
+    const [color, setColor] = useState("");
+    const [mileage, setMileage] = useState("");
+
+
+    // Old EV fields (required for your newEV object)
+    const [evName, setEvName] = useState("");
+    const [regNo, setRegNo] = useState("");
+    const [battery, setBattery] = useState("");
+    const [speed, setSpeed] = useState("");
+
+    // New EV fields
+    const [make, setMake] = useState("");
+    const [model, setModel] = useState("");
+    const [year, setYear] = useState("");
     const [maxChargeKw, setMaxChargeKw] = useState("");
     const [vin, setVin] = useState("");
     const [nickname, setNickname] = useState("");
@@ -69,12 +89,17 @@ const EVHubDashboard: React.FC = () => {
     
 
     const newEV = {
+      evName,
+      regNo,
+      battery,
+      speed,
       make,
       model,
       year,
       maxChargeKw,
       vin,
       nickname,
+      color,
       mileage,
     };
 
@@ -129,7 +154,7 @@ const EVHubDashboard: React.FC = () => {
           <div
             className="bg-[#101726] p-6 rounded-2xl w-full max-w-md shadow-lg relative
                       border border-[#1A2236] animate-fadeIn
-                      max-h-[90vh] 
+                      max-h-[90vh] overflow-y-auto
                       scrollbar-thin scrollbar-track-[#101726] scrollbar-thumb-[#1A2236]"
           >
 
@@ -194,7 +219,7 @@ const EVHubDashboard: React.FC = () => {
                   <label className="text-sm text-gray-300">VIN</label>
                   <input
                     className="w-full mt-1 bg-[#0B0F19] p-3 rounded-lg text-white border border-[#1A2236]"
-                    placeholder="ABC-1254"
+                    placeholder="1254"
                     value={vin}
                     onChange={(e) => setVin(e.target.value)}
                   />
@@ -207,6 +232,16 @@ const EVHubDashboard: React.FC = () => {
                     placeholder="My Car"
                     value={nickname}
                     onChange={(e) => setNickname(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-300">Color</label>
+                  <input
+                    className="w-full mt-1 bg-[#0B0F19] p-3 rounded-lg text-white border border-[#1A2236]"
+                    placeholder="Black"
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
                   />
                 </div>
 

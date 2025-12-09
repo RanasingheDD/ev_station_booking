@@ -8,6 +8,7 @@ const Stations: React.FC = () => {
   useAuth();
   const place = useLocation();
 
+
   return (
     <div className="flex-1 bg-[#0B0F19] text-gray-200 p-8 overflow-y-auto">
       {/* Header */}
@@ -27,7 +28,7 @@ const Stations: React.FC = () => {
         </div>
       </div>
 
-      {/* Location Map Section */}
+      {/* Location Map */}
       <div className="bg-[#101726] rounded-2xl p-6 mb-8">
         <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
           <MapPin className="text-green-400 w-5 h-5" /> {place}
@@ -40,56 +41,35 @@ const Stations: React.FC = () => {
 
       {/* Station Cards */}
       <div className="grid grid-cols-3 gap-6">
-        {/* Tesla Station */}
-        <div className="bg-[#161B2E] p-5 rounded-xl border border-green-400/40 hover:border-green-400 transition">
-          <p className="text-gray-400 text-sm mb-1">1.5 miles</p>
-          <h3 className="text-white text-lg font-semibold mb-2">
-            Tesla Station
-          </h3>
-          <div className="flex justify-between text-sm mb-3">
-            <p>
-              Type: <span className="text-green-400">DC</span>
-            </p>
-            <p>
-              Price: <span className="text-green-400">$0.6/kW</span>
-            </p>
-          </div>
-          <p className="text-gray-400 text-sm">Slot Available: 5</p>
-        </div>
+        {loading ? (
+          <p className="text-gray-400">Loading stations...</p>
+        ) : stations.length === 0 ? (
+          <p className="text-gray-400">No stations found.</p>
+        ) : (
+          stations.map((s) => (
+            <div
+              key={s.id}
+              className="bg-[#161B2E] p-5 rounded-xl border border-transparent hover:border-green-400 transition"
+            >
+              <p className="text-gray-400 text-sm mb-1">{s.distance} miles</p>
 
-        {/* Super Charger */}
-        <div className="bg-[#161B2E] p-5 rounded-xl border border-transparent hover:border-green-400 transition">
-          <p className="text-gray-400 text-sm mb-1">2.3 miles</p>
-          <h3 className="text-white text-lg font-semibold mb-2">
-            Super Charger
-          </h3>
-          <div className="flex justify-between text-sm mb-3">
-            <p>
-              Type: <span className="text-green-400">DC</span>
-            </p>
-            <p>
-              Price: <span className="text-green-400">$0.8/kW</span>
-            </p>
-          </div>
-          <p className="text-gray-400 text-sm">Slot Available: 9</p>
-        </div>
+              <h3 className="text-white text-lg font-semibold mb-2">
+                {s.name}
+              </h3>
 
-        {/* Shell Station */}
-        <div className="bg-[#161B2E] p-5 rounded-xl border border-transparent hover:border-green-400 transition">
-          <p className="text-gray-400 text-sm mb-1">3.1 miles</p>
-          <h3 className="text-white text-lg font-semibold mb-2">
-            Shell Station
-          </h3>
-          <div className="flex justify-between text-sm mb-3">
-            <p>
-              Type: <span className="text-green-400">DC</span>
-            </p>
-            <p>
-              Price: <span className="text-green-400">$1.3/kW</span>
-            </p>
-          </div>
-          <p className="text-gray-400 text-sm">Slot Available: 4</p>
-        </div>
+              <div className="flex justify-between text-sm mb-3">
+                <p>
+                  Type: <span className="text-green-400">{s.type}</span>
+                </p>
+                <p>
+                  Price: <span className="text-green-400">${s.price}/kW</span>
+                </p>
+              </div>
+
+              <p className="text-gray-400 text-sm">Slot Available: {s.slot}</p>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Vehicle Stats Panel */}
@@ -126,6 +106,7 @@ const Stations: React.FC = () => {
 
         <div className="bg-[#161B2E] p-6 rounded-2xl">
           <h4 className="text-white font-semibold mb-2">Performance</h4>
+
           <div className="flex items-center justify-between mb-3">
             <p className="text-gray-400 text-sm">Battery Status:</p>
             <p className="text-green-400 flex items-center gap-1">

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config/api_config";
 
 export default function useAuth() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function useAuth() {
       }
 
       try {
-        const res = await fetch("http://localhost:8080/api/auth/check", {
+        const res = await fetch(API_URL + "/auth/check", {
           headers: {
             Authorization: "Bearer " + token,
           },
@@ -25,7 +26,6 @@ export default function useAuth() {
           localStorage.removeItem("token");
           navigate("/login");
         }
-
       } catch (error) {
         localStorage.removeItem("token");
         navigate("/login");

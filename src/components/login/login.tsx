@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { API_URL } from "../../config/api_config";
 
 export default function Login(): React.ReactElement {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ export default function Login(): React.ReactElement {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/api/users/login", {
+      const response = await fetch(API_URL + "/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
