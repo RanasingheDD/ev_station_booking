@@ -54,12 +54,24 @@ export const getStationById = async (id: string): Promise<Station> => {
     headers: { Authorization: token ? `Bearer ${token}` : "" },
   });
 
-  const data = res.data as Station;
+  const data = res.data;
+
+  // Convert string → JSON object
+  const parsedChargers = (data.chargers || [])
+    .map((c: any) => {
+      try {
+        return typeof c === "string" ? JSON.parse(c) : c;
+      } catch (error) {
+        console.error("Invalid charger JSON:", c);
+        return null;
+      }
+    })
+    .filter(Boolean);
 
   return {
     ...data,
     images: data.images || [],
-    chargers: data.chargers || [],
+    chargers: parsedChargers,
     tariffRules: data.tariffRules || [],
     amenities: data.amenities || [],
   };
