@@ -3,7 +3,6 @@ import { X } from "lucide-react";
 // import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
-
 const EVHubDashboard: React.FC = () => {
   useAuth();
   // const navigate = useNavigate();
@@ -14,79 +13,60 @@ const EVHubDashboard: React.FC = () => {
   // const [regNo, setRegNo] = useState("");
   // const [battery, setBattery] = useState("");
   // const [speed, setSpeed] = useState("");
-  
-//   React.useEffect(() => {
-//   const verifySession = async () => {
-//     const token = localStorage.getItem("token");
-//     if (!token) {
-//       return navigate("/login");
-//     }
 
-//     try {
-//       const response = await fetch("http://localhost:8080/api/auth/check", {
-//         headers: {
-//           Authorization: "Bearer " + token,
-//         },
-//       });
+  //   React.useEffect(() => {
+  //   const verifySession = async () => {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) {
+  //       return navigate("/login");
+  //     }
 
-//       if (response.status === 401) {
-//         localStorage.removeItem("token");
-//         alert("Session expired. Please log in again.");
-//         navigate("/login");
-//       }
-//     } catch (error) {
-//       console.error("Failed to verify session", error);
-//       localStorage.removeItem("token");
-//       navigate("/login");
-//     }
-//   };
+  //     try {
+  //       const response = await fetch("http://localhost:8080/api/auth/check", {
+  //         headers: {
+  //           Authorization: "Bearer " + token,
+  //         },
+  //       });
 
-//   verifySession();
-// }, []);
+  //       if (response.status === 401) {
+  //         localStorage.removeItem("token");
+  //         alert("Session expired. Please log in again.");
+  //         navigate("/login");
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to verify session", error);
+  //       localStorage.removeItem("token");
+  //       navigate("/login");
+  //     }
+  //   };
 
-    // Modal OPEN/CLOSE state
-    const [showModal, setShowModal] = useState(false);
+  //   verifySession();
+  // }, []);
 
-    // Old EV fields (required for your newEV object)
-    const [evName, setEvName] = useState("");
-    const [regNo, setRegNo] = useState("");
-    const [battery, setBattery] = useState("");
-    const [speed, setSpeed] = useState("");
+  // Modal OPEN/CLOSE state
+  const [showModal, setShowModal] = useState(false);
 
-    // New EV fields
-    const [make, setMake] = useState("");
-    const [model, setModel] = useState("");
-    const [year, setYear] = useState("");
-    const [batteryKWh, setBatteryKWh] = useState("");
-    const [maxChargeKw, setMaxChargeKw] = useState("");
-    const [connectorTypes, setConnectorTypes] = useState("");
-    const [vin, setVin] = useState("");
-    const [licensePlate, setLicensePlate] = useState("");
-    const [nickname, setNickname] = useState("");
-    const [color, setColor] = useState("");
-    const [mileage, setMileage] = useState("");
+  // Old EV fields (required for your newEV object)
+  const [evName, setEvName] = useState("");
+  const [regNo, setRegNo] = useState("");
+  const [battery, setBattery] = useState("");
+  const [speed, setSpeed] = useState("");
 
-
-    // Old EV fields (required for your newEV object)
-    const [evName, setEvName] = useState("");
-    const [regNo, setRegNo] = useState("");
-    const [battery, setBattery] = useState("");
-    const [speed, setSpeed] = useState("");
-
-    // New EV fields
-    const [make, setMake] = useState("");
-    const [model, setModel] = useState("");
-    const [year, setYear] = useState("");
-    const [maxChargeKw, setMaxChargeKw] = useState("");
-    const [vin, setVin] = useState("");
-    const [nickname, setNickname] = useState("");
-    const [color, setColor] = useState("");
-    const [mileage, setMileage] = useState("");
-
+  // New EV fields
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
+  const [year, setYear] = useState("");
+  const [batteryKWh, setBatteryKWh] = useState("");
+  const [maxChargeKw, setMaxChargeKw] = useState("");
+  const [connectorTypes, setConnectorTypes] = useState("");
+  const [vin, setVin] = useState("");
+  const [licensePlate, setLicensePlate] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [color, setColor] = useState("");
+  const [mileage, setMileage] = useState("");
 
   const handleAddEV = async (e: React.FormEvent) => {
     e.preventDefault();
-    
 
     const newEV = {
       evName,
@@ -105,7 +85,7 @@ const EVHubDashboard: React.FC = () => {
 
     console.log("New EV Added:", newEV);
 
-      try {
+    try {
       const response = await fetch("http://localhost:8080/api/evs/add", {
         method: "POST",
         headers: {
@@ -126,7 +106,6 @@ const EVHubDashboard: React.FC = () => {
 
       // OPTIONAL: clear input fields
       // setEvName(""); setRegNo(""); ...
-
     } catch (error) {
       console.error("Error saving EV:", error);
     }
@@ -134,7 +113,6 @@ const EVHubDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-gray-200 flex">
-
       {/* Main Content */}
       <main className="flex-1 p-8">
         <div className="flex justify-between items-center mb-8">
@@ -150,14 +128,13 @@ const EVHubDashboard: React.FC = () => {
 
         {/* ------- Modal Overlay ------- */}
         {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div
-            className="bg-[#101726] p-6 rounded-2xl w-full max-w-md shadow-lg relative
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div
+              className="bg-[#101726] p-6 rounded-2xl w-full max-w-md shadow-lg relative
                       border border-[#1A2236] animate-fadeIn
                       max-h-[90vh] overflow-y-auto
                       scrollbar-thin scrollbar-track-[#101726] scrollbar-thumb-[#1A2236]"
-          >
-
+            >
               {/* Close Button */}
               <button
                 onClick={() => setShowModal(false)}
@@ -171,8 +148,10 @@ const EVHubDashboard: React.FC = () => {
               </h3>
 
               {/* EV Form */}
-              <form onSubmit={handleAddEV} className="space-y-1 w-full max-w-sm mx-auto">
-
+              <form
+                onSubmit={handleAddEV}
+                className="space-y-1 w-full max-w-sm mx-auto"
+              >
                 <div>
                   <label className="text-sm text-gray-300">Make</label>
                   <input
@@ -205,7 +184,9 @@ const EVHubDashboard: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm text-gray-300">Max Charge (kW)</label>
+                  <label className="text-sm text-gray-300">
+                    Max Charge (kW)
+                  </label>
                   <input
                     type="number"
                     className="w-full mt-1 bg-[#0B0F19] p-3 rounded-lg text-white border border-[#1A2236]"
@@ -287,7 +268,9 @@ const EVHubDashboard: React.FC = () => {
               alt="Tesla Model Y"
               className="rounded-xl w-full object-cover"
             />
-            <h3 className="text-white text-xl font-semibold mt-4">Tesla Model Y</h3>
+            <h3 className="text-white text-xl font-semibold mt-4">
+              Tesla Model Y
+            </h3>
 
             <div className="flex justify-between mt-4 text-gray-400">
               <div>

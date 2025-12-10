@@ -17,17 +17,9 @@ export const fetchStations = async (): Promise<DisplayStation[]> => {
     const res = await axios.get(API_URL + "/ev_stations/all");
 
     return res.data.map((station: Station) => {
-      const chargers: Charger[] = station.chargers
-        .map((c) => {
-          try {
-            return typeof c === "string" ? JSON.parse(c) : c;
-          } catch {
-            console.error("Invalid charger JSON:", c);
-            return null;
-          }
-        })
-        .filter(Boolean) as Charger[];
-
+      const chargers: Charger[] = (station.chargers || []).map((c) =>
+        typeof c === "string" ? JSON.parse(c) : c
+      );
       const firstCharger = chargers[0];
 
       return {
@@ -38,7 +30,8 @@ export const fetchStations = async (): Promise<DisplayStation[]> => {
         price: firstCharger?.maxPowerKw
           ? parseFloat((firstCharger.maxPowerKw * 0.03).toFixed(2))
           : 0,
-        slot: chargers.filter((c) => c.status === "AVAILABLE").length,
+        slot: chargers.filter((c) => c.status.toUpperCase() === "AVAILABLE")
+          .length,
       };
     });
   } catch (error) {
