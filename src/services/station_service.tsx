@@ -1,25 +1,7 @@
 // src/services/station_service.ts
 import axios from "axios";
 import { API_URL } from "../config/api_config";
-
-export interface Charger {
-  _id: string;
-  stationId: string;
-  connectorType: string;
-  maxPowerKw: number;
-  status: string;
-  name: string;
-  portNumber: number;
-}
-
-export interface Station {
-  id: string;
-  name: string;
-  latitude: number;
-  longitude: number;
-  address: string;
-  chargers: string[]; // JSON strings
-}
+import type { Charger, Station } from "../models/station_model";
 
 export interface DisplayStation {
   id: string;
@@ -35,13 +17,23 @@ export const fetchStations = async (): Promise<DisplayStation[]> => {
     const res = await axios.get(API_URL + "/ev_stations/all");
 
     return res.data.map((station: Station) => {
-      const chargers: Charger[] = station.chargers.map((c) => JSON.parse(c));
+      const chargers: Charger[] = station.chargers
+        .map((c) => {
+          try {
+            return typeof c === "string" ? JSON.parse(c) : c;
+          } catch {
+            console.error("Invalid charger JSON:", c);
+            return null;
+          }
+        })
+        .filter(Boolean) as Charger[];
+
       const firstCharger = chargers[0];
 
       return {
         id: station.id,
         name: station.name,
-        distance: 1.5, // TODO: calculate real distance from user
+        distance: 1.5, // TODO: calculate real distance
         type: firstCharger?.connectorType || "Unknown",
         price: firstCharger?.maxPowerKw
           ? parseFloat((firstCharger.maxPowerKw * 0.03).toFixed(2))
@@ -53,4 +45,22 @@ export const fetchStations = async (): Promise<DisplayStation[]> => {
     console.error("Error fetching stations:", error);
     return [];
   }
+};
+
+export const getStationById = async (id: string): Promise<Station> => {
+  const token = localStorage.getItem("token");
+
+  const res = await axios.get(`${API_URL}/ev_stations/${id}`, {
+    headers: { Authorization: token ? `Bearer ${token}` : "" },
+  });
+
+  const data = res.data as Station;
+
+  return {
+    ...data,
+    images: data.images || [],
+    chargers: data.chargers || [],
+    tariffRules: data.tariffRules || [],
+    amenities: data.amenities || [],
+  };
 };
