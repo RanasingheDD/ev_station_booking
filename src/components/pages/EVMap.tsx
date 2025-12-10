@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import L from "leaflet";
 import axios from "axios";
 import useLocation from "../hooks/useLocation";
+import { useState } from "react";
+import { API_URL } from "../../config/api_config";
 
 interface EVStation {
   id: number;
@@ -12,6 +14,8 @@ interface EVStation {
 
 export default function EVMap() {
   const { place, coords, error } = useLocation();
+  const [evStations, setEvStations] = useState<EVStation[]>([]);
+
 
   useEffect(() => {
     if (error) {
@@ -40,11 +44,10 @@ export default function EVMap() {
 
   const fetchEVStations = async (map: L.Map, userLat: number, userLng: number) => {
     try {
-      const response = await axios.get<EVStation[]>(
-        "http://localhost:8080/api/ev_stations/all"
-      );
+      const response = await axios.get<EVStation[]>(API_URL+"/ev_stations/all");
 
       const stations = response.data;
+      setEvStations(stations);
 
       stations.forEach((station) => {
         const distance = getDistance(
@@ -90,6 +93,13 @@ export default function EVMap() {
 
   return (
     <div className="w-full h-screen">
+       <ul>
+        {evStations.map((station) => (
+          <li key={station.id}>
+            {station.name} — ({station.latitude}, {station.longitude})
+          </li>
+        ))}
+      </ul>
       <div id="map" className="w-full h-full rounded-lg shadow-lg"></div>
     </div>
   );
