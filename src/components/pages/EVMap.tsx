@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import L from "leaflet";
+import axios from "axios";
 import useLocation from "../hooks/useLocation";
-
 
 interface EVStation {
   id: number;
@@ -11,25 +11,20 @@ interface EVStation {
 }
 
 export default function EVMap() {
-
-
   const { place, coords, error } = useLocation();
 
-
   useEffect(() => {
-  if (error) {
-    alert(error);
-    return;
-  }
+    if (error) {
+      alert(error);
+      return;
+    }
 
-  if (coords.lat && coords.lng) {
-    initMap(coords.lat, coords.lng);
-  }
-}, [coords, error]);
-
+    if (coords.lat && coords.lng) {
+      initMap(coords.lat, coords.lng);
+    }
+  }, [coords, error]);
 
   const initMap = (lat: number, lng: number) => {
-
     const map = L.map("map").setView([lat, lng], 14);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
@@ -37,37 +32,41 @@ export default function EVMap() {
     // User marker
     L.marker([lat, lng])
       .addTo(map)
-      .bindPopup(`📍 You are here<br>${place}`)
+      .bindPopup(`You are here: ${place}`)
       .openPopup();
 
     fetchEVStations(map, lat, lng);
   };
 
   const fetchEVStations = async (map: L.Map, userLat: number, userLng: number) => {
-
-    const response = await fetch("http://localhost:8080/api/ev_stations/all");
-    const stations: EVStation[] = await response.json();
-
-    stations.forEach((station) => {
-
-      const distance = getDistance(
-        userLat,
-        userLng,
-        station.latitude,
-        station.longitude
+    try {
+      const response = await axios.get<EVStation[]>(
+        "http://localhost:8080/api/ev_stations/all"
       );
 
+      const stations = response.data;
 
-      if (distance <= 1000) {
+      stations.forEach((station) => {
+        const distance = getDistance(
+          userLat,
+          userLng,
+          station.latitude,
+          station.longitude
+        );
 
-        L.marker([station.latitude, station.longitude])
-          .addTo(map)
-          .bindPopup(`
-            ⚡ ${station.name} <br/>
-            📏 ${distance.toFixed(2)} km away
-          `);
-      }
-    });
+        if (distance <= 10000000) {
+          L.marker([station.latitude, station.longitude])
+            .addTo(map)
+            .bindPopup(`
+              ⚡ ${station.name} <br/>
+              📏 ${distance.toFixed(2)} km away
+            `);
+        }
+      });
+    } catch (err) {
+      console.error("Error fetching EV stations:", err);
+      alert("Failed to load EV stations. Check your backend server.");
+    }
   };
 
   const getDistance = (

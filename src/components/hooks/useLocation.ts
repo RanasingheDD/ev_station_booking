@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function useLocation() {
   const [place, setPlace] = useState("Detecting location...");
@@ -22,13 +23,23 @@ export default function useLocation() {
 
           setCoords({ lat, lng });
 
-          const res = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+          // Axios request (auto JSON parsing)
+          const response = await axios.get(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client`,
+            {
+              params: {
+                latitude: lat,
+                longitude: lng,
+                localityLanguage: "en",
+              },
+            }
           );
 
-          const data = await res.json();
+          const data = response.data;
+
           setPlace(`${data.city}, ${data.countryName}`);
-        } catch {
+        } catch (err) {
+          console.error(err);
           setError("Error fetching location");
         }
       },

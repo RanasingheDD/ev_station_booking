@@ -48,7 +48,11 @@ const Stations: React.FC = () => {
       {/* Map */}
       <div className="bg-[#101726] rounded-2xl p-6 mb-8">
         <h3 className="flex items-center gap-2 text-lg font-semibold mb-4">
+<<<<<<< Updated upstream
           <MapPin className="text-green-400 w-5 h-5" /> {!place}
+=======
+          <MapPin className="text-green-400 w-5 h-5" /> {place.place}
+>>>>>>> Stashed changes
         </h3>
 
         <div className="bg-[#161B2E] rounded-xl h-98 overflow-hidden">
