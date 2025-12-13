@@ -13,7 +13,7 @@ const App: React.FC = () => {
       <Navbar />
       <TopHome />
       {/* <AboutUs /> */}
-      <Footer />
+      {/* <Footer /> */}
     </>
   )
 }

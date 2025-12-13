@@ -19,7 +19,7 @@ export default function Navbar(): React.ReactElement {
         {/* Logo */}
         <div className="flex items-center gap-6">
           <Link to="/" className="text-white font-bold text-xl tracking-wide">
-            LOGO
+            ⚡ EV HUB
           </Link>
 
           {/* Navigation Links */}
