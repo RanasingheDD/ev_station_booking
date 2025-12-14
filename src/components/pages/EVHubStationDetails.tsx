@@ -127,7 +127,7 @@ const StationDetails: React.FC = () => {
             <div className="flex items-center gap-2 text-white">
               <Star size={18} className="text-green-400" />
               <span>
-                {station.rating.toFixed(1)} ({station.rating})
+                {station.rating} ({station.rating})
               </span>
             </div>
           )}
@@ -164,7 +164,7 @@ const StationDetails: React.FC = () => {
             <div key={idx} className="flex justify-between text-sm mb-2">
               <span>{rule.description ?? "General"}</span>
               <span className="text-green-400">
-                Rs {rule.pricePerKwh.toFixed(2)} / kWh
+                Rs {rule.pricePerKwh} / kWh
               </span>
             </div>
           ))
