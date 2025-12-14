@@ -2,7 +2,7 @@ import { useEffect ,useState} from "react";
 import L from "leaflet";
 import axios from "axios";
 import useLocation from "../hooks/useLocation";
-import { useState } from "react";
+
 import { API_URL } from "../../config/api_config";
 
 interface EVStation {
@@ -13,16 +13,11 @@ interface EVStation {
 }
 
 export default function EVMap() {
-<<<<<<< Updated upstream
-  const { place, coords, error } = useLocation();
-  const [evStations, setEvStations] = useState<EVStation[]>([]);
-=======
 
   const { place, coords, error } = useLocation();
   const [distances, setDistance] = useState<number>(0);
   const [latitudes, setLatitude] = useState<number | null>(null);
 
->>>>>>> Stashed changes
 
 
   useEffect(() => {
@@ -54,9 +49,8 @@ export default function EVMap() {
     try {
       const response = await axios.get<EVStation[]>(API_URL+"/ev_stations/all");
 
-<<<<<<< Updated upstream
       const stations = response.data;
-      setEvStations(stations);
+      // setEvStations(stations);
 
       stations.forEach((station) => {
         const distance = getDistance(
@@ -79,32 +73,6 @@ export default function EVMap() {
       console.error("Error fetching EV stations:", err);
       alert("Failed to load EV stations. Check your backend server.");
     }
-=======
-    const response = await fetch("http://localhost:8080/api/ev_stations/all");
-    const stations: EVStation[] = await response.json();
-    
-    stations.forEach((station) => {
-      setLatitude(station.latitude);
-      const distance = getDistance(
-        userLat,
-        userLng,
-        station.latitude,
-        station.longitude
-      );
-      // setDistance(distance)
-
-      if (distance <= 10000) {
-        L.marker([station.latitude, station.longitude])
-          .addTo(map)
-          .bindPopup(`
-            ⚡ ${station.name} <br/>
-            📏 ${distance.toFixed(2)} km away
-          `);
-          setDistance(station.latitude);
-      }
-      
-    });
->>>>>>> Stashed changes
   };
 
   const getDistance = (
@@ -128,17 +96,13 @@ export default function EVMap() {
 
   return (
     <div className="w-full h-screen">
-<<<<<<< Updated upstream
        <ul>
-        {evStations.map((station) => (
+        {/* {evStations.map((station) => (
           <li key={station.id}>
             {station.name} — ({station.latitude}, {station.longitude})
           </li>
-        ))}
+        ))} */}
       </ul>
-=======
-      <p>{place}-{coords.lat}-{distances}-{latitudes}</p>
->>>>>>> Stashed changes
       <div id="map" className="w-full h-full rounded-lg shadow-lg"></div>
     </div>
   );

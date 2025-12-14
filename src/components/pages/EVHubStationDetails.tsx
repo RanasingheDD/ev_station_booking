@@ -81,10 +81,10 @@ const StationDetails: React.FC = () => {
           <h1 className="text-green-400 font-bold text-xl">{station.name}</h1>
           <span
             className={`px-3 py-1 rounded-full text-xs font-semibold ${
-              station.isOpen ? "bg-green-500" : "bg-gray-600"
+              station.open ? "bg-green-500" : "bg-gray-600"
             }`}
           >
-            {station.isOpen ? "Open Now" : "Closed"}
+            {station.open ? "Open Now" : "Closed"}
           </span>
         </div>
 
@@ -95,11 +95,6 @@ const StationDetails: React.FC = () => {
           </div>
         )}
 
-<<<<<<< Updated upstream
-        <div className="flex items-center gap-2 text-green-400">
-          <MapPin size={18} />
-          <p>{station.address}</p>
-=======
         {/* Overlay content */}
         <div className="absolute inset-0 bg-white bg-opacity-90 flex flex-col justify-end p-5 space-y-2">
           {/* Name and Open/Closed Badge */}
@@ -150,7 +145,6 @@ const StationDetails: React.FC = () => {
               <span>Operated by {station.operatorName}</span>
             </div>
           )}
->>>>>>> Stashed changes
         </div>
         {station.operatorName && (
           <div className="flex items-center gap-2 text-gray-400">
