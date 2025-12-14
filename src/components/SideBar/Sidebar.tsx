@@ -19,7 +19,7 @@ const Sidebar: React.FC = () => {
       <div>
         <h1
           className="text-green-400 font-bold text-2xl mb-10 cursor-pointer"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/")}
         >
           ⚡ EV HUB
         </h1>

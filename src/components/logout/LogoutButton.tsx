@@ -15,7 +15,7 @@ export default function LogoutButton() {
     // Redirect to login
     //navigate("/login");
     navigate(from, { replace: true }); 
-    // window.location.reload();
+    window.location.reload();
   };
 
   return (

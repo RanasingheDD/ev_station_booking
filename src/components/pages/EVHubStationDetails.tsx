@@ -95,27 +95,28 @@ const StationDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white p-5 space-y-5">
-      {/* Header with image, badges, rating, address, operator */}
-      <div className="relative w-full rounded-2xl overflow-hidden border border-[#1A2236]">
-        {/* Station Image */}
-        {station.images && station.images.length > 0 ? (
-          <img
-            src={station.images[0]}
-            alt={station.name}
-            className="w-full h-64 object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src =
-                "https://via.placeholder.com/400x200?text=EV+Station";
-            }}
-          />
-        ) : (
-          <div className="w-full h-64 flex items-center justify-center bg-green-500">
-            <span className="text-white text-3xl font-bold">EV Station</span>
+      {/* Header */}
+      <div className="bg-[#0E1424] p-6 rounded-2xl border border-[#1A2236] space-y-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-green-400 font-bold text-xl">{station.name}</h1>
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+              station.open ? "bg-green-500" : "bg-gray-600"
+            }`}
+          >
+            {station.open ? "Open Now" : "Closed"}
+          </span>
+        </div>
+
+        {station.rating && (
+          <div className="flex items-center gap-2">
+            <Star size={18} className="text-green-400" />
+            <span>{station.rating}</span>
           </div>
         )}
 
         {/* Overlay content */}
-        <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col justify-end p-5 space-y-2">
+        <div className="absolute inset-0 bg-white bg-opacity-90 flex flex-col justify-end p-5 space-y-2">
           {/* Name and Open/Closed Badge */}
           <div className="flex justify-between items-center">
             <h1 className="text-green-400 font-bold text-xl">{station.name}</h1>
@@ -126,6 +127,49 @@ const StationDetails: React.FC = () => {
             >
               {station.open ? "Open Now" : "Closed"}
             </span>
+          </div>
+
+          {/* Available Chargers */}
+          <div>
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                availableChargers.length > 0
+                  ? "bg-green-100 text-green-500"
+                  : "bg-red-100 text-red-500"
+              }`}
+            >
+              {availableChargers.length}/{station.chargers.length} Available
+            </span>
+          </div>
+
+          {/* Rating */}
+          {station.rating && (
+            <div className="flex items-center gap-2 text-white">
+              <Star size={18} className="text-green-400" />
+              <span>
+                {station.rating.toFixed(1)} ({station.rating})
+              </span>
+            </div>
+          )}
+
+          {/* Address */}
+          <div className="flex items-center gap-2 text-green-400">
+            <MapPin size={18} />
+            <p>{station.address}</p>
+          </div>
+
+          {/* Operator */}
+          {station.operatorName && (
+            <div className="flex items-center gap-2 text-gray-300">
+              <Building2 size={16} />
+              <span>Operated by {station.operatorName}</span>
+            </div>
+          )}
+        </div>
+        {station.operatorName && (
+          <div className="flex items-center gap-2 text-gray-400">
+            <Building2 size={16} />
+            <span>Operated by {station.operatorName}</span>
           </div>
 
           {/* Available Chargers */}
