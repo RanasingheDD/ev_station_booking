@@ -4,13 +4,7 @@ import axios from "axios";
 import useLocation from "../hooks/useLocation";
 
 import { API_URL } from "../../config/api_config";
-
-interface EVStation {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-}
+import type { Station } from "../../models/station_model";
 
 export default function EVMap() {
 
@@ -47,7 +41,7 @@ export default function EVMap() {
 
   const fetchEVStations = async (map: L.Map, userLat: number, userLng: number) => {
     try {
-      const response = await axios.get<EVStation[]>(API_URL+"/ev_stations/all");
+      const response = await axios.get<Station[]>(API_URL+"/ev_stations/all");
 
       const stations = response.data;
       // setEvStations(stations);
@@ -56,17 +50,18 @@ export default function EVMap() {
         const distance = getDistance(
           userLat,
           userLng,
-          station.latitude,
-          station.longitude
+          station.lat,
+          station.lng
         );
-
+        console.log("Calculated distance:", distance, "km");
         if (distance <= 10000000) {
-          L.marker([station.latitude, station.longitude])
+          L.marker([station.lat, station.lng])
             .addTo(map)
             .bindPopup(`
               ⚡ ${station.name} <br/>
               📏 ${distance.toFixed(2)} km away
             `);
+            console.log("Station:", station.lat, "Distance:", distance.toFixed(2), "km");
         }
       });
     } catch (err) {

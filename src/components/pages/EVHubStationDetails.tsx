@@ -14,6 +14,7 @@ import {
 import { getStationById } from "../../services/station_service";
 import type { Station, Charger, TariffRule } from "../../models/station_model";
 
+
 const amenityIcons: Record<string, React.ReactNode> = {
   wifi: <Wifi size={16} />,
   restroom: <Building2 size={16} />,
@@ -95,28 +96,27 @@ const StationDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white p-5 space-y-5">
-      {/* Header */}
-      <div className="bg-[#0E1424] p-6 rounded-2xl border border-[#1A2236] space-y-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-green-400 font-bold text-xl">{station.name}</h1>
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${
-              station.open ? "bg-green-500" : "bg-gray-600"
-            }`}
-          >
-            {station.open ? "Open Now" : "Closed"}
-          </span>
-        </div>
-
-        {station.rating && (
-          <div className="flex items-center gap-2">
-            <Star size={18} className="text-green-400" />
-            <span>{station.rating}</span>
+      {/* Header with image, badges, rating, address, operator */}
+      <div className="relative w-full rounded-2xl overflow-hidden border border-[#1A2236]">
+        {/* Station Image */}
+        {station.images && station.images.length > 0 ? (
+          <img
+            src={station.images[0]}
+            alt={station.name}
+            className="w-full h-64 object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src =
+                "https://via.placeholder.com/400x200?text=EV+Station";
+            }}
+          />
+        ) : (
+          <div className="w-full h-64 flex items-center justify-center bg-green-500">
+            <span className="text-white text-3xl font-bold">EV Station</span>
           </div>
         )}
 
         {/* Overlay content */}
-        <div className="absolute inset-0 bg-white bg-opacity-90 flex flex-col justify-end p-5 space-y-2">
+        <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col justify-end p-5 space-y-2">
           {/* Name and Open/Closed Badge */}
           <div className="flex justify-between items-center">
             <h1 className="text-green-400 font-bold text-xl">{station.name}</h1>
@@ -127,49 +127,6 @@ const StationDetails: React.FC = () => {
             >
               {station.open ? "Open Now" : "Closed"}
             </span>
-          </div>
-
-          {/* Available Chargers */}
-          <div>
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                availableChargers.length > 0
-                  ? "bg-green-100 text-green-500"
-                  : "bg-red-100 text-red-500"
-              }`}
-            >
-              {availableChargers.length}/{station.chargers.length} Available
-            </span>
-          </div>
-
-          {/* Rating */}
-          {station.rating && (
-            <div className="flex items-center gap-2 text-white">
-              <Star size={18} className="text-green-400" />
-              <span>
-                {station.rating} ({station.rating})
-              </span>
-            </div>
-          )}
-
-          {/* Address */}
-          <div className="flex items-center gap-2 text-green-400">
-            <MapPin size={18} />
-            <p>{station.address}</p>
-          </div>
-
-          {/* Operator */}
-          {station.operatorName && (
-            <div className="flex items-center gap-2 text-gray-300">
-              <Building2 size={16} />
-              <span>Operated by {station.operatorName}</span>
-            </div>
-          )}
-        </div>
-        {station.operatorName && (
-          <div className="flex items-center gap-2 text-gray-400">
-            <Building2 size={16} />
-            <span>Operated by {station.operatorName}</span>
           </div>
 
           {/* Available Chargers */}
@@ -219,10 +176,8 @@ const StationDetails: React.FC = () => {
         ) : (
           station.tariffRules.map((rule: TariffRule, idx: number) => (
             <div key={idx} className="flex justify-between text-sm mb-2">
-              <span>{rule.description ?? "General"}</span>
-              <span className="text-green-400">
-                Rs {rule.pricePerKwh.toFixed(2)} / kWh
-              </span>
+              <span>{rule.description ?? "All connectors"}</span>
+              <span className="text-green-400">{rule.pricePerKwh}</span>
             </div>
           ))
         )}
@@ -282,7 +237,7 @@ const StationDetails: React.FC = () => {
       )}
 
       {/* Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 p-5 bg-[#0E1424] flex justify-center border-t border-[#1A2236]">
+      <div className="bottom-0 left-0 right-0 p-5 bg-[#0E1424] flex justify-center border-t border-[#1A2236]">
         <div className="w-full max-w-3xl flex gap-3">
           <button className="flex-1 px-4 py-3 border border-green-500 text-green-400 rounded-lg flex items-center justify-center gap-2">
             <Navigation size={18} /> Directions
@@ -303,5 +258,4 @@ const StationDetails: React.FC = () => {
     </div>
   );
 };
-
 export default StationDetails;
