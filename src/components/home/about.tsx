@@ -29,27 +29,16 @@ export default function About(): React.ReactElement {
       <Navbar />
       
       <div className="min-h-screen bg-white font-sans overflow-x-hidden">
-
-        {/* ⚡ HERO SECTION */}
-        {/* UPDATES:
-            1. w-screen: Forces width to be 100vw (viewport width).
-            2. left-1/2 -translate-x-1/2: Centers the section to ensure it hits both edges even if parent has padding.
-            3. h-screen: Sets height to 100vh (fills the actual window height).
-        */}
         <section className="relative w-screen left-1/2 -translate-x-1/2 h-screen flex items-center justify-center overflow-hidden">
-            
-            {/* Background Image: Forces full coverage */}
             <div className="absolute inset-0 w-full h-full">
                 <img
                     src={coverImg}
                     alt="EV HUB Smart Charging"
                     className="w-full h-full object-cover"
                 />
-                {/* Dark overlay to make text pop against any background image */}
                 <div className="absolute inset-0 bg-black/40" />
             </div>
 
-            {/* Glassmorphism Card */}
             <div className="relative z-10 text-center px-8 py-12 max-w-4xl mx-4 
                           bg-black/50 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
                 
@@ -67,7 +56,6 @@ export default function About(): React.ReactElement {
             </div>
         </section>
 
-        {/* 📖 STORY SECTION */}
         <section className="py-20 px-6">
           <div className="max-w-5xl mx-auto text-center">
             <Zap className="w-12 h-12 text-green-600 mx-auto mb-6" />
@@ -95,13 +83,11 @@ export default function About(): React.ReactElement {
           </div>
         </section>
 
-        {/* 🎯 MISSION & VISION SECTION */}
         <section className="py-20 px-6 bg-gradient-to-b from-white to-green-50">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-center text-gray-900 text-3xl md:text-4xl font-bold mb-16">Our Core Pillars</h2>
             
             <div className="grid md:grid-cols-2 gap-10">
-              {/* Mission Card */}
               <div className="flex flex-col items-center text-center p-10 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-t-4 border-green-500 group">
                 <div className="bg-green-100 p-4 rounded-full mb-6 group-hover:bg-green-500 transition-colors duration-300">
                     <Briefcase className="w-8 h-8 text-green-600 group-hover:text-white" />
@@ -111,8 +97,6 @@ export default function About(): React.ReactElement {
                   To accelerate the adoption of electric vehicles by providing smart and reliable digital solutions that empower users and promote sustainable mobility worldwide.
                 </p>
               </div>
-
-              {/* Vision Card */}
               <div className="flex flex-col items-center text-center p-10 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-t-4 border-green-500 group">
                 <div className="bg-green-100 p-4 rounded-full mb-6 group-hover:bg-green-500 transition-colors duration-300">
                     <Lightbulb className="w-8 h-8 text-green-600 group-hover:text-white" />
@@ -126,7 +110,6 @@ export default function About(): React.ReactElement {
           </div>
         </section>
 
-        {/* 🧑‍🤝‍🧑 TEAM SECTION */}
         <section className="py-24 px-6 bg-white">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
