@@ -266,7 +266,7 @@ const EVHubDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* ------- Existing Dashboard UI ------- */}
+        {/* ------- Existing Dashboard  ------- */}
         <div className="bg-[#101726] p-6 rounded-2xl flex justify-between">
           {/* Vehicle Section */}
           {evs.map((ev) => (
