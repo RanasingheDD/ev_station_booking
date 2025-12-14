@@ -18,8 +18,11 @@ const amenityIcons: Record<string, React.ReactNode> = {
   wifi: <Wifi size={16} />,
   restroom: <Building2 size={16} />,
   cafe: <Coffee size={16} />,
+  coffee: <Coffee size={16} />,
   restaurant: <Coffee size={16} />,
+  food: <Coffee size={16} />,
   parking: <ParkingCircle size={16} />,
+  "24/7": <Star size={16} />,
 };
 
 const StationDetails: React.FC = () => {
@@ -28,6 +31,7 @@ const StationDetails: React.FC = () => {
 
   const [station, setStation] = useState<Station | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadStation();
@@ -40,8 +44,10 @@ const StationDetails: React.FC = () => {
       setStation(data);
     } catch (err) {
       console.error("Error loading station:", err);
+      setError("Station not found");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (loading) {
@@ -52,13 +58,11 @@ const StationDetails: React.FC = () => {
     );
   }
 
-  if (!station) {
+  if (!station || error) {
     return (
       <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
         <div className="bg-[#0E1424] p-10 rounded-2xl border border-[#1A2236] text-center">
-          <h1 className="text-green-400 font-bold text-2xl mb-4">
-            Station not found
-          </h1>
+          <h1 className="text-green-400 font-bold text-2xl mb-4">{error}</h1>
           <button
             onClick={() => navigate(-1)}
             className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-semibold"
@@ -71,7 +75,23 @@ const StationDetails: React.FC = () => {
   }
 
   const availableChargers =
-    station.chargers?.filter((c) => c.status === "Available") || [];
+    station.chargers?.filter((c) => c.status === "AVAILABLE") || [];
+
+  const handleBookNow = () => {
+    if (availableChargers.length === 1) {
+      navigate(`/booking/${station.id}/${availableChargers[0].id}`);
+    } else if (availableChargers.length > 1) {
+      // Show modal to select charger
+      const selected = window.prompt(
+        `Select charger ID:\n${availableChargers
+          .map((c) => `${c.id}: ${c.connectorType}`)
+          .join("\n")}`
+      );
+      if (selected) {
+        navigate(`/booking/${station.id}/${selected}`);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white p-5 space-y-5">
@@ -151,7 +171,44 @@ const StationDetails: React.FC = () => {
             <Building2 size={16} />
             <span>Operated by {station.operatorName}</span>
           </div>
-        )}
+
+          {/* Available Chargers */}
+          <div>
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                availableChargers.length > 0
+                  ? "bg-green-100 text-green-500"
+                  : "bg-red-100 text-red-500"
+              }`}
+            >
+              {availableChargers.length}/{station.chargers.length} Available
+            </span>
+          </div>
+
+          {/* Rating */}
+          {station.rating && (
+            <div className="flex items-center gap-2 text-white">
+              <Star size={18} className="text-green-400" />
+              <span>
+                {station.rating.toFixed(1)} ({station.rating})
+              </span>
+            </div>
+          )}
+
+          {/* Address */}
+          <div className="flex items-center gap-2 text-green-400">
+            <MapPin size={18} />
+            <p>{station.address}</p>
+          </div>
+
+          {/* Operator */}
+          {station.operatorName && (
+            <div className="flex items-center gap-2 text-gray-300">
+              <Building2 size={16} />
+              <span>Operated by {station.operatorName}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Pricing */}
@@ -164,7 +221,7 @@ const StationDetails: React.FC = () => {
             <div key={idx} className="flex justify-between text-sm mb-2">
               <span>{rule.description ?? "General"}</span>
               <span className="text-green-400">
-                Rs {rule.pricePerKwh} / kWh
+                Rs {rule.pricePerKwh.toFixed(2)} / kWh
               </span>
             </div>
           ))
@@ -174,36 +231,29 @@ const StationDetails: React.FC = () => {
       {/* Chargers */}
       <div className="bg-[#0E1424] p-4 rounded-2xl border border-[#1A2236]">
         <h2 className="text-green-400 font-semibold mb-3">Chargers</h2>
-        {station.chargers && station.chargers.length > 0 ? (
-          station.chargers.map((charger: Charger) => {
-            console.log(charger); // logs each charger
-            return (
-              <div
-                key={charger.id}
-                className="p-3 border border-[#1A2236] rounded-lg mb-2 flex justify-between cursor-pointer"
-                onClick={() =>
-                  charger.status === "AVAILABLE" &&
-                  navigate(`/booking/${station.id}/${charger.id}`)
-                }
-              >
-                <span>
-                  {charger.connectorType} ({charger.maxPowerKw} kW)
-                </span>
-                <span
-                  className={`${
-                    charger.status === "Available"
-                      ? "text-green-400"
-                      : "text-gray-400"
-                  }`}
-                >
-                  {charger.status}
-                </span>
-              </div>
-            );
-          })
-        ) : (
-          <p className="text-gray-400">No chargers available</p>
-        )}
+        {station.chargers.map((charger: Charger) => (
+          <div
+            key={charger.id}
+            className="p-3 border border-[#1A2236] rounded-lg mb-2 flex justify-between cursor-pointer"
+            onClick={() =>
+              charger.status === "AVAILABLE" &&
+              navigate(`/booking/${station.id}/${charger.id}`)
+            }
+          >
+            <span>
+              {charger.connectorType} ({charger.maxPowerKw} kW)
+            </span>
+            <span
+              className={`${
+                charger.status === "AVAILABLE"
+                  ? "text-green-400"
+                  : "text-gray-400"
+              }`}
+            >
+              {charger.status}
+            </span>
+          </div>
+        ))}
       </div>
 
       {/* Amenities */}
@@ -232,25 +282,23 @@ const StationDetails: React.FC = () => {
       )}
 
       {/* Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 p-5 bg-[#0E1424] border-t border-[#1A2236] flex gap-3">
-        <button className="flex-1 border border-green-500 text-green-400 py-3 rounded-lg flex items-center justify-center gap-2">
-          <Navigation size={18} /> Directions
-        </button>
-        <button
-          disabled={availableChargers.length === 0}
-          className={`flex-1 py-3 rounded-lg flex items-center justify-center gap-2 font-semibold ${
-            availableChargers.length === 0
-              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-              : "bg-green-500 hover:bg-green-600 text-white"
-          }`}
-          onClick={() => {
-            if (availableChargers.length === 1) {
-              navigate(`/booking/${station.id}/${availableChargers[0].id}`);
-            }
-          }}
-        >
-          <Calendar size={18} /> Book Now
-        </button>
+      <div className="fixed bottom-0 left-0 right-0 p-5 bg-[#0E1424] flex justify-center border-t border-[#1A2236]">
+        <div className="w-full max-w-3xl flex gap-3">
+          <button className="flex-1 px-4 py-3 border border-green-500 text-green-400 rounded-lg flex items-center justify-center gap-2">
+            <Navigation size={18} /> Directions
+          </button>
+          <button
+            disabled={availableChargers.length === 0}
+            className={`flex-1 px-4 py-3 rounded-lg flex items-center justify-center gap-2 font-semibold ${
+              availableChargers.length === 0
+                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-green-500 hover:bg-green-600 text-white"
+            }`}
+            onClick={handleBookNow}
+          >
+            <Calendar size={18} /> Book Now
+          </button>
+        </div>
       </div>
     </div>
   );
