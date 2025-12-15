@@ -4,7 +4,6 @@ import { API_URL } from "../../config/api_config";
 
 export default function useAuth() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const verifySession = async () => {
@@ -23,10 +22,7 @@ export default function useAuth() {
           credentials: "include",
         });
 
-        if (res.ok) {
-          const userData = await res.json();
-          setUser(userData);
-        } else {
+        if (!res.ok) {
           localStorage.removeItem("token");
           navigate("/login");
         }
@@ -39,5 +35,5 @@ export default function useAuth() {
     verifySession();
   }, [navigate]);
 
-  return { user };
+
 }
