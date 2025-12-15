@@ -236,7 +236,7 @@ const StationDetails: React.FC = () => {
       )}
 
       {/* Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 p-5 bg-[#0E1424] flex justify-center border-t border-[#1A2236]">
+      <div className="bottom-0 left-0 right-0 p-5 bg-[#0E1424] flex justify-center border-t border-[#1A2236]">
         <div className="w-full max-w-3xl flex gap-3">
           <button className="flex-1 px-4 py-3 border border-green-500 text-green-400 rounded-lg flex items-center justify-center gap-2">
             <Navigation size={18} /> Directions
