@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock, User } from "lucide-react";
 import { API_URL } from "../../config/api_config";
+import { useNavigate } from "react-router-dom";
 
 const Registration: React.FC = () => {
   function showNotification(message: string | null, type: string) {
@@ -29,11 +30,11 @@ const Registration: React.FC = () => {
     });
   };
 
+  const navigate = useNavigate();
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     const payload = {
-      fullName: form.fullName,
       username: form.username,
       email: form.email,
       password: form.password,
@@ -52,6 +53,7 @@ const Registration: React.FC = () => {
 
       if (response.ok) {
         showNotification("Registration successful!", "success");
+        navigate("/login");
       } else if (response.status === 409) {
         showNotification("Email already exists!", "error");
       } else {
