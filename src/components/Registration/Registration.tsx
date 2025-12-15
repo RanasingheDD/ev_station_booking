@@ -40,7 +40,6 @@ const Registration: React.FC = () => {
     e.preventDefault();
 
     const payload = {
-      fullName: form.fullName,
       username: form.username,
       email: form.email,
       password: form.password,
@@ -59,6 +58,7 @@ const Registration: React.FC = () => {
 
       if (response.ok) {
         showNotification("Registration successful!", "success");
+        navigate("/login");
       } else if (response.status === 409) {
         showNotification("Email already exists!", "error");
       } else {
