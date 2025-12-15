@@ -28,6 +28,8 @@ export default function Login(): React.ReactElement {
       // Save user info in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.username);
+
+      
       // Redirect to previous page or dashboard
       navigate(from, { replace: true });
     } catch (error) {
