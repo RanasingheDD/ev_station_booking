@@ -28,7 +28,7 @@ export interface Station {
   description?: string;
   operatorName?: string;
 
-  isOpen: boolean;
+  open: boolean;
   openTime?: string;
   closeTime?: string;
 
