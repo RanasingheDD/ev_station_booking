@@ -112,7 +112,7 @@ const EVHubDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-gray-200 flex">
+    <div className="min-h-screen bg-[#0B0F19] text-gray-200 flex ml-64">
       {/* Main Content */}
       <main className="flex-1 p-8">
         <div className="flex justify-between items-center mb-8">

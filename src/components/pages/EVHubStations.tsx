@@ -51,9 +51,9 @@ const Stations: React.FC = () => {
   }, [query]);
 
   return (
-    <div className="flex-1 bg-[#0B0F19] text-gray-200 p-8 overflow-y-auto">
+    <div className="flex-1 bg-[#0B0F19] text-gray-200 p-8 ml-64 overflow-y-auto">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-8 ">
         <div>
           <h2 className="text-sm text-gray-400">Pages / Stations</h2>
           <h1 className="text-2xl font-bold text-white">Stations</h1>

@@ -106,7 +106,7 @@ const EVHubAccount: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-gray-100 flex flex-col p-8">
+    <div className="min-h-screen bg-[#0B0F19] text-gray-100 flex flex-col p-8 ml-64">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
