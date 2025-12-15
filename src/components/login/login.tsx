@@ -32,7 +32,7 @@ export default function Login(): React.ReactElement {
       const data = await response.json();
       // Save user info in localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username);
+      localStorage.setItem("name", data.name);
 
       
       // Redirect to previous page or dashboard

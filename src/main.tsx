@@ -23,6 +23,7 @@ import Account from "./components/pages/EVHubAccount";
 import StationDetails from "./components/pages/EVHubStationDetails";
 import ContactUs from "./components/contactUs/contactUs";
 import PublicLayout from "./components/Layout/PublicLayout";
+import BookingPage from "./components/pages/BookingPage";
 
 //PrivateRoute Component
 const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
@@ -63,7 +64,7 @@ const router = createBrowserRouter([
       { path: "stations", element: <Stations /> },
       { path: "account", element: <Account /> },
       { path: "/stations/:id", element: <StationDetails /> },
-      // Add more private pages here
+      { path:"/booking/:stationId/:chargerId", element: <BookingPage/>}
     ],
   },
 ]);

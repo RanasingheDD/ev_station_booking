@@ -10,7 +10,7 @@ export default function LogoutButton() {
 
     // Clear token
     localStorage.removeItem("token");
-    localStorage.removeItem("username");
+    localStorage.removeItem("name");
 
     // Redirect to login
     //navigate("/login");

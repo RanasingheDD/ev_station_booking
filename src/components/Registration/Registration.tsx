@@ -219,12 +219,12 @@ const Registration: React.FC = () => {
 
              {/* Signup Link */}
             <p className="text-gray-400 text-sm text-center mt-3">
-              I have an account{" "}
+              Already have an account{" "}
               <span
                 className="text-green-400 hover:underline cursor-pointer"
                 onClick={() => navigate("/login")}
               >
-                Sign up
+                Sign in
               </span>
             </p>
           </form>
