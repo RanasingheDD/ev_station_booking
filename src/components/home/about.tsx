@@ -131,7 +131,6 @@ export default function About(): React.ReactElement {
             </div>
           </div>
         </section>
-
       </div>
     </>
   );

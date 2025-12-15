@@ -1,16 +1,41 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../navbar/navbar";
 import Footer from "../footer/footer";
-import useAuth from "../hooks/useAuth"; // Assuming you have this hook
-// You will need to create this service function later
-// import { getOwnerStations, deleteStation } from "../../services/station_service"; 
-import { Plus, Edit, Trash2, MapPin, Zap } from "lucide-react";
+import useAuth from "../hooks/useAuth";
+import { Plus, Edit, Trash2, MapPin } from "lucide-react";
+import { API_URL } from "../../config/api_config"; // Ensure you import your API_URL
 
 export default function OwnerDashboard() {
-  const { user } = useAuth(); // Get logged in user details
-  const [stations, setStations] = useState<any[]>([]); // Store owner's stations
+  // 1. Run the strict session check (It no longer returns data)
+  useAuth(); 
+  // 2. Local state for User and Stations
+  const [user, setUser] = useState<any>(null);
+  const [stations, setStations] = useState<any[]>([]);
 
-  // Mock Data for visualization (We will replace this with API call later)
+  // 3. Fetch User Profile Data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await fetch(`${API_URL}/users/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error("Failed to load user profile", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  // 4. Mock Data for visualization (Stations)
   useEffect(() => {
     setStations([
       {
@@ -43,7 +68,8 @@ export default function OwnerDashboard() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">Owner Dashboard</h1>
-            <p className="text-gray-500">Welcome back, {user?.name || "Partner"}!</p>
+            {/* Display the fetched username */}
+            <p className="text-gray-500">Welcome back, {user?.username || "Partner"}!</p>
           </div>
           <button className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition-colors shadow-lg">
             <Plus size={20} />
