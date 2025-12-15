@@ -257,5 +257,4 @@ const StationDetails: React.FC = () => {
     </div>
   );
 };
-
 export default StationDetails;
