@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../../config/api_config";
 
 export default function useAuth() {
   const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const verifySession = async () => {
@@ -22,7 +23,10 @@ export default function useAuth() {
           credentials: "include",
         });
 
-        if (!res.ok) {
+        if (res.ok) {
+          const userData = await res.json();
+          setUser(userData);
+        } else {
           localStorage.removeItem("token");
           navigate("/login");
         }
@@ -34,4 +38,6 @@ export default function useAuth() {
 
     verifySession();
   }, [navigate]);
+
+  return { user };
 }
