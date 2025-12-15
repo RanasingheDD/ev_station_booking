@@ -6,9 +6,12 @@ import useAuth from "../hooks/useAuth";
 
 interface UserDetails {
   username: string;
-  location: string;
   email: string;
+  mobile: string;
+  address: string;
+  role: string;
   avatar: string;
+  location?: string;
 }
 
 const EVHubAccount: React.FC = () => {
@@ -20,20 +23,31 @@ const EVHubAccount: React.FC = () => {
     username: "",
     email: "",
     location: "",
+    mobile: ""
   });
 
-  // Fetch user info from localStorage
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      const parsedUser = JSON.parse(user);
-      setUserDetails(parsedUser);
-      setEditForm({
-        username: parsedUser.username,
-        email: parsedUser.email,
-        location: parsedUser.location || "",
-      });
-    }
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token");
+
+        const res = await fetch("http://localhost:8080/api/users/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Unauthorized");
+
+        const data = await res.json();
+        setUserDetails(data);
+      } catch (err) {
+        console.error("Account load failed:", err);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   // Fetch real-time location
@@ -72,14 +86,14 @@ const EVHubAccount: React.FC = () => {
 
     // Update backend
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/users/${userDetails.email}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedUser),
-        }
-      );
+      const response = await fetch("http://localhost:8080/api/users/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(editForm),
+      });
 
       if (!response.ok) {
         console.error("Backend update failed:", response.statusText);
@@ -150,14 +164,18 @@ const EVHubAccount: React.FC = () => {
             alt="User"
             className="w-60 h-60 rounded-full border border-gray-600 mb-4 mx-auto"
           />
-          <p className="text-gray-500">Username</p>
-          <p className="font-semibold mb-2">{userDetails.username}</p>
+          <p className="text-gray-500">Name</p>
+          <p className="font-semibold">{userDetails.username}</p>
+
+          <p className="text-gray-500">Email</p>
+          <p className="font-semibold">{userDetails.email}</p>
+
+          <p className="text-gray-500">Mobile</p>
+          <p className="font-semibold">{userDetails.mobile}</p>
           <p className="text-gray-500">Location</p>
           <p className="font-semibold mb-2">
             {userDetails?.location || "Fetching location..."}
           </p>
-          <p className="text-gray-500">Email</p>
-          <p className="font-semibold">{userDetails.email}</p>
         </div>
 
         {/* Activity + Subscription + Security */}
@@ -183,33 +201,52 @@ const EVHubAccount: React.FC = () => {
               className="bg-[#10141f] p-6 rounded-2xl w-96"
             >
               <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
+
               <div className="space-y-3">
+                {/* Username */}
                 <input
                   type="text"
                   name="username"
+                  placeholder="Enter your name"
                   value={editForm.username}
                   onChange={(e) =>
                     setEditForm({ ...editForm, username: e.target.value })
                   }
-                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 focus:outline-none"
+                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 placeholder-gray-500 focus:outline-none"
                 />
-                <input
+
+                {/* Email (usually readonly) */}
+                {/* <input
                   type="email"
                   name="email"
+                  placeholder="Email address"
                   value={editForm.email}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, email: e.target.value })
-                  }
-                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 focus:outline-none"
-                />
+                  disabled
+                  className="w-full bg-[#141a25] p-2 rounded text-gray-400 cursor-not-allowed focus:outline-none"
+                /> */}
+
+                {/* Mobile */}
                 <input
                   type="text"
-                  name="location"
+                  name="Mobile"
+                  placeholder="Enter your mobile"
+                  value={editForm.mobile}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, mobile: e.target.value })
+                  }
+                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 placeholder-gray-500 focus:outline-none"
+                />
+
+                {/* Address */}
+                <input
+                  type="text"
+                  name="Address"
+                  placeholder="Enter your address"
                   value={editForm.location}
                   onChange={(e) =>
                     setEditForm({ ...editForm, location: e.target.value })
                   }
-                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 focus:outline-none"
+                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 placeholder-gray-500 focus:outline-none"
                 />
               </div>
 
