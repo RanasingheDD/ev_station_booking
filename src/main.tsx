@@ -21,6 +21,9 @@ import Stations from "./components/pages/EVHubStations";
 import Layout from "./components/Layout/SideBarLayout";
 import Account from "./components/pages/EVHubAccount";
 import StationDetails from "./components/pages/EVHubStationDetails";
+import ContactUs from "./components/contactUs/contactUs";
+import PublicLayout from "./components/Layout/PublicLayout";
+import BookingPage from "./components/pages/BookingPage";
 
 //PrivateRoute Component
 const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
@@ -30,11 +33,27 @@ const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
 
 // Router
 const router = createBrowserRouter([
-  // Public
-  { path: "/", element: <App /> },
+
+   {
+    path: "/",
+    element: <PublicLayout />,
+    children: [
+      { path: "/", element: <App /> },
+      { path: "/about", element: <AboutUs /> },
+      { path: "/contact", element: <ContactUs /> },
+    ],
+  },
+
+   // Public routes without Navbar/Footer
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <Login /> },
-  { path: "/about", element: <AboutUs /> },
+  
+  // Public
+  // { path: "/", element: <App /> },
+  // { path: "/signup", element: <SignUp /> },
+  // { path: "/login", element: <Login /> },
+  // { path: "/about", element: <AboutUs /> },
+  // { path: "/contact", element: <ContactUs /> },
 
   // Private routes wrapped in Layout
   {
@@ -45,7 +64,7 @@ const router = createBrowserRouter([
       { path: "stations", element: <Stations /> },
       { path: "account", element: <Account /> },
       { path: "/stations/:id", element: <StationDetails /> },
-      // Add more private pages here
+      { path:"/booking/:stationId/:chargerId", element: <BookingPage/>}
     ],
   },
 ]);

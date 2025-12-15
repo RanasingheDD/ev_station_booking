@@ -10,12 +10,12 @@ export default function LogoutButton() {
 
     // Clear token
     localStorage.removeItem("token");
-    localStorage.removeItem("username");
+    localStorage.removeItem("name");
 
     // Redirect to login
     //navigate("/login");
     navigate(from, { replace: true }); 
-    // window.location.reload();
+    window.location.reload();
   };
 
   return (

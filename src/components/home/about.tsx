@@ -94,7 +94,7 @@ export default function About(): React.ReactElement {
         </section>
 
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

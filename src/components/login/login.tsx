@@ -11,6 +11,11 @@ export default function Login(): React.ReactElement {
   const navigate = useNavigate();
 
   const from = location.state?.from?.pathname || "/";
+  
+  const handleGoogleLogin = () => {
+  console.log("Google login clicked");
+};
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +32,9 @@ export default function Login(): React.ReactElement {
       const data = await response.json();
       // Save user info in localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username);
+      localStorage.setItem("name", data.name);
+
+      
       // Redirect to previous page or dashboard
       navigate(from, { replace: true });
     } catch (error) {
@@ -86,6 +93,39 @@ export default function Login(): React.ReactElement {
             >
               Login
             </button>
+
+              {/* Or Divider */}
+            <div className="flex items-center justify-center text-gray-500 text-sm">
+              <span className="border-b border-gray-500 w-1/4"></span>
+              <span className="px-2">or</span>
+              <span className="border-b border-gray-500 w-1/4"></span>
+            </div>
+
+            {/* Google Login */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center border border-gray-500 hover:bg-gray-700 transition-colors text-white py-3 rounded-lg font-semibold"
+            >
+              <img
+                src="/google-icon.svg"
+                alt="Google"
+                className="w-5 h-5 mr-2"
+              />
+              Continue with Google
+            </button>
+
+
+             {/* Signup Link */}
+            <p className="text-gray-400 text-sm text-center mt-3">
+              Don’t have an account?{" "}
+              <span
+                className="text-green-400 hover:underline cursor-pointer"
+                onClick={() => navigate("/signup")}
+              >
+                Sign up
+              </span>
+            </p>
           </form>
         </div>
       </div>
