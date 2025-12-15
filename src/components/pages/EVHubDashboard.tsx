@@ -139,6 +139,7 @@ const EVHubDashboard: React.FC = () => {
               <button
                 onClick={() => setShowModal(false)}
                 className="absolute right-4 top-4 text-gray-400 hover:text-white"
+                aria-label="Close modal"
               >
                 <X size={22} />
               </button>
