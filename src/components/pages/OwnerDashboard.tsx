@@ -61,8 +61,6 @@ export default function OwnerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="flex justify-between items-center mb-8">
@@ -143,7 +141,6 @@ export default function OwnerDashboard() {
           ))}
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
