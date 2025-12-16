@@ -14,6 +14,7 @@ import {
 import { getStationById } from "../../services/station_service";
 import type { Station, Charger, TariffRule } from "../../models/station_model";
 
+
 const amenityIcons: Record<string, React.ReactNode> = {
   wifi: <Wifi size={16} />,
   restroom: <Building2 size={16} />,
@@ -52,7 +53,7 @@ const StationDetails: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#0B0F19]">
+      <div className="flex h-screen items-center justify-center bg-[#0B0F19] ">
         <div className="animate-spin h-10 w-10 border-2 rounded-full border-green-500 border-t-transparent"></div>
       </div>
     );
@@ -94,7 +95,7 @@ const StationDetails: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-white p-5 space-y-5">
+    <div className="min-h-screen bg-[#0B0F19] text-white p-5 space-y-5 ml-64">
       {/* Header with image, badges, rating, address, operator */}
       <div className="relative w-full rounded-2xl overflow-hidden border border-[#1A2236]">
         {/* Station Image */}
@@ -115,7 +116,7 @@ const StationDetails: React.FC = () => {
         )}
 
         {/* Overlay content */}
-        <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col justify-end p-5 space-y-2">
+        <div className="absolute inset-0 bg-white/30 flex flex-col justify-end p-5 space-y-2">
           {/* Name and Open/Closed Badge */}
           <div className="flex justify-between items-center">
             <h1 className="text-green-400 font-bold text-xl">{station.name}</h1>
@@ -229,14 +230,14 @@ const StationDetails: React.FC = () => {
 
       {/* Description */}
       {station.description && (
-        <div className="bg-[#0E1424] p-4 rounded-2xl border border-[#1A2236]">
+        <div className="bg-[#0E1424] p-4 rounded-2xl border border-[#1A2236] mb-20">
           <h2 className="text-green-400 font-semibold mb-2">About</h2>
           <p className="text-gray-400">{station.description}</p>
         </div>
       )}
 
       {/* Bottom Actions */}
-      <div className="bottom-0 left-0 right-0 p-5 bg-[#0E1424] flex justify-center border-t border-[#1A2236]">
+      <div className="fixed ml-64 bottom-0 left-0 right-0 p-5 bg-[#0E1424] flex justify-center border-t border-[#1A2236]">
         <div className="w-full max-w-3xl flex gap-3">
           <button className="flex-1 px-4 py-3 border border-green-500 text-green-400 rounded-lg flex items-center justify-center gap-2">
             <Navigation size={18} /> Directions

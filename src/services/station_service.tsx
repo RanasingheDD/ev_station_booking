@@ -69,3 +69,45 @@ export const getStationById = async (id: string): Promise<Station> => {
     amenities: data.amenities || [],
   };
 };
+// Search stations by name
+export const searchStations = async (
+  query: string
+): Promise<DisplayStation[]> => {
+  try {
+    const res = await axios.get(API_URL + "/ev_stations/search", {
+      params: { q: query },
+    });
+
+    // ✅ FIX: Extract stations array correctly
+    const stations: Station[] = res.data.stations || [];
+
+    return stations.map((station: Station) => {
+      const chargers: Charger[] = (station.chargers || []).map((c) =>
+        typeof c === "string" ? JSON.parse(c) : c
+      );
+
+      const firstCharger = chargers[0];
+
+      return {
+        id: station.id,
+        name: station.name,
+
+        // ✅ use backend distance if available
+        distance: station.distance ?? 0,
+
+        type: firstCharger?.connectorType || "Unknown",
+
+        price: firstCharger?.maxPowerKw
+          ? parseFloat((firstCharger.maxPowerKw * 0.03).toFixed(2))
+          : 0,
+
+        slot: chargers.filter(
+          (c) => c.status?.toUpperCase() === "AVAILABLE"
+        ).length,
+      };
+    });
+  } catch (error) {
+    console.error("Error searching stations:", error);
+    return [];
+  }
+};

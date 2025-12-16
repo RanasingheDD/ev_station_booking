@@ -24,6 +24,8 @@ import StationDetails from "./components/pages/EVHubStationDetails";
 import ContactUs from "./components/contactUs/contactUs";
 import PublicLayout from "./components/Layout/PublicLayout";
 import OwnerDashboard from "./components/pages/OwnerDashboard";
+import BookingPage from "./components/pages/BookingPage";
+import UnderDeveloping from "./components/underDeveloping/underDeveloping";
 
 //PrivateRoute Component
 const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
@@ -47,6 +49,7 @@ const router = createBrowserRouter([
    // Public routes without Navbar/Footer
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <Login /> },
+  {path:"/under-development", element:<UnderDeveloping/>},
 
   { 
     path: "/owner-dashboard", 
@@ -69,7 +72,7 @@ const router = createBrowserRouter([
       { path: "stations", element: <Stations /> },
       { path: "account", element: <Account /> },
       { path: "/stations/:id", element: <StationDetails /> },
-      // Add more private pages here
+      { path:"/booking/:stationId/:chargerId", element: <BookingPage/>}
     ],
   },
 ]);

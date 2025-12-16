@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock, User } from "lucide-react";
 import { API_URL } from "../../config/api_config";
+
 import { useNavigate } from "react-router-dom";
 
 const Registration: React.FC = () => {
@@ -14,6 +15,7 @@ const Registration: React.FC = () => {
 
     setTimeout(() => box.remove(), 3000);
   }
+ 
   const [form, setForm] = useState({
     fullName: "",
     address: "",
@@ -30,7 +32,11 @@ const Registration: React.FC = () => {
     });
   };
 
+   const handleGoogleRegistration = () => {
+  console.log("Google login clicked");
+};
   const navigate = useNavigate();
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
@@ -189,6 +195,39 @@ const Registration: React.FC = () => {
             >
               Register
             </button>
+
+             {/* Or Divider */}
+            <div className="flex items-center justify-center text-gray-500 text-sm">
+              <span className="border-b border-gray-500 w-1/4"></span>
+              <span className="px-2">or</span>
+              <span className="border-b border-gray-500 w-1/4"></span>
+            </div>
+
+            {/* Google Login */}
+            <button
+              type="button"
+              onClick={handleGoogleRegistration}
+              className="w-full flex items-center justify-center border border-gray-500 hover:bg-gray-700 transition-colors text-white py-3 rounded-lg font-semibold"
+            >
+              <img
+                src="/google-icon.svg"
+                alt="Google"
+                className="w-5 h-5 mr-2"
+              />
+              Continue with Google
+            </button>
+
+
+             {/* Signup Link */}
+            <p className="text-gray-400 text-sm text-center mt-3">
+              Already have an account{" "}
+              <span
+                className="text-green-400 hover:underline cursor-pointer"
+                onClick={() => navigate("/login")}
+              >
+                Sign in
+              </span>
+            </p>
           </form>
         </div>
       </div>
