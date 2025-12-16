@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "../navbar/navbar";
-import Footer from "../footer/footer";
+// import Navbar from "../navbar/navbar";
+// import Footer from "../footer/footer";
 import useAuth from "../hooks/useAuth";
 import { Plus, Edit, Trash2, MapPin } from "lucide-react";
 import { API_URL } from "../../config/api_config"; // Ensure you import your API_URL
