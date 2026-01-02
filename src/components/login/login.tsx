@@ -35,8 +35,19 @@ export default function Login(): React.ReactElement {
       localStorage.setItem("name", data.name);
 
       
-      // Redirect to previous page or dashboard
-      navigate(from, { replace: true });
+// 2. Role-Based Navigation Logic
+      if (data.role === "OWNER") {
+        navigate("/owner-dashboard", { replace: true });
+      } else if (data.role === "ADMIN") {
+        navigate("/admin-dashboard", { replace: true }); // Assuming you have an Admin page later
+      } else {
+        // Normal User OR redirect to where they came from
+        if (from === "/") {
+            navigate("/", { replace: true });
+        } else {
+            navigate(from, { replace: true });
+        }
+      }
     } catch (error) {
       console.error(error);
       alert("Login failed! Check your email/password.");
