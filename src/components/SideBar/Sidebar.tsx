@@ -1,5 +1,5 @@
 import React from "react";
-import { Car } from "lucide-react";
+//import { Car } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import LogoutButton from "../logout/LogoutButton";
 
