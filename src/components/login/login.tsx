@@ -6,6 +6,7 @@ import { API_URL } from "../../config/api_config";
 export default function Login(): React.ReactElement {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -16,9 +17,25 @@ export default function Login(): React.ReactElement {
   console.log("Google login clicked");
 };
 
+  function showNotification(message: string | null, type: string) {
+    const box = document.createElement("div");
+    box.className = "notification";
+    box.style.background = type === "success" ? "#28a745" : "#dc3545";
+    box.textContent = message;
+
+    document.body.appendChild(box);
+    setTimeout(() => box.remove(), 3000);
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (password.length < 8) {
+    alert("Password must be at least 8 characters long.");
+    return; // stop login
+    }
+
+    setLoading(true);
 
     try {
       const response = await fetch(API_URL + "/users/login", {
@@ -27,7 +44,12 @@ export default function Login(): React.ReactElement {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) throw new Error("Invalid credentials");
+      if (response.ok) {
+        showNotification("Login successful!", "success");
+        navigate("/login");
+      } else {
+        showNotification("Invalid username or password!", "error");
+      }
 
       const data = await response.json();
       // Save user info in localStorage
@@ -40,6 +62,8 @@ export default function Login(): React.ReactElement {
     } catch (error) {
       console.error(error);
       alert("Login failed! Check your email/password.");
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -81,6 +105,7 @@ export default function Login(): React.ReactElement {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  minLength={8}
                   className="bg-transparent focus:outline-none text-white w-full"
                   required
                 />
@@ -89,9 +114,42 @@ export default function Login(): React.ReactElement {
 
             <button
               type="submit"
-              className="w-full bg-green-500 hover:bg-green-600 transition-colors text-white py-3 rounded-lg font-semibold"
+              disabled={loading}
+              className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-colors
+                ${
+                  loading
+                    ? "bg-green-400 cursor-not-allowed"
+                    : "bg-green-500 hover:bg-green-600"
+                }
+              `}
             >
-              Login
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                  Loging...
+                </>
+              ) : (
+                "Login"
+              )}
             </button>
 
               {/* Or Divider */}
@@ -114,6 +172,7 @@ export default function Login(): React.ReactElement {
               />
               Continue with Google
             </button>
+
 
 
              {/* Signup Link */}
