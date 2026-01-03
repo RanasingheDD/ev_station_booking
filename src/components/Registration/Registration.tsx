@@ -34,7 +34,6 @@ const Registration: React.FC = () => {
     });
   };
 
-  const handleGoogleRegistration = () => {};
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();

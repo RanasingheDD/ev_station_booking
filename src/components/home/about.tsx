@@ -1,6 +1,5 @@
 import React from "react";
 import Navbar from "../navbar/navbar";
-import Footer from "../footer/footer";
 import coverImg from "../../assets/about/ImageWithFallback.png";
 import memberImg from "../../assets/about/member.jpg";
 import { TeamMember } from "../../components/teamMembers/teamMembers"; 
