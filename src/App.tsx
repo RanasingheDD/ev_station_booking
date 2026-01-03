@@ -13,8 +13,6 @@ const App: React.FC = () => {
       <Navbar />
       <TopHome />
       <VideoWithStorySection/>
-      {/* <AboutUs /> */}
-      {/* <Footer /> */}
     </>
   )
 }

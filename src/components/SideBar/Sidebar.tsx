@@ -50,7 +50,7 @@ const Sidebar: React.FC = () => {
             Stations
           </li>
 
-          <li
+          {/* <li
             onClick={() => navigate("/trips")}
             className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200
               ${
@@ -61,7 +61,7 @@ const Sidebar: React.FC = () => {
             `}
           >
             My Trips
-          </li>
+          </li> */}
 
           <li
             onClick={() => navigate("/account")}
@@ -77,10 +77,10 @@ const Sidebar: React.FC = () => {
           </li>
 
           <li
-            onClick={() => navigate("/subscription")}
+            onClick={() => navigate("/under-development")}
             className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200
               ${
-                isActive("/subscription")
+                isActive("/under-development")
                   ? "bg-green-400 text-black font-semibold"
                   : "text-white hover:bg-white/10 hover:text-green-400"
               }

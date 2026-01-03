@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock, User } from "lucide-react";
 import { API_URL } from "../../config/api_config";
+
 import { useNavigate } from "react-router-dom";
 
 const Registration: React.FC = () => {

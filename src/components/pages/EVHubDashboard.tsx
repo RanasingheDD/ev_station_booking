@@ -41,6 +41,7 @@ const EVHubDashboard: React.FC = () => {
   // Handle adding new EV
   const handleAddEV = async (e: React.FormEvent) => {
     e.preventDefault();
+    
 
     const newEV: Omit<EV, "id"> = {
       make,
@@ -90,6 +91,7 @@ const EVHubDashboard: React.FC = () => {
               <button
                 onClick={() => setShowModal(false)}
                 className="absolute right-4 top-4 text-gray-400 hover:text-white"
+                aria-label="Close modal"
               >
                 <X size={22} />
               </button>
