@@ -3,110 +3,146 @@ import { Edit2, Bell, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Snackbar, Alert } from "@mui/material";
 import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import {
+  fetchCurrentUser,
+  updateUserProfile,
+  fetchSessions,
+  logoutSession,
+  deleteAccountService,
+} from "../../services/account_service";
 
 interface UserDetails {
-  username: string;
-  location: string;
+  name: string;
   email: string;
+  mobile: string;
   avatar: string;
+  location?: string;
+}
+
+interface DeviceSession {
+  id: string;
+  device: string;
+  os: string;
+  ip: string;
+  lastActive: string;
 }
 
 const EVHubAccount: React.FC = () => {
   useAuth();
+  const navigate = useNavigate();
+
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [devices, setDevices] = useState<DeviceSession[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteText, setDeleteText] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+
   const [editForm, setEditForm] = useState({
     username: "",
-    email: "",
+    mobile: "",
     location: "",
   });
+  
 
-  // Fetch user info from localStorage
+  // 👤 Load user
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) {
-      const parsedUser = JSON.parse(user);
-      setUserDetails(parsedUser);
-      setEditForm({
-        username: parsedUser.username,
-        email: parsedUser.email,
-        location: parsedUser.location || "",
-      });
-    }
+    const loadUser = async () => {
+      try {
+        const data = await fetchCurrentUser();
+        setUserDetails(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadUser();
   }, []);
 
-  // Fetch real-time location
+  // 📍 Location
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-          );
-          const data = await res.json();
-          const city =
-            data.address.city ||
-            data.address.town ||
-            data.address.village ||
-            data.display_name;
+    if (!navigator.geolocation) return;
 
-          setUserDetails((prev) => (prev ? { ...prev, location: city } : prev));
-          setEditForm((prev) => ({ ...prev, location: city }));
-        } catch (err) {
-          console.error("Failed to fetch location:", err);
-        }
-      });
-    }
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+      );
+      const data = await res.json();
+      const city =
+        data.address.city ||
+        data.address.town ||
+        data.address.village ||
+        data.display_name;
+
+      setUserDetails((prev) =>
+        prev ? { ...prev, location: city } : prev
+      );
+      setEditForm((prev) => ({ ...prev, location: city }));
+    });
   }, []);
 
+  // 🖥 Load devices
+  useEffect(() => {
+    const loadDevices = async () => {
+      try {
+        const data = await fetchSessions();
+        setDevices(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadDevices();
+  }, []);
+
+  // ✏️ Save profile
   const handleSaveProfile = async () => {
     if (!userDetails) return;
 
-    const updatedUser = { ...userDetails, ...editForm };
-    setUserDetails(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser)); // persist locally
+    const updated = { ...userDetails, ...editForm };
+    setUserDetails(updated);
+    localStorage.setItem("user", JSON.stringify(updated));
     setIsEditOpen(false);
     setOpenSnackbar(true);
 
-    // Update backend
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/users/${userDetails.email}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedUser),
-        }
-      );
-
-      if (!response.ok) {
-        console.error("Backend update failed:", response.statusText);
-      }
+      await updateUserProfile(editForm);
     } catch (err) {
-      console.error("Failed to update backend:", err);
+      console.error(err);
     }
   };
 
-  const handleCloseSnackbar = (
-    _event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") return;
-    setOpenSnackbar(false);
+  // 🚪 Logout device
+  const logoutDevice = async (id: string) => {
+    try {
+      await logoutSession(id);
+      setDevices((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ❌ Delete account
+  const deleteAccount = async () => {
+    try {
+      await deleteAccountService();
+      localStorage.clear();
+      navigate("/register");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (!userDetails) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
-        Loading your account...
+        Loading account...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-gray-100 flex flex-col p-8">
+    <div className="min-h-screen bg-[#0B0F19] text-gray-100 flex flex-col p-8 ml-64">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -124,7 +160,7 @@ const EVHubAccount: React.FC = () => {
           </div>
           <Bell className="text-gray-400" />
           <img
-            src={userDetails.avatar}
+            src={userDetails.avatar || "/logo.png "}
             alt="avatar"
             className="w-10 h-10 rounded-full border border-gray-600"
           />
@@ -150,21 +186,67 @@ const EVHubAccount: React.FC = () => {
             alt="User"
             className="w-60 h-60 rounded-full border border-gray-600 mb-4 mx-auto"
           />
-          <p className="text-gray-500">Username</p>
-          <p className="font-semibold mb-2">{userDetails.username}</p>
+          <p className="text-gray-500">Name</p>
+          <p className="font-semibold">{userDetails.name}</p>
+
+          <p className="text-gray-500">Email</p>
+          <p className="font-semibold">{userDetails.email}</p>
+
+          <p className="text-gray-500">Mobile</p>
+          <p className="font-semibold">{userDetails.mobile}</p>
           <p className="text-gray-500">Location</p>
           <p className="font-semibold mb-2">
             {userDetails?.location || "Fetching location..."}
           </p>
-          <p className="text-gray-500">Email</p>
-          <p className="font-semibold">{userDetails.email}</p>
         </div>
 
-        {/* Activity + Subscription + Security */}
-        <div className="bg-[#10141f] rounded-2xl p-6 lg:col-span-2 flex flex-col gap-6">
-          {/* Recent Activity, Subscription, Usage Stats, Security Dashboard */}
-          {/* ...keep your current JSX here for brevity... */}
+        {/* Devices Logged In */}
+        <div className="bg-[#10141f] rounded-2xl p-6">
+          <h2 className="text-xl font-semibold mb-4">Active Devices</h2>
+
+          <div className="space-y-4">
+            {devices.map((device) => (
+              <div
+                key={device.id}
+                className="flex justify-between items-center bg-[#141a25] p-4 rounded-lg"
+              >
+                <div>
+                  <p className="font-semibold">{device.device}</p>
+                  <p className="text-sm text-gray-400">
+                    {device.os} • {device.ip}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Last active: {device.lastActive}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => logoutDevice(device.id)}
+                  className="text-red-400 hover:text-red-500 text-sm"
+                >
+                  Logout
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
+
+        <div className="bg-[#10141f] rounded-2xl p-6 border border-red-600">
+        <h2 className="text-xl font-semibold text-red-400 mb-4">
+          Danger Zone
+        </h2>
+
+        <p className="text-sm text-gray-400 mb-4">
+          Deleting your account will permanently remove all your data.
+        </p>
+
+        <button
+          onClick={() => setIsDeleteOpen(true)}
+          className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-white"
+        >
+          Delete Account
+        </button>
+      </div>
       </div>
 
       {/* Edit Profile Modal */}
@@ -183,33 +265,52 @@ const EVHubAccount: React.FC = () => {
               className="bg-[#10141f] p-6 rounded-2xl w-96"
             >
               <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
+
               <div className="space-y-3">
+                {/* Username */}
                 <input
                   type="text"
                   name="username"
+                  placeholder="Enter your name"
                   value={editForm.username}
                   onChange={(e) =>
                     setEditForm({ ...editForm, username: e.target.value })
                   }
-                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 focus:outline-none"
+                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 placeholder-gray-500 focus:outline-none"
                 />
-                <input
+
+                {/* Email (usually readonly) */}
+                {/* <input
                   type="email"
                   name="email"
+                  placeholder="Email address"
                   value={editForm.email}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, email: e.target.value })
-                  }
-                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 focus:outline-none"
-                />
+                  disabled
+                  className="w-full bg-[#141a25] p-2 rounded text-gray-400 cursor-not-allowed focus:outline-none"
+                /> */}
+
+                {/* Mobile */}
                 <input
                   type="text"
-                  name="location"
+                  name="Mobile"
+                  placeholder="Enter your mobile"
+                  value={editForm.mobile}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, mobile: e.target.value })
+                  }
+                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 placeholder-gray-500 focus:outline-none"
+                />
+
+                {/* Address */}
+                <input
+                  type="text"
+                  name="Address"
+                  placeholder="Enter your address"
                   value={editForm.location}
                   onChange={(e) =>
                     setEditForm({ ...editForm, location: e.target.value })
                   }
-                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 focus:outline-none"
+                  className="w-full bg-[#141a25] p-2 rounded text-gray-200 placeholder-gray-500 focus:outline-none"
                 />
               </div>
 
@@ -232,15 +333,50 @@ const EVHubAccount: React.FC = () => {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {isDeleteOpen && (
+          <motion.div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50">
+            <motion.div className="bg-[#10141f] p-6 rounded-xl w-96">
+              <h3 className="text-lg font-semibold text-red-400">
+                Confirm Account Deletion
+              </h3>
+
+              <p className="text-sm text-gray-400 mt-2">
+                Type <b>DELETE</b> to confirm.
+              </p>
+
+              <input
+                className="w-full bg-[#141a25] p-2 mt-3 rounded"
+                value={deleteText}
+                onChange={(e) => setDeleteText(e.target.value)}
+              />
+
+              <div className="flex justify-end mt-4 gap-3">
+                <button onClick={() => setIsDeleteOpen(false)}>
+                  Cancel
+                </button>
+                <button
+                  disabled={deleteText !== "DELETE"}
+                  onClick={deleteAccount}
+                  className="bg-red-600 px-4 py-2 rounded disabled:opacity-50"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Interactive Snackbar */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
+        //onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
-          onClose={handleCloseSnackbar}
+          //onClose={handleCloseSnackbar}
           severity="success"
           sx={{ width: "100%" }}
         >

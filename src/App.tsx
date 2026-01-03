@@ -4,7 +4,6 @@ import React from 'react';
 import Navbar from './components/navbar/navbar'
 import TopHome from './components/home/topHome'
 //import AboutUs from './components/home/about'
-import Footer from './components/footer/footer'
 import VideoWithStorySection from './components/home/VideoWithStorySection';
 
 
@@ -14,8 +13,6 @@ const App: React.FC = () => {
       <Navbar />
       <TopHome />
       <VideoWithStorySection/>
-      {/* <AboutUs /> */}
-      {/* <Footer /> */}
     </>
   )
 }

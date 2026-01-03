@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { Mail, Lock, User } from "lucide-react";
 import { API_URL } from "../../config/api_config";
 
+import { useNavigate } from "react-router-dom";
+
 const Registration: React.FC = () => {
+  const navigate = useNavigate();
+
   function showNotification(message: string | null, type: string) {
     const box = document.createElement("div");
     box.className = "notification";
@@ -10,9 +14,9 @@ const Registration: React.FC = () => {
     box.textContent = message;
 
     document.body.appendChild(box);
-
     setTimeout(() => box.remove(), 3000);
   }
+
   const [form, setForm] = useState({
     fullName: "",
     address: "",
@@ -22,6 +26,8 @@ const Registration: React.FC = () => {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e: any) => {
     setForm({
       ...form,
@@ -29,12 +35,19 @@ const Registration: React.FC = () => {
     });
   };
 
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
+    if (form.password.length < 8) {
+      showNotification("Password must be at least 8 characters long!", "error");
+      return;
+    }
+
+    setLoading(true);
+
     const payload = {
-      fullName: form.fullName,
-      username: form.username,
+      name: form.username,
       email: form.email,
       password: form.password,
       address: form.address,
@@ -52,6 +65,7 @@ const Registration: React.FC = () => {
 
       if (response.ok) {
         showNotification("Registration successful!", "success");
+        navigate("/login");
       } else if (response.status === 409) {
         showNotification("Email already exists!", "error");
       } else {
@@ -60,6 +74,8 @@ const Registration: React.FC = () => {
     } catch (error) {
       console.error(error);
       showNotification("Server error!", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,7 +127,7 @@ const Registration: React.FC = () => {
               </div>
             </div>
 
-            {/* Mobile No */}
+            {/* Mobile */}
             <div>
               <label className="text-gray-300 text-sm block mb-2">
                 Mobile No
@@ -174,6 +190,7 @@ const Registration: React.FC = () => {
                   type="password"
                   name="password"
                   placeholder="••••••••"
+                  minLength={8}
                   onChange={handleChange}
                   className="bg-transparent focus:outline-none text-white w-full"
                   required
@@ -181,21 +198,60 @@ const Registration: React.FC = () => {
               </div>
             </div>
 
+            {/* Register Button */}
             <button
               type="submit"
-              className="w-full bg-green-500 hover:bg-green-600 transition-colors text-white py-3 rounded-lg font-semibold"
+              disabled={loading}
+              className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-colors
+                ${
+                  loading
+                    ? "bg-green-400 cursor-not-allowed"
+                    : "bg-green-500 hover:bg-green-600"
+                }
+              `}
             >
-              Register
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                  Registering...
+                </>
+              ) : (
+                "Register"
+              )}
             </button>
+
+            {/* Login Link */}
+            <p className="text-gray-400 text-sm text-center mt-3">
+              Already have an account?{" "}
+              <span
+                className="text-green-400 hover:underline cursor-pointer"
+                onClick={() => navigate("/login")}
+              >
+                Sign in
+              </span>
+            </p>
           </form>
         </div>
       </div>
-
-      <footer className="bg-white/5 py-3 flex justify-center items-center">
-        <p className="text-white text-sm font-medium">
-          © <span className="text-green-400 font-semibold">NextGen</span>
-        </p>
-      </footer>
     </div>
   );
 };

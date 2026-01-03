@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 // Replace with your actual video path
 const sectionVideo = "/videos/hero.mp4";

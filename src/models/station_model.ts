@@ -21,8 +21,8 @@ export interface Station {
   distanceDisplay?: string; // “2.3 km away”
 
   address: string;
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lng: number;
 
   images: string[]; // gallery
   description?: string;

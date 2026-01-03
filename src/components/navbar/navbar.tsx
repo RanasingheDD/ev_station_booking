@@ -1,13 +1,12 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Navbar(): React.ReactElement {
-  const navigate = useNavigate();
-  const username = localStorage.getItem("username");
+  const username = localStorage.getItem("name");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("username");
+    localStorage.removeItem("name");
     // navigate("/login", { replace: true });
      // quick hack to update navbar
       window.location.reload();

@@ -1,5 +1,4 @@
 import React from "react";
-import { Car } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import LogoutButton from "../logout/LogoutButton";
 
@@ -14,7 +13,7 @@ const Sidebar: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <aside className="w-64 bg-[#0E1424] p-6 flex flex-col justify-between min-h-screen">
+    <aside className=" fixed w-64 bg-[#0E1424] p-6 flex flex-col justify-between min-h-screen">
       {/* Top Section */}
       <div>
         <h1
@@ -24,56 +23,82 @@ const Sidebar: React.FC = () => {
           ⚡ EV HUB
         </h1>
 
-        <ul className="space-y-6">
+        <ul className="space-y-5">
         <li
-          onClick={() => navigate("/dashboard")}
-          className={`cursor-pointer hover:text-green-400 ${
-            isActive("/dashboard") ? "text-green-400 font-semibold" : "text-white"
-          }`}
-        >
-          Dashboard
+            onClick={() => navigate("/dashboard")}
+            className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200
+              ${
+                isActive("/dashboard")
+                  ? "bg-green-400 text-black font-semibold"
+                  : "text-white hover:bg-white/10 hover:text-green-400"
+              }
+            `}
+          >
+            Dashboard
         </li>
-        <li
-          onClick={() => navigate("/stations")}
-          className={`cursor-pointer hover:text-green-400 ${
-            isActive("/stations") ? "text-green-400 font-semibold" : "text-white"
-          }`}
-        >
-          Stations
-        </li>
-        <li
-          onClick={() => navigate("/trips")}
-          className={`cursor-pointer hover:text-green-400 ${
-            isActive("/trips") ? "text-green-400 font-semibold" : "text-white"
-          }`}
-        >
-          My Trips
-        </li>
-        <li
-          onClick={() => navigate("/account")}
-          className={`cursor-pointer hover:text-green-400 ${
-            isActive("/account") ? "text-green-400 font-semibold" : "text-white"
-          }`}
-        >
-          Account
-        </li>
-        <li
-          onClick={() => navigate("/subscription")}
-          className={`cursor-pointer hover:text-green-400 ${
-            isActive("/subscription") ? "text-green-400 font-semibold" : "text-white"
-          }`}
-        >
-          Subscription
-        </li>
-         <li className={`cursor-pointer hover:text-green-400 `}>
-         <LogoutButton />
-        </li>
+
+         <li
+            onClick={() => navigate("/stations")}
+            className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200 
+              ${
+                isActive("/stations")
+                  ? "bg-green-400 text-black font-semibold"
+                  : "text-white hover:bg-white/10 hover:text-green-400"
+              }
+            `}
+          >
+            Stations
+          </li>
+
+          {/* <li
+            onClick={() => navigate("/trips")}
+            className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200
+              ${
+                isActive("/trips")
+                  ? "bg-green-400 text-black font-semibold"
+                  : "text-white hover:bg-white/10 hover:text-green-400"
+              }
+            `}
+          >
+            My Trips
+          </li> */}
+
+          <li
+            onClick={() => navigate("/account")}
+            className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200
+              ${
+                isActive("/account")
+                  ? "bg-green-400 text-black font-semibold"
+                  : "text-white hover:bg-white/10 hover:text-green-400"
+              }
+            `}
+          >
+            Account
+          </li>
+
+          <li
+            onClick={() => navigate("/under-development")}
+            className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200
+              ${
+                isActive("/under-development")
+                  ? "bg-green-400 text-black font-semibold"
+                  : "text-white hover:bg-white/10 hover:text-green-400"
+              }
+            `}
+          >
+            Subscription
+          </li>
+
+          <li className="px-4 py-3 rounded-lg hover:bg-white/10">
+            <LogoutButton />
+          </li>
+
       </ul>
           
       </div>
 
       {/* Bottom Section */}
-      <div>
+      {/* <div>
         <h2 className="text-gray-400 text-sm mb-4">My Cars</h2>
         <div className="space-y-3">
           <div className="flex items-center justify-between bg-[#161B2E] p-3 rounded-lg">
@@ -91,7 +116,7 @@ const Sidebar: React.FC = () => {
             <Car className="text-green-400" />
           </div>
         </div>
-      </div>
+      </div> */}
     </aside>
   );
 };
