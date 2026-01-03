@@ -4,13 +4,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Snackbar, Alert } from "@mui/material";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import {
+  fetchCurrentUser,
+  updateUserProfile,
+  fetchSessions,
+  logoutSession,
+  deleteAccountService,
+} from "../../services/account_service";
 
 interface UserDetails {
-  username: string;
+  name: string;
   email: string;
   mobile: string;
-  address: string;
-  role: string;
   avatar: string;
   location?: string;
 }
@@ -25,167 +30,116 @@ interface DeviceSession {
 
 const EVHubAccount: React.FC = () => {
   useAuth();
-  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [editForm, setEditForm] = useState({
-    username: "",
-    email: "",
-    location: "",
-    mobile: ""
-  });
-  const [devices, setDevices] = useState<DeviceSession[]>([]);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [deleteText, setDeleteText] = useState("");
-  
   const navigate = useNavigate();
 
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [devices, setDevices] = useState<DeviceSession[]>([]);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteText, setDeleteText] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const [editForm, setEditForm] = useState({
+    username: "",
+    mobile: "",
+    location: "",
+  });
+  
+
+  // 👤 Load user
   useEffect(() => {
-    const fetchUser = async () => {
+    const loadUser = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No token");
-
-        const res = await fetch("http://localhost:8080/api/users/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) throw new Error("Unauthorized");
-
-        const data = await res.json();
+        const data = await fetchCurrentUser();
         setUserDetails(data);
       } catch (err) {
-        console.error("Account load failed:", err);
+        console.error(err);
       }
     };
-
-    fetchUser();
+    loadUser();
   }, []);
 
-  // Fetch real-time location
+  // 📍 Location
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-          );
-          const data = await res.json();
-          const city =
-            data.address.city ||
-            data.address.town ||
-            data.address.village ||
-            data.display_name;
+    if (!navigator.geolocation) return;
 
-          setUserDetails((prev) => (prev ? { ...prev, location: city } : prev));
-          setEditForm((prev) => ({ ...prev, location: city }));
-        } catch (err) {
-          console.error("Failed to fetch location:", err);
-        }
-      });
-    }
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+      );
+      const data = await res.json();
+      const city =
+        data.address.city ||
+        data.address.town ||
+        data.address.village ||
+        data.display_name;
+
+      setUserDetails((prev) =>
+        prev ? { ...prev, location: city } : prev
+      );
+      setEditForm((prev) => ({ ...prev, location: city }));
+    });
   }, []);
 
+  // 🖥 Load devices
   useEffect(() => {
-    const fetchDevices = async () => {
+    const loadDevices = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/sessions", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-
-        if (!res.ok) throw new Error("Failed to load devices");
-
-        const data = await res.json();
+        const data = await fetchSessions();
         setDevices(data);
       } catch (err) {
-        console.error("Failed to fetch devices:", err);
+        console.error(err);
       }
     };
-
-    fetchDevices();
+    loadDevices();
   }, []);
 
+  // ✏️ Save profile
   const handleSaveProfile = async () => {
     if (!userDetails) return;
 
-    const updatedUser = { ...userDetails, ...editForm };
-    setUserDetails(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser)); // persist locally
+    const updated = { ...userDetails, ...editForm };
+    setUserDetails(updated);
+    localStorage.setItem("user", JSON.stringify(updated));
     setIsEditOpen(false);
     setOpenSnackbar(true);
 
-    // Update backend
     try {
-      const response = await fetch("http://localhost:8080/api/users/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(editForm),
-      });
-
-      if (!response.ok) {
-        console.error("Backend update failed:", response.statusText);
-      }
+      await updateUserProfile(editForm);
     } catch (err) {
-      console.error("Failed to update backend:", err);
+      console.error(err);
     }
   };
 
-  const handleCloseSnackbar = (
-    _event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") return;
-    setOpenSnackbar(false);
+  // 🚪 Logout device
+  const logoutDevice = async (id: string) => {
+    try {
+      await logoutSession(id);
+      setDevices((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ❌ Delete account
+  const deleteAccount = async () => {
+    try {
+      await deleteAccountService();
+      localStorage.clear();
+      navigate("/register");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (!userDetails) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
-        Loading your account...
+        Loading account...
       </div>
     );
   }
-
-
-  const deleteAccount = async () => {
-    try {
-      await fetch("http://localhost:8080/api/users/me", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      localStorage.clear();
-      navigate("/register");
-    } catch (err) {
-      console.error("Account deletion failed");
-    }
-  };
-
-  const logoutDevice = async (sessionId: string) => {
-    try {
-      await fetch(`http://localhost:8080/api/sessions/${sessionId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      setDevices((prev) => prev.filter((d) => d.id !== sessionId));
-    } catch (err) {
-      console.error("Failed to logout device:", err);
-    }
-  };
-
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-gray-100 flex flex-col p-8 ml-64">
@@ -233,7 +187,7 @@ const EVHubAccount: React.FC = () => {
             className="w-60 h-60 rounded-full border border-gray-600 mb-4 mx-auto"
           />
           <p className="text-gray-500">Name</p>
-          <p className="font-semibold">{userDetails.username}</p>
+          <p className="font-semibold">{userDetails.name}</p>
 
           <p className="text-gray-500">Email</p>
           <p className="font-semibold">{userDetails.email}</p>
@@ -418,11 +372,11 @@ const EVHubAccount: React.FC = () => {
       <Snackbar
         open={openSnackbar}
         autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
+        //onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
-          onClose={handleCloseSnackbar}
+          //onClose={handleCloseSnackbar}
           severity="success"
           sx={{ width: "100%" }}
         >
