@@ -1,4 +1,3 @@
-import React from 'react';
 import { Settings, ArrowLeft, Hammer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
