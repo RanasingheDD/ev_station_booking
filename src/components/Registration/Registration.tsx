@@ -5,6 +5,8 @@ import { API_URL } from "../../config/api_config";
 import { useNavigate } from "react-router-dom";
 
 const Registration: React.FC = () => {
+  const navigate = useNavigate();
+
   function showNotification(message: string | null, type: string) {
     const box = document.createElement("div");
     box.className = "notification";
@@ -12,10 +14,9 @@ const Registration: React.FC = () => {
     box.textContent = message;
 
     document.body.appendChild(box);
-
     setTimeout(() => box.remove(), 3000);
   }
- 
+
   const [form, setForm] = useState({
     fullName: "",
     address: "",
@@ -25,6 +26,8 @@ const Registration: React.FC = () => {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e: any) => {
     setForm({
       ...form,
@@ -32,16 +35,19 @@ const Registration: React.FC = () => {
     });
   };
 
-   const handleGoogleRegistration = () => {
-  console.log("Google login clicked");
-};
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
+    if (form.password.length < 8) {
+      showNotification("Password must be at least 8 characters long!", "error");
+      return;
+    }
+
+    setLoading(true);
+
     const payload = {
-      username: form.username,
+      name: form.username,
       email: form.email,
       password: form.password,
       address: form.address,
@@ -68,6 +74,8 @@ const Registration: React.FC = () => {
     } catch (error) {
       console.error(error);
       showNotification("Server error!", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -119,7 +127,7 @@ const Registration: React.FC = () => {
               </div>
             </div>
 
-            {/* Mobile No */}
+            {/* Mobile */}
             <div>
               <label className="text-gray-300 text-sm block mb-2">
                 Mobile No
@@ -182,6 +190,7 @@ const Registration: React.FC = () => {
                   type="password"
                   name="password"
                   placeholder="••••••••"
+                  minLength={8}
                   onChange={handleChange}
                   className="bg-transparent focus:outline-none text-white w-full"
                   required
@@ -189,38 +198,50 @@ const Registration: React.FC = () => {
               </div>
             </div>
 
+            {/* Register Button */}
             <button
               type="submit"
-              className="w-full bg-green-500 hover:bg-green-600 transition-colors text-white py-3 rounded-lg font-semibold"
+              disabled={loading}
+              className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-colors
+                ${
+                  loading
+                    ? "bg-green-400 cursor-not-allowed"
+                    : "bg-green-500 hover:bg-green-600"
+                }
+              `}
             >
-              Register
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                  Registering...
+                </>
+              ) : (
+                "Register"
+              )}
             </button>
 
-             {/* Or Divider */}
-            <div className="flex items-center justify-center text-gray-500 text-sm">
-              <span className="border-b border-gray-500 w-1/4"></span>
-              <span className="px-2">or</span>
-              <span className="border-b border-gray-500 w-1/4"></span>
-            </div>
-
-            {/* Google Login */}
-            <button
-              type="button"
-              onClick={handleGoogleRegistration}
-              className="w-full flex items-center justify-center border border-gray-500 hover:bg-gray-700 transition-colors text-white py-3 rounded-lg font-semibold"
-            >
-              <img
-                src="/google-icon.svg"
-                alt="Google"
-                className="w-5 h-5 mr-2"
-              />
-              Continue with Google
-            </button>
-
-
-             {/* Signup Link */}
+            {/* Login Link */}
             <p className="text-gray-400 text-sm text-center mt-3">
-              Already have an account{" "}
+              Already have an account?{" "}
               <span
                 className="text-green-400 hover:underline cursor-pointer"
                 onClick={() => navigate("/login")}
@@ -231,12 +252,6 @@ const Registration: React.FC = () => {
           </form>
         </div>
       </div>
-
-      <footer className="bg-white/5 py-3 flex justify-center items-center">
-        <p className="text-white text-sm font-medium">
-          © <span className="text-green-400 font-semibold">NextGen</span>
-        </p>
-      </footer>
     </div>
   );
 };

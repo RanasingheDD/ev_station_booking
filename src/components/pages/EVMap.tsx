@@ -9,8 +9,8 @@ import type { Station } from "../../models/station_model";
 export default function EVMap() {
 
   const { place, coords, error } = useLocation();
-  const [distances, setDistance] = useState<number>(0);
-  const [latitudes, setLatitude] = useState<number | null>(null);
+  const [] = useState<number>(0);
+  const [] = useState<number | null>(null);
 
 
   const mapRef = useRef<L.Map | null>(null);

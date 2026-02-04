@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 // import Navbar from "../navbar/navbar";
 // import Footer from "../footer/footer";
 import useAuth from "../hooks/useAuth";
