@@ -124,6 +124,7 @@ const BookingScreen = () => {
             <input
               type="date"
               className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2"
+              title="Select date for scheduled charging"
             />
           </div>
 
@@ -132,6 +133,7 @@ const BookingScreen = () => {
             <input
               type="time"
               className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2"
+              title="Select time for scheduled charging"
             />
           </div>
         </div>
