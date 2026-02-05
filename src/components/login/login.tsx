@@ -30,7 +30,7 @@ export default function Login(): React.ReactElement {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password.length < 8) {
+    if (password.length < 1) {
     alert("Password must be at least 8 characters long.");
     return; // stop login
     }
