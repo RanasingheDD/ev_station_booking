@@ -56,6 +56,7 @@ export interface TariffRule {
   connectorType?: string;
   minPowerKw?: number;
   maxPowerKw?: number;
+  pricePerKwh?: number;
   peakHours?: TimeRange;
   peakMultiplier?: number;
 }

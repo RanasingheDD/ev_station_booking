@@ -77,7 +77,7 @@ export default function StationDetailsPage() {
     try {
       await deleteStation(stationId);
       alert("Station deleted successfully");
-      navigate("/owner/dashboard");
+      navigate("/owner-dashboard");
     } catch (error) {
       console.error("Error deleting station:", error);
       alert("Failed to delete station");

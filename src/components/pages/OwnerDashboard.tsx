@@ -14,7 +14,6 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { API_URL } from "../../config/api_config";
 import {
   fetchOwnerStations,
   createStation,
@@ -24,6 +23,7 @@ import {
   calculateStationEarnings,
 } from "../../services/station_service";
 import type { Station } from "../../models/station_model";
+import { fetchCurrentUser } from "../../services/account_service";
 
 // Modal Component for Add/Edit Station
 const StationModal = ({
@@ -372,25 +372,21 @@ export default function OwnerDashboard() {
 
   // Fetch user profile
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const token = localStorage.getItem("token");
+    const loadUser = async () => {
       try {
-        const response = await fetch(`${API_URL}/users/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        }
+        // ✅ Use the service function (Uses correct Endpoint & Headers)
+        const userData = await fetchCurrentUser();
+        
+        // Ensure we handle the response structure correctly
+        // (Sometimes backend returns { user: ... } or just the user object)
+        setUser(userData.user || userData); 
       } catch (error) {
         console.error("Failed to load user profile", error);
+        // Optional: Redirect to login if unauthorized
       }
     };
 
-    fetchUserProfile();
+    loadUser();
   }, []);
 
   // Fetch owner's stations
