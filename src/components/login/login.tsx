@@ -30,7 +30,7 @@ export default function Login(): React.ReactElement {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password.length < 8) {
+    if (password.length < 1) {
     alert("Password must be at least 8 characters long.");
     return; // stop login
     }
@@ -55,6 +55,7 @@ export default function Login(): React.ReactElement {
       // Save user info in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("name", data.name);
+      localStorage.setItem("role", data.role);
 
       
 // 2. Role-Based Navigation Logic

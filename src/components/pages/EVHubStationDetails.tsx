@@ -36,7 +36,7 @@ const StationDetails: React.FC = () => {
 
   useEffect(() => {
     loadStation();
-  }, []);
+  }, [id]);
 
   const loadStation = async () => {
     try {
@@ -76,7 +76,8 @@ const StationDetails: React.FC = () => {
   }
 
   const availableChargers =
-    station.chargers?.filter((c) => c.status === "AVAILABLE") || [];
+station.chargers?.filter((c) => c.status === "AVAILABLE") || [];
+const totalChargers = station.chargers?.length || 0;
 
   const handleBookNow = () => {
     if (availableChargers.length === 1) {
@@ -148,10 +149,10 @@ const StationDetails: React.FC = () => {
             <h1 className="text-green-400 font-bold text-xl">{station.name}</h1>
             <span
               className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                station.open ? "bg-green-500" : "bg-gray-600"
+                station.isOpen ? "bg-green-500" : "bg-gray-600"
               }`}
             >
-              {station.open ? "Open Now" : "Closed"}
+              {station.isOpen ? "Open Now" : "Closed"}
             </span>
           </div>
 
@@ -164,7 +165,7 @@ const StationDetails: React.FC = () => {
                   : "bg-red-100 text-red-500"
               }`}
             >
-              {availableChargers.length}/{station.chargers.length} Available
+              {availableChargers.length}/{totalChargers} Available
             </span>
           </div>
 
@@ -212,7 +213,10 @@ const StationDetails: React.FC = () => {
       {/* Chargers */}
       <div className="bg-[#0E1424] p-4 rounded-2xl border border-[#1A2236]">
         <h2 className="text-green-400 font-semibold mb-3">Chargers</h2>
-        {station.chargers.map((charger: Charger) => (
+        {!station.chargers || station.chargers.length === 0 ? (
+          <p className="text-gray-400">No chargers available</p>
+        ) : (
+        station.chargers.map((charger: Charger) => (
           <div
             key={charger.id}
             className="p-3 border border-[#1A2236] rounded-lg mb-2 flex justify-between cursor-pointer"
@@ -233,7 +237,7 @@ const StationDetails: React.FC = () => {
             >
               {charger.status}
             </span>
-          </div>
+          </div>)
         ))}
       </div>
 

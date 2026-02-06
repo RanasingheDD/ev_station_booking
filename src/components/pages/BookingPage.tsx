@@ -111,11 +111,19 @@ const BookingScreen = () => {
         <div className="flex gap-3">
           <div className="flex-1">
             <label className="text-sm text-gray-400">Date</label>
-            <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2 text-white" />
+            <input
+              type="date"
+              className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2"
+              title="Select date for scheduled charging"
+            />
           </div>
           <div className="flex-1">
             <label className="text-sm text-gray-400">Time</label>
-            <input type="time" value={selectedTime} onChange={(e) => setSelectedTime(e.target.value)} className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2 text-white" />
+            <input
+              type="time"
+              className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2"
+              title="Select time for scheduled charging"
+            />
           </div>
         </div>
       </div>
