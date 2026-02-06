@@ -15,7 +15,7 @@ export default function ContactUs(): React.ReactElement {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-[#0B0F19] flex flex-col items-center justify-center px-6 py-25">
       <h1 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
         Contact <span className="text-green-400">Us</span>
       </h1>
