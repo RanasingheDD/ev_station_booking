@@ -2,12 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Calendar, Clock, Car, Zap, CheckCircle, AlertCircle } from "lucide-react";
 import { loadEVs, type EV } from "../../services/ev_service";
-<<<<<<< HEAD
 import { checkAvailability, createBooking } from "../../services/booking_service";
-=======
-import axios from 'axios';
-import { useParams } from "react-router-dom";
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
 
 const durations = [30, 60, 90, 120, 180];
 
@@ -16,7 +11,6 @@ interface CheckoutResponse {
 }
 
 const BookingScreen = () => {
-  const { stationId, chargerId } = useParams<{ stationId: string; chargerId: string }>();
   const navigate = useNavigate();
 
   const [evs, setEvs] = useState<EV[]>([]);
@@ -46,16 +40,12 @@ const BookingScreen = () => {
     const fetchEVs = async () => {
       try {
         const data = await loadEVs();
-<<<<<<< HEAD
         if (Array.isArray(data)) {
           setEvs(data);
           if (data.length > 0) setSelectedEvId(data[0].id);
         } else {
           setEvs([]);
         }
-=======
-        if (Array.isArray(data)) setEvs(data);
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
       } catch (err) {
         setError("Unable to load vehicles");
       } finally {
@@ -65,7 +55,6 @@ const BookingScreen = () => {
     fetchEVs();
   }, []);
 
-<<<<<<< HEAD
   // Check availability whenever time/date/duration changes
   useEffect(() => {
     if (!stationId || !chargerId || !date || !time) return;
@@ -116,44 +105,6 @@ const BookingScreen = () => {
       navigate('/owner-dashboard'); // Or wherever appropriate
     } else {
       alert("Booking Failed: " + res.message);
-=======
-
-  const handleConfirmPayment = async () => {
-    if (!selectedEvId) {
-      alert("Please select a vehicle!");
-      return;
-    }
-
-    setIsLoading(true);
-
-    // Calculate timing as we did before
-    const startDateTime = new Date(`${selectedDate}T${selectedTime}`);
-    const endDateTime = new Date(startDateTime.getTime() + selectedDuration * 60000);
-
-    const payload = {
-      evId: selectedEvId,
-      stationId: stationId, // Dynamically pulled from URL (e.g., "station-001")
-      chargerId: chargerId, // Dynamically pulled from URL (e.g., "ch-001")
-      startAt: startDateTime.toISOString(),
-      endAt: endDateTime.toISOString(),
-    };
-
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post<CheckoutResponse>(
-        'http://localhost:8080/api/bookings/checkout', 
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (response.data.url) {
-        window.location.href = response.data.url;
-      }
-    } catch (error) {
-      console.error("Payment Error:", error);
-      alert("Unable to process booking. Check if IDs exist in Database.");
-      setIsLoading(false); 
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
     }
   };
 
@@ -172,7 +123,6 @@ const BookingScreen = () => {
         </h2>
         <div className="space-y-3">
           {evs.map((ev) => (
-<<<<<<< HEAD
             <label
               key={ev.id}
               className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer
@@ -191,12 +141,6 @@ const BookingScreen = () => {
                   {ev.batteryKwh} kWh •{" "}
                   {ev.connectorTypes?.join(", ") ?? "Unknown connector"}
                 </p>
-=======
-            <label key={ev.id} className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-all ${selectedEvId === ev.id ? "border-green-500 bg-green-500/5" : "border-[#1A2236]"}`}>
-              <div>
-                <p className="font-medium">{ev.make} {ev.model}</p>
-                <p className="text-sm text-gray-400">{ev.licensePlate || "No Plate"}</p>
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
               </div>
               <input type="radio" name="vehicle" checked={selectedEvId === ev.id} onChange={() => setSelectedEvId(ev.id)} />
             </label>
@@ -209,39 +153,25 @@ const BookingScreen = () => {
         <h2 className="text-green-400 font-semibold mb-3 flex items-center gap-2">
           <Clock size={18} /> Charging Time
         </h2>
-<<<<<<< HEAD
 
         {/* Date and Time Inputs */}
         <div className="flex gap-3 mb-4">
-=======
-        <div className="flex gap-3">
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
           <div className="flex-1">
             <label className="text-sm text-gray-400">Date</label>
             <input
               type="date"
-<<<<<<< HEAD
               value={date}
               onChange={(e) => setDate(e.target.value)}
               className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2 text-white"
-=======
-              className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2"
-              title="Select date for scheduled charging"
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
             />
           </div>
           <div className="flex-1">
             <label className="text-sm text-gray-400">Time</label>
             <input
               type="time"
-<<<<<<< HEAD
               value={time}
               onChange={(e) => setTime(e.target.value)}
               className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2 text-white"
-=======
-              className="w-full mt-1 bg-[#0B0F19] border border-[#1A2236] rounded-lg px-3 py-2"
-              title="Select time for scheduled charging"
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
             />
           </div>
         </div>
@@ -265,7 +195,6 @@ const BookingScreen = () => {
         </h2>
         <div className="flex flex-wrap gap-3">
           {durations.map((m) => (
-<<<<<<< HEAD
             <button
               key={m}
               onClick={() => setDuration(m)}
@@ -273,9 +202,6 @@ const BookingScreen = () => {
                 ${duration === m ? "border-green-500 bg-green-500/10 text-green-400" : "border-[#1A2236] text-gray-400"}
                 hover:border-green-500 transition-colors`}
             >
-=======
-            <button key={m} onClick={() => setSelectedDuration(m)} className={`px-4 py-2 rounded-lg border transition-all ${selectedDuration === m ? "bg-green-500 border-green-500 text-white" : "border-[#1A2236] text-gray-400 hover:border-green-500"}`}>
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
               {m} min
             </button>
           ))}
@@ -284,7 +210,6 @@ const BookingScreen = () => {
 
       {/* SUMMARY */}
       <div className="mb-40 bg-[#0E1424] p-5 rounded-2xl border border-[#1A2236]">
-<<<<<<< HEAD
         <h2 className="text-green-400 font-semibold mb-3">
           Booking Summary
         </h2>
@@ -309,22 +234,12 @@ const BookingScreen = () => {
         <div className="flex justify-between font-semibold text-lg mt-3">
           <span>Total Estimate</span>
           <span className="text-green-400">Rs. {((duration / 60) * 1200).toFixed(2)}</span>
-=======
-        <h2 className="text-green-400 font-semibold mb-3">Booking Summary</h2>
-        <div className="space-y-2 text-sm text-gray-400">
-          <div className="flex justify-between"><span>Station</span><span className="text-white">{stationName}</span></div>
-          <div className="flex justify-between"><span>Start</span><span className="text-white">{selectedDate}, {selectedTime}</span></div>
-          <div className="flex justify-between font-semibold text-lg mt-3 border-t border-[#1A2236] pt-3">
-            <span>Total</span><span className="text-green-400">Rs. 1,200.00</span>
-          </div>
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
         </div>
       </div>
 
       {/* BOTTOM ACTION */}
       <div className="fixed ml-64 bottom-0 left-0 right-0 bg-[#0E1424] border-t border-[#1A2236] p-5">
         <button
-<<<<<<< HEAD
           onClick={handleConfirmBooking}
           disabled={!selectedEvId || !isAvailable || checking}
           className={`w-full py-4 rounded-xl text-white font-bold flex items-center justify-center gap-2 transition-all
@@ -335,14 +250,6 @@ const BookingScreen = () => {
         >
           <Calendar size={20} />
           {checking ? "Checking..." : isAvailable === false ? "Slot Unavailable" : "Confirm Booking"}
-=======
-          onClick={handleConfirmPayment}
-          disabled={!selectedEvId || isLoading}
-          className={`w-full py-4 rounded-xl text-white font-bold flex items-center justify-center gap-2 transition-all ${selectedEvId && !isLoading ? "bg-green-500 hover:bg-green-600 active:scale-[0.98]" : "bg-gray-600 cursor-not-allowed"}`}
-        >
-          {isLoading ? <><div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full" /> Processing...</> : "Confirm Payment"}
-          {!isLoading && <Calendar size={20} />}
->>>>>>> 9e707ef937b336e652d5ba6feeb27d1235ad36cc
         </button>
       </div>
     </div>
