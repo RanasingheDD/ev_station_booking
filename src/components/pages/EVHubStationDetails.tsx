@@ -95,6 +95,32 @@ const totalChargers = station.chargers?.length || 0;
     }
   };
 
+  const handleDirections = () => {
+    if (!station) return;
+
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+
+        const destination = `${station.lat},${station.lng}`;
+
+        const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destination}&travelmode=driving`;
+
+        window.open(googleMapsUrl, "_blank");
+      },
+      (error) => {
+        alert("Failed to get your location. Please allow location access.");
+        console.error(error);
+      }
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white p-5 space-y-5 ml-64">
       {/* Header with image, badges, rating, address, operator */}
@@ -243,7 +269,10 @@ const totalChargers = station.chargers?.length || 0;
       {/* Bottom Actions */}
       <div className="fixed ml-64 bottom-0 left-0 right-0 p-5 bg-[#0E1424] flex justify-center border-t border-[#1A2236]">
         <div className="w-full max-w-3xl flex gap-3">
-          <button className="flex-1 px-4 py-3 border border-green-500 text-green-400 rounded-lg flex items-center justify-center gap-2">
+          <button 
+            className="flex-1 px-4 py-3 border border-green-500 text-green-400 rounded-lg flex items-center justify-center gap-2"
+            onClick={handleDirections}
+            >
             <Navigation size={18} /> Directions
           </button>
           <button
