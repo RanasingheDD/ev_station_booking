@@ -26,6 +26,7 @@ import PublicLayout from "./components/Layout/PublicLayout";
 import OwnerDashboard from "./components/pages/OwnerDashboard";
 import BookingPage from "./components/pages/BookingPage";
 import UnderDeveloping from "./components/underDeveloping/underDeveloping";
+import OwnerStationDetails from "./components/pages/OwnerStationDetails";
 
 const RoleProtectedRoute = ({ 
   element, 
@@ -81,6 +82,16 @@ const router = createBrowserRouter([
     element: (
       <RoleProtectedRoute 
         element={<OwnerDashboard />} 
+        allowedRoles={["OWNER"]} 
+      />
+    )
+  },
+  { 
+    path: "/owner/station/:id", 
+    element: (
+      <RoleProtectedRoute 
+        // Import OwnerStationDetails at the top of the file!
+        element={<OwnerStationDetails />} 
         allowedRoles={["OWNER"]} 
       />
     )

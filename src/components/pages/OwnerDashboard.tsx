@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import {
   Plus,
@@ -134,7 +135,7 @@ const StationModal = ({
             <X size={24} />
           </button>
         </div>
-
+        
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Basic Information */}
           <div className="space-y-4">
@@ -347,6 +348,7 @@ const DeleteConfirmModal = ({
 // Main Owner Dashboard Component
 export default function OwnerDashboard() {
   useAuth();
+  const navigate = useNavigate();
 
   const [user, setUser] = useState<any>(null);
   const [stations, setStations] = useState<Station[]>([]);
@@ -507,7 +509,7 @@ export default function OwnerDashboard() {
           <div>
             <h1 className="text-3xl font-bold text-gray-800">Owner Dashboard</h1>
             <p className="text-gray-500">
-              Welcome back, {user?.username || "Partner"}!
+              Welcome back, {user?.name || "Partner"}!
             </p>
           </div>
           <button
@@ -688,10 +690,18 @@ export default function OwnerDashboard() {
                         setEditingStation(station);
                         setShowModal(true);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="flex items-center justify-center gap-2 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors"
                       type="button"
                     >
                       <Edit size={16} /> Edit
+                    </button>
+                    <button
+                      onClick={() => navigate(`/owner/station/${station.id}`)}
+                      className="flex-1 flex items-center justify-center gap-2 bg-green-100 text-green-700 py-2 px-3 rounded-lg hover:bg-green-200 transition-colors"
+                      type="button"
+                      title="Manage Chargers"
+                    >
+                      <Zap size={16} /> Manage
                     </button>
                     <button
                       onClick={() => {
