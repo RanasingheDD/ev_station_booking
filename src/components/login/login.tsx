@@ -55,6 +55,7 @@ export default function Login(): React.ReactElement {
       // Save user info in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("name", data.name);
+      localStorage.setItem("role", data.role);
 
       
 // 2. Role-Based Navigation Logic

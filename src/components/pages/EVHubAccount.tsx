@@ -349,6 +349,7 @@ const EVHubAccount: React.FC = () => {
                 className="w-full bg-[#141a25] p-2 mt-3 rounded"
                 value={deleteText}
                 onChange={(e) => setDeleteText(e.target.value)}
+                placeholder="Type DELETE to confirm"
               />
 
               <div className="flex justify-end mt-4 gap-3">
