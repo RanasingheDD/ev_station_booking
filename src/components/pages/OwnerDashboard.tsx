@@ -6,7 +6,6 @@ import {
   Edit,
   Trash2,
   MapPin,
-  TrendingUp,
   Zap,
   DollarSign,
   Calendar,
@@ -14,6 +13,9 @@ import {
   AlertCircle,
   Search,
   X,
+  Image as ImageIcon,
+  LogOut,
+  LayoutDashboard
 } from "lucide-react";
 import {
   fetchOwnerStations,
@@ -21,12 +23,45 @@ import {
   updateStation,
   deleteStation,
   getStationStats,
-  calculateStationEarnings,
 } from "../../services/station_service";
 import type { Station } from "../../models/station_model";
 import { fetchCurrentUser } from "../../services/account_service";
 
-// Modal Component for Add/Edit Station
+// 🎨 "COMMAND CENTER" THEME (Slate & Indigo)
+const styles = {
+  // Backgrounds
+  pageBg: "bg-slate-950", // Very dark slate (almost black, but blue-ish)
+  cardBg: "bg-slate-900", // Slightly lighter for cards
+  modalBg: "bg-slate-900",
+  
+  // Inputs
+  input: "w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder-slate-500",
+  
+  // Text
+  textPrimary: "text-slate-100",
+  textSecondary: "text-slate-400",
+  label: "block text-sm font-medium text-slate-300 mb-2",
+  
+  // Buttons
+  // Primary (Add/Save) -> Indigo
+  buttonPrimary: "flex-1 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-900/20 disabled:opacity-50 disabled:cursor-not-allowed font-medium",
+  
+  // Secondary (Cancel/Edit) -> Dark Slate
+  buttonSecondary: "flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-800 border border-slate-700 text-slate-300 rounded-xl hover:bg-slate-700 hover:text-white transition-colors font-medium",  
+  // Danger (Delete) -> Red
+  buttonDanger: "flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors shadow-lg shadow-red-900/20 font-medium",
+  
+  // Manage Button (Specific styling)
+  buttonManage: "flex-1 flex items-center justify-center gap-2 bg-slate-800 text-indigo-400 border border-slate-700 rounded-xl hover:bg-slate-700 hover:text-indigo-300 transition-colors font-medium",
+
+  // Overlays
+  modalOverlay: "fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4",
+  modalContent: "bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl ring-1 ring-white/10",
+};
+
+// ----------------------------------------------------------------------
+// 1. MODAL COMPONENT
+// ----------------------------------------------------------------------
 const StationModal = ({
   isOpen,
   onClose,
@@ -88,6 +123,25 @@ const StationModal = ({
     }
   }, [station, userId]);
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("File is too large! Please choose an image under 2MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setFormData((prev) => ({
+          ...prev,
+          images: [base64String], 
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -96,7 +150,7 @@ const StationModal = ({
       onClose();
     } catch (error) {
       console.error("Error saving station:", error);
-      alert("Failed to save station. Please try again.");
+      alert("Failed to save. Try again.");
     } finally {
       setLoading(false);
     }
@@ -120,64 +174,55 @@ const StationModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-800">
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        {/* Modal Header */}
+        <div className="sticky top-0 bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center z-10">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <LayoutDashboard className="text-indigo-500" size={24} />
             {station ? "Edit Station" : "Add New Station"}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-            type="button"
-            title="Close modal"
-          >
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors" title="Close Modal">
             <X size={24} />
           </button>
         </div>
-        
+
+        {/* Modal Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Basic Information */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg text-gray-700">
+          <div className="space-y-5">
+            <h3 className="font-semibold text-lg text-indigo-400 border-b border-slate-800 pb-2">
               Basic Information
             </h3>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Station Name *
-              </label>
+              <label className={styles.label}>Station Name *</label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="e.g., GreenEnergy Hub - Colombo"
+                className={styles.input}
+                placeholder="e.g., GreenEnergy Hub"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Address *
-              </label>
+              <label className={styles.label}>Address *</label>
               <input
                 type="text"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className={styles.input}
                 placeholder="Full address"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Latitude *
-                </label>
+                <label className={styles.label}>Latitude *</label>
                 <input
                   type="number"
                   name="lat"
@@ -185,14 +230,12 @@ const StationModal = ({
                   onChange={handleChange}
                   required
                   step="any"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className={styles.input}
                   placeholder="6.9271"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Longitude *
-                </label>
+                <label className={styles.label}>Longitude *</label>
                 <input
                   type="number"
                   name="lng"
@@ -200,85 +243,110 @@ const StationModal = ({
                   onChange={handleChange}
                   required
                   step="any"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className={styles.input}
                   placeholder="79.8612"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
+              <label className={styles.label}>Phone Number</label>
               <input
                 type="tel"
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className={styles.input}
                 placeholder="+94 XX XXX XXXX"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Operator Name
-              </label>
+              <label className={styles.label}>Operator Name</label>
               <input
                 type="text"
                 name="operatorName"
                 value={formData.operatorName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="Your company/business name"
+                className={styles.input}
+                placeholder="Your Name / Company"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
+              <label className={styles.label}>Description</label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="Brief description of your charging station"
+                className={styles.input}
+                placeholder="Tell drivers about your station..."
               />
             </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="isOpen"
-                checked={formData.isOpen}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, isOpen: e.target.checked }))
-                }
-                className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                title="Station Open Status"
-              />
-              <label className="text-sm font-medium text-gray-700">
-                Station is currently open
+            {/* Dark Mode File Upload */}
+            <div>
+              <label className={`${styles.label} flex items-center gap-2`}>
+                <ImageIcon size={16} className="text-indigo-400" /> Station Image
+              </label>
+              
+              <div className="border-2 border-dashed border-slate-700 bg-slate-800/50 rounded-xl p-6 text-center cursor-pointer relative hover:border-indigo-500 hover:bg-slate-800 transition-all group">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  title="Upload Station Image"
+                />
+                
+                {formData.images?.[0] ? (
+                  <div className="relative h-48 w-full">
+                    <img 
+                      src={formData.images[0]} 
+                      alt="Preview" 
+                      className="h-full w-full object-cover rounded-lg shadow-lg ring-1 ring-white/10"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg backdrop-blur-sm">
+                      <p className="text-white font-medium flex items-center gap-2">
+                        <Edit size={16} /> Change Image
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-2">
+                    <div className="mx-auto w-12 h-12 bg-slate-700 text-indigo-400 rounded-full flex items-center justify-center mb-3 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                      <ImageIcon size={24} />
+                    </div>
+                    <p className="text-slate-300 font-medium">Click to upload image</p>
+                    <p className="text-xs text-slate-500 mt-1">Max size: 2MB</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Toggle Switch */}
+            <div className="flex items-center justify-between bg-slate-800 p-4 rounded-xl border border-slate-700">
+              <span className="text-slate-300 font-medium">Station Open Status</span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.isOpen}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, isOpen: e.target.checked }))}
+                  className="sr-only peer"
+                  title="Toggle Station Open/Closed Status"
+                />
+                <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
               </label>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
+          <div className="flex gap-3 pt-4 border-t border-slate-800">
+            <button type="button" onClick={onClose} className={styles.buttonSecondary}>
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400"
-            >
+            <button type="submit" disabled={loading} className={styles.buttonPrimary}>
               {loading ? "Saving..." : station ? "Update Station" : "Create Station"}
             </button>
           </div>
@@ -288,7 +356,9 @@ const StationModal = ({
   );
 };
 
-// Delete Confirmation Modal
+// ----------------------------------------------------------------------
+// 2. DELETE CONFIRMATION MODAL
+// ----------------------------------------------------------------------
 const DeleteConfirmModal = ({
   isOpen,
   onClose,
@@ -305,38 +375,28 @@ const DeleteConfirmModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-md w-full p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-            <AlertCircle className="text-red-600" size={24} />
+    <div className={styles.modalOverlay}>
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl ring-1 ring-white/10">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-12 h-12 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center shrink-0">
+            <AlertCircle size={24} />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-800">Delete Station</h3>
-            <p className="text-sm text-gray-500">This action cannot be undone</p>
+            <h3 className="text-xl font-bold text-white">Delete Station?</h3>
+            <p className="text-sm text-slate-400">This action is permanent.</p>
           </div>
         </div>
 
-        <p className="text-gray-600 mb-6">
-          Are you sure you want to delete <strong>{stationName}</strong>? All associated
-          chargers and data will be permanently removed.
+        <p className="text-slate-300 mb-6 leading-relaxed">
+          Are you sure you want to delete <strong className="text-white">{stationName}</strong>? 
+          All chargers and history will be wiped out.
         </p>
 
         <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            disabled={loading}
-            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-            type="button"
-          >
+          <button onClick={onClose} disabled={loading} className={styles.buttonSecondary}>
             Cancel
           </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:bg-gray-400"
-            type="button"
-          >
+          <button onClick={onConfirm} disabled={loading} className={styles.buttonDanger}>
             {loading ? "Deleting..." : "Delete Station"}
           </button>
         </div>
@@ -345,7 +405,9 @@ const DeleteConfirmModal = ({
   );
 };
 
-// Main Owner Dashboard Component
+// ----------------------------------------------------------------------
+// 3. MAIN DASHBOARD
+// ----------------------------------------------------------------------
 export default function OwnerDashboard() {
   useAuth();
   const navigate = useNavigate();
@@ -356,42 +418,32 @@ export default function OwnerDashboard() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Modal states
   const [showModal, setShowModal] = useState(false);
   const [editingStation, setEditingStation] = useState<Station | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingStation, setDeletingStation] = useState<Station | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // Stats
   const [stats, setStats] = useState({
     totalStations: 0,
     totalEarnings: 0,
-    activeBookings: 8, // Mock data - replace with real API
+    activeBookings: 0,
     totalChargers: 0,
     availableChargers: 0,
   });
 
-  // Fetch user profile
   useEffect(() => {
     const loadUser = async () => {
       try {
-        // ✅ Use the service function (Uses correct Endpoint & Headers)
         const userData = await fetchCurrentUser();
-        
-        // Ensure we handle the response structure correctly
-        // (Sometimes backend returns { user: ... } or just the user object)
-        setUser(userData.user || userData); 
+        setUser(userData.user || userData);
       } catch (error) {
         console.error("Failed to load user profile", error);
-        // Optional: Redirect to login if unauthorized
       }
     };
-
     loadUser();
   }, []);
 
-  // Fetch owner's stations
   useEffect(() => {
     if (user?.id) {
       loadStations();
@@ -400,19 +452,16 @@ export default function OwnerDashboard() {
 
   const loadStations = async () => {
     if (!user?.id) return;
-
     setLoading(true);
     try {
       const data = await fetchOwnerStations(user.id);
       setStations(data);
       setFilteredStations(data);
-
-      // Calculate stats
       const stationStats = getStationStats(data);
       setStats({
         totalStations: data.length,
-        totalEarnings: calculateStationEarnings(data),
-        activeBookings: 8, // Mock - replace with real data
+        totalEarnings: 0,
+        activeBookings: 0,
         totalChargers: stationStats.totalChargers,
         availableChargers: stationStats.availableChargers,
       });
@@ -423,7 +472,6 @@ export default function OwnerDashboard() {
     }
   };
 
-  // Search functionality
   useEffect(() => {
     if (searchQuery.trim() === "") {
       setFilteredStations(stations);
@@ -437,20 +485,13 @@ export default function OwnerDashboard() {
     }
   }, [searchQuery, stations]);
 
-  // Handle add/edit station
   const handleSaveStation = async (stationData: Partial<Station>) => {
     try {
       if (editingStation) {
-        // Update existing station
         await updateStation(editingStation.id!, stationData);
       } else {
-        // Create new station
-        await createStation({
-          ...stationData,
-          operatorId: user.id,
-        });
+        await createStation({ ...stationData, operatorId: user.id });
       }
-
       await loadStations();
       setShowModal(false);
       setEditingStation(null);
@@ -460,10 +501,8 @@ export default function OwnerDashboard() {
     }
   };
 
-  // Handle delete station
   const handleDeleteStation = async () => {
     if (!deletingStation) return;
-
     setDeleteLoading(true);
     try {
       await deleteStation(deletingStation.id!);
@@ -472,247 +511,189 @@ export default function OwnerDashboard() {
       setDeletingStation(null);
     } catch (error) {
       console.error("Error deleting station:", error);
-      alert("Failed to delete station. Please try again.");
+      alert("Failed to delete.");
     } finally {
       setDeleteLoading(false);
     }
   };
 
-  // Get status badge color
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to logout?")) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      navigate("/login");
+    }
+  };
+
+  // Status Badge Logic
   const getStatusColor = (station: Station) => {
-    if (!station.isOpen) return "bg-red-100 text-red-700";
-
-    const availableChargers = station.chargers?.filter(
-      (c) => c.status === "AVAILABLE"
-    ).length || 0;
-
-    if (availableChargers === 0) return "bg-yellow-100 text-yellow-700";
-    return "bg-green-100 text-green-700";
+    if (!station.isOpen) return "bg-red-500/10 text-red-400 border-red-500/20";
+    const available = station.chargers?.filter((c) => c.status === "AVAILABLE").length || 0;
+    return available === 0 
+      ? "bg-amber-500/10 text-amber-400 border-amber-500/20" 
+      : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
   };
 
   const getStatusText = (station: Station) => {
     if (!station.isOpen) return "Closed";
-
-    const availableChargers = station.chargers?.filter(
-      (c) => c.status === "AVAILABLE"
-    ).length || 0;
-
-    if (availableChargers === 0) return "Full";
-    return `${availableChargers} Available`;
+    const available = station.chargers?.filter((c) => c.status === "AVAILABLE").length || 0;
+    return available === 0 ? "Full" : `${available} Available`;
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${styles.pageBg} text-slate-200`}>
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Owner Dashboard</h1>
-            <p className="text-gray-500">
-              Welcome back, {user?.name || "Partner"}!
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-indigo-600/20 rounded-lg">
+                <LayoutDashboard className="text-indigo-400" size={28} />
+              </div>
+              <h1 className="text-3xl font-bold text-white">
+                Owner Dashboard
+              </h1>
+            </div>
+            <p className="text-slate-400 mt-2 ml-1">
+              Welcome back, <span className="text-indigo-400 font-medium">{user?.name || "Partner"}</span>!
             </p>
           </div>
-          <button
-            onClick={() => {
-              setEditingStation(null);
-              setShowModal(true);
-            }}
-            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition-colors shadow-lg"
-            type="button"
-          >
-            <Plus size={20} />
-            Add New Station
-          </button>
+          
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setEditingStation(null);
+                setShowModal(true);
+              }}
+              className={styles.buttonPrimary}
+            >
+              <div className="flex items-center gap-2">
+                <Plus size={20} /> Add Station
+              </div>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+            >
+              <LogOut size={20} /> Logout
+            </button>
+          </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-gray-500 text-sm">Total Stations</p>
-              <Zap className="text-green-600" size={20} />
+          {[
+            { label: "Total Stations", value: stats.totalStations, icon: Zap, color: "text-indigo-400", bg: "bg-indigo-500/10" },
+            { label: "Total Earnings", value: `$${stats.totalEarnings.toFixed(2)}`, icon: DollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+            { label: "Active Bookings", value: stats.activeBookings, icon: Calendar, color: "text-blue-400", bg: "bg-blue-500/10" },
+            { label: "Available Chargers", value: `${stats.availableChargers}/${stats.totalChargers}`, icon: Power, color: "text-amber-400", bg: "bg-amber-500/10" },
+          ].map((stat, idx) => (
+            <div key={idx} className={`${styles.cardBg} border border-slate-800 rounded-2xl p-6 hover:border-slate-600 transition-all shadow-lg`}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">{stat.label}</p>
+                <div className={`p-2 rounded-lg ${stat.bg} ${stat.color}`}>
+                  <stat.icon size={20} />
+                </div>
+              </div>
+              <h3 className="text-3xl font-bold text-white">{stat.value}</h3>
             </div>
-            <h3 className="text-3xl font-bold text-gray-800">
-              {stats.totalStations}
-            </h3>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-gray-500 text-sm">Total Earnings</p>
-              <DollarSign className="text-green-600" size={20} />
-            </div>
-            <h3 className="text-3xl font-bold text-green-600">
-              ${stats.totalEarnings.toFixed(2)}
-            </h3>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-gray-500 text-sm">Active Bookings</p>
-              <Calendar className="text-blue-600" size={20} />
-            </div>
-            <h3 className="text-3xl font-bold text-blue-600">
-              {stats.activeBookings}
-            </h3>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-gray-500 text-sm">Available Chargers</p>
-              <Power className="text-purple-600" size={20} />
-            </div>
-            <h3 className="text-3xl font-bold text-purple-600">
-              {stats.availableChargers}/{stats.totalChargers}
-            </h3>
-          </div>
+          ))}
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              size={20}
-            />
+        <div className="mb-8">
+          <div className="relative max-w-lg">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
             <input
               type="text"
-              placeholder="Search stations by name or address..."
+              placeholder="Search stations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all placeholder-slate-600 shadow-md"
             />
           </div>
         </div>
 
         {/* Stations List */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-800">
-            My Charging Stations
-            {searchQuery && (
-              <span className="text-sm font-normal text-gray-500 ml-2">
-                ({filteredStations.length} results)
-              </span>
-            )}
-          </h2>
-        </div>
+        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          My Stations
+          {searchQuery && <span className="text-sm font-normal text-slate-500">({filteredStations.length})</span>}
+        </h2>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-              <p className="text-gray-500">Loading stations...</p>
-            </div>
+          <div className="flex flex-col items-center justify-center py-20 text-slate-500">
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-500 border-t-transparent mb-4"></div>
+            Loading stations...
           </div>
         ) : filteredStations.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-            <Zap className="mx-auto text-gray-300 mb-4" size={48} />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              {searchQuery ? "No stations found" : "No stations yet"}
-            </h3>
-            <p className="text-gray-500 mb-6">
-              {searchQuery
-                ? "Try adjusting your search query"
-                : "Get started by adding your first charging station"}
-            </p>
-            {!searchQuery && (
-              <button
-                onClick={() => {
-                  setEditingStation(null);
-                  setShowModal(true);
-                }}
-                className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
-                type="button"
-              >
-                <Plus size={20} />
-                Add Your First Station
-              </button>
-            )}
+          <div className={`${styles.cardBg} border border-slate-800 rounded-2xl p-12 text-center border-dashed`}>
+            <Zap className="mx-auto text-slate-600 mb-4" size={48} />
+            <h3 className="text-xl font-semibold text-white mb-2">No stations found</h3>
+            <p className="text-slate-500">Get started by adding your first station.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStations.map((station) => (
-              <div
-                key={station.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100"
-              >
-                <div className="relative h-48">
+              <div key={station.id} className={`${styles.cardBg} border border-slate-800 rounded-2xl overflow-hidden flex flex-col group hover:border-slate-500 transition-all duration-300 shadow-lg`}>
+                <div className="relative h-48 overflow-hidden bg-slate-800">
                   <img
-                    src={
-                      station.images?.[0] ||
-                      "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=1000"
-                    }
+                    src={station.images?.[0] || "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=1000"}
                     alt={station.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                   />
-                  <span
-                    className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      station
-                    )}`}
-                  >
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+                  <span className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md shadow-sm ${getStatusColor(station)}`}>
                     {getStatusText(station)}
                   </span>
                 </div>
 
-                <div className="p-5">
-                  <h3 className="font-bold text-lg text-gray-800 mb-1">
-                    {station.name}
-                  </h3>
-                  <div className="flex items-center text-gray-500 text-sm mb-4">
-                    <MapPin size={16} className="mr-1 flex-shrink-0" />
+                <div className="p-5 flex-1 flex flex-col">
+                  <h3 className="font-bold text-lg text-white mb-1 truncate">{station.name}</h3>
+                  <div className="flex items-center text-slate-400 text-sm mb-5">
+                    <MapPin size={16} className="mr-1 shrink-0 text-indigo-500" />
                     <span className="truncate">{station.address}</span>
                   </div>
 
-                  <div className="flex justify-between items-center py-3 border-t border-gray-100 mb-4">
-                    <div>
-                      <p className="text-xs text-gray-400">Chargers</p>
-                      <p className="font-semibold text-gray-700">
-                        {station.chargers?.length || 0}
-                      </p>
+                  <div className="grid grid-cols-3 gap-2 py-4 border-t border-slate-800 mb-4 bg-slate-900/50 rounded-lg">
+                    <div className="text-center border-r border-slate-800">
+                      <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Chargers</p>
+                      <p className="font-bold text-white text-lg">{station.chargers?.length || 0}</p>
+                    </div>
+                    <div className="text-center border-r border-slate-800">
+                      <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Rating</p>
+                      <p className="font-bold text-amber-400 text-lg">★ {station.rating?.toFixed(1) || "-"}</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs text-gray-400">Rating</p>
-                      <p className="font-semibold text-gray-700">
-                        ⭐ {station.rating?.toFixed(1) || "N/A"}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-gray-400">Status</p>
-                      <p className="font-semibold text-green-600">
+                      <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Status</p>
+                      <p className={`font-bold text-lg ${station.isOpen ? "text-emerald-400" : "text-red-400"}`}>
                         {station.isOpen ? "Open" : "Closed"}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingStation(station);
-                        setShowModal(true);
-                      }}
-                      className="flex items-center justify-center gap-2 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg hover:bg-gray-200 transition-colors"
-                      type="button"
+                  <div className="flex gap-2 mt-auto">
+                    <button 
+                      onClick={() => { setEditingStation(station); setShowModal(true); }} 
+                      className={styles.buttonSecondary}
+                      title="Edit Station"
                     >
-                      <Edit size={16} /> Edit
+                      <Edit size={18} />
+                      <span>Edit</span>
                     </button>
-                    <button
-                      onClick={() => navigate(`/owner/station/${station.id}`)}
-                      className="flex-1 flex items-center justify-center gap-2 bg-green-100 text-green-700 py-2 px-3 rounded-lg hover:bg-green-200 transition-colors"
-                      type="button"
-                      title="Manage Chargers"
+                    
+                    <button 
+                      onClick={() => navigate(`/owner/station/${station.id}`)} 
+                      className={styles.buttonManage}
                     >
-                      <Zap size={16} /> Manage
+                      <Zap size={18} /> Manage
                     </button>
-                    <button
-                      onClick={() => {
-                        setDeletingStation(station);
-                        setShowDeleteModal(true);
-                      }}
-                      className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-                      title="Delete station"
-                      type="button"
+                    
+                    <button 
+                      onClick={() => { setDeletingStation(station); setShowDeleteModal(true); }} 
+                      className="px-3 py-2 border border-slate-700 bg-slate-800 text-red-400 rounded-xl hover:bg-red-900/20 hover:border-red-900/50 transition-colors"
+                      title="Delete Station"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 </div>
@@ -722,28 +703,21 @@ export default function OwnerDashboard() {
         )}
       </div>
 
-      {/* Add/Edit Station Modal */}
-      <StationModal
-        isOpen={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setEditingStation(null);
-        }}
-        station={editingStation}
-        onSave={handleSaveStation}
-        userId={user?.id || ""}
+      {/* Modals */}
+      <StationModal 
+        isOpen={showModal} 
+        onClose={() => { setShowModal(false); setEditingStation(null); }} 
+        station={editingStation} 
+        onSave={handleSaveStation} 
+        userId={user?.id || ""} 
       />
-
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setDeletingStation(null);
-        }}
-        onConfirm={handleDeleteStation}
-        stationName={deletingStation?.name || ""}
-        loading={deleteLoading}
+      
+      <DeleteConfirmModal 
+        isOpen={showDeleteModal} 
+        onClose={() => { setShowDeleteModal(false); setDeletingStation(null); }} 
+        onConfirm={handleDeleteStation} 
+        stationName={deletingStation?.name || ""} 
+        loading={deleteLoading} 
       />
     </div>
   );
