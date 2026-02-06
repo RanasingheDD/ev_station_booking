@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Mail, Lock } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { API_URL, GOOGLE_AUTH_URL } from "../../config/api_config";
+import { getPublicIP } from "../hooks/getPublicIP";
+import { getOSInfo } from "../hooks/getOSInfo";
 
 export default function Login(): React.ReactElement {
   const [email, setEmail] = useState("");
@@ -38,23 +40,33 @@ export default function Login(): React.ReactElement {
     setLoading(true);
 
     try {
+      // get device and OS info
+      const deviceName = navigator.userAgent;
+
+      // get public IP
+      const ip = await getPublicIP();
+      const os = getOSInfo();
+
       const response = await fetch(API_URL + "/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, deviceName, os, ip }),
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         showNotification("Login successful!", "success");
-        navigate("/login");
+
+        // Save user info in localStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("name", data.name);
+        localStorage.setItem("role", data.role);
+        
+        navigate(from, { replace: true });
       } else {
         showNotification("Invalid username or password!", "error");
       }
-
-      const data = await response.json();
-      // Save user info in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("name", data.name);
       
 // 2. Role-Based Navigation Logic
       if (data.role === "OWNER") {
