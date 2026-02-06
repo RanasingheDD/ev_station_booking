@@ -29,11 +29,8 @@
     "tailwind-scrollbar": "^4.0.2",
     "tailwind-scrollbar-hide": "^4.0.0",
     "tailwindcss": "^4.1.16",
-<<<<<<< HEAD
+    "ua-parser-js": "^2.0.9",
     "uuid": "^13.0.0"
-=======
-    "ua-parser-js": "^2.0.9"
->>>>>>> 22f644141b085f6cd32db4f3fd4712735815e0b7
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
