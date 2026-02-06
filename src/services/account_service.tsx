@@ -28,11 +28,13 @@ export const updateUserProfile = async (data: any) => {
 };
 
 // 🖥 Get active sessions
-export const fetchSessions = async () => {
-  const res = await fetch(`${API_URL}/sessions`, {
-    headers: authHeader(),
+export const fetchSessions = async (username: string) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/sessions/sessions/${username}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
-  if (!res.ok) throw new Error("Failed to fetch sessions");
   return res.json();
 };
 
