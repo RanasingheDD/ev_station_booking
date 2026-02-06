@@ -27,6 +27,7 @@ import OwnerDashboard from "./components/pages/OwnerDashboard";
 import BookingPage from "./components/pages/BookingPage";
 import UnderDeveloping from "./components/underDeveloping/underDeveloping";
 import OwnerStationDetails from "./components/pages/OwnerStationDetails";
+import OAuthRedirect from "./components/auth/OAuthRedirect";
 
 const RoleProtectedRoute = ({ 
   element, 
@@ -75,6 +76,7 @@ const router = createBrowserRouter([
    // Public routes without Navbar/Footer
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <Login /> },
+  { path: "/oauth2/redirect", element: <OAuthRedirect /> },
   {path:"/under-development", element:<UnderDeveloping/>},
 
   { 
