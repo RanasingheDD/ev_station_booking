@@ -22,6 +22,8 @@ const EVHubDashboard: React.FC = () => {
   const [nickname, setNickname] = useState("");
   const [licensePlate, setLicensePlate] = useState("");
 
+
+
   // Load EVs on component mount
   useEffect(() => {
     const fetchEVs = async () => {
@@ -170,6 +172,7 @@ const EVHubDashboard: React.FC = () => {
           </div>
         )}
 
+        
         {/* Vehicle List - Full Width */}
         <div className="flex flex-col gap-10">
           {loading && <p>Loading vehicles...</p>}
@@ -184,13 +187,13 @@ const EVHubDashboard: React.FC = () => {
                 <img
                   src="/car01.png"
                   alt={ev.nickname || ev.make}
-                  className="w-full h-96 object-cover"
+                  className="w-[65%] h-96 object-cover justify-center mx-auto"
                 />
                 <div className="p-8">
                   <h3 className="text-white text-3xl font-bold">
                     {ev.nickname || `${ev.make} ${ev.model}`}
                   </h3>
-                  <div className="flex justify-between mt-6 text-gray-400">
+                  <div className="flex justify-between mt-2 text-gray-400">
                     <div>
                       <p className="text-sm">Model</p>
                       <p className="text-white font-semibold">{ev.model}</p>
