@@ -26,9 +26,11 @@ import ContactUs from "./components/contactUs/contactUs";
 import PublicLayout from "./components/Layout/PublicLayout";
 import OwnerDashboard from "./components/pages/OwnerDashboard";
 import BookingPage from "./components/pages/BookingPage";
+import BookingsPage from "./components/pages/BookingsDetailsPage";
 import UnderDeveloping from "./components/underDeveloping/underDeveloping";
 import OwnerStationDetails from "./components/pages/OwnerStationDetails";
 import OAuthRedirect from "./components/auth/OAuthRedirect";
+import SubscriptionPage from "./components/pages/SubscriptionPage";
 
 const RoleProtectedRoute = ({ 
   element, 
@@ -109,6 +111,8 @@ const router = createBrowserRouter([
       { path: "stations", element: <Stations /> },
       { path: "stations/:id", element: <StationDetails /> },
       { path: "account", element: <Account /> },
+      { path: "subscriptions", element: <SubscriptionPage /> },
+      { path: "bookings", element: <BookingsPage /> },
       { path: "booking/:stationId/:chargerId", element: <BookingPage /> },
     ],
   },
@@ -118,6 +122,7 @@ const router = createBrowserRouter([
   { path: "/dashboard", element: <Navigate to="/app/dashboard" replace /> },
   { path: "/stations", element: <Navigate to="/app/stations" replace /> },
   { path: "/account", element: <Navigate to="/app/account" replace /> },
+  { path: "/subscriptions", element: <Navigate to="/app/subscriptions" replace /> },
   { path: "/stations/:id", element: <Navigate to="/app/stations/:id" replace /> },
   { path: "/booking/:stationId/:chargerId", element: <Navigate to="/app/booking/:stationId/:chargerId" replace /> },
   { path: "/owner-dashboard", element: <Navigate to="/owner" replace /> },

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Calendar, Clock, Car, Zap, CheckCircle, AlertCircle, Coins } from "lucide-react";
+import { Clock, Car, Zap, CheckCircle, AlertCircle, Coins } from "lucide-react";
 import axios from "axios";
 import { loadEVs, type EV } from "../../services/ev_service";
 import { checkAvailability } from "../../services/booking_service";

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Coins, CreditCard } from "lucide-react";
 import { useUser } from "../../context/UserContext";
 import { API_URL } from "../../config/api_config";
+import { BUY_POINT_PACKAGES } from "../../config/pricing";
 import axios from "axios";
 
 interface BuyPointsModalProps {
@@ -24,12 +25,7 @@ const BuyPointsModal: React.FC<BuyPointsModalProps> = ({
   const [error, setError] = useState("");
 
   // Predefined point packages: points -> price (in LKR)
-  const pointPackages = [
-    { points: 100, price: 100, discount: 0 },
-    { points: 500, price: 450, discount: 10 },
-    { points: 1000, price: 850, discount: 15 },
-    { points: 5000, price: 4000, discount: 20 },
-  ];
+  const pointPackages = BUY_POINT_PACKAGES;
 
   const handleSelectPackage = (points: number) => {
     setSelectedPackage(points);
@@ -131,7 +127,7 @@ const BuyPointsModal: React.FC<BuyPointsModalProps> = ({
           <h3 className="text-white font-semibold mb-3">Select Package</h3>
           <div className="space-y-2">
             {pointPackages.map((pkg) => {
-              const isDeal = pkg.discount > 0;
+              const isDeal = (pkg.discount ?? 0) > 0;
               return (
                 <button
                   key={pkg.points}
