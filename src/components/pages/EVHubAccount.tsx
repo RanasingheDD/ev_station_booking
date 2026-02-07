@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Edit2, Bell, Search, Coins, CreditCard } from "lucide-react";
+import { Edit2, Coins, CreditCard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Snackbar, Alert } from "@mui/material";
 import useAuth from "../hooks/useAuth";
