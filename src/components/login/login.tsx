@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { API_URL } from "../../config/api_config";
+import { API_URL, GOOGLE_AUTH_URL } from "../../config/api_config";
 import { getPublicIP } from "../hooks/getPublicIP";
 import { getOSInfo } from "../hooks/getOSInfo";
 
@@ -16,8 +16,8 @@ export default function Login(): React.ReactElement {
   const from = location.state?.from?.pathname || "/";
   
   const handleGoogleLogin = () => {
-  console.log("Google login clicked");
-};
+    window.location.href = GOOGLE_AUTH_URL;
+  };
 
   function showNotification(message: string | null, type: string) {
     const box = document.createElement("div");
@@ -67,8 +67,6 @@ export default function Login(): React.ReactElement {
       } else {
         showNotification("Invalid username or password!", "error");
       }
-      
-
       
 // 2. Role-Based Navigation Logic
       if (data.role === "OWNER") {
