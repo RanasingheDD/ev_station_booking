@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { API_URL, GOOGLE_AUTH_URL } from "../../config/api_config";
 import { getPublicIP } from "../hooks/getPublicIP";
 import { getOSInfo } from "../hooks/getOSInfo";
+import { useUser } from "../../context/UserContext";
+import axios from "axios";
 
 export default function Login(): React.ReactElement {
   const [email, setEmail] = useState("");
@@ -12,6 +14,7 @@ export default function Login(): React.ReactElement {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const from = location.state?.from?.pathname || "/";
   
@@ -47,39 +50,64 @@ export default function Login(): React.ReactElement {
       const ip = await getPublicIP();
       const os = getOSInfo();
 
-      const response = await fetch(API_URL + "/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, deviceName, os, ip }),
-      });
+      // Send login request via axios
+      const resp = await axios.post(
+        API_URL + "/users/login",
+        { email, password, deviceName, os, ip },
+        { headers: { "Content-Type": "application/json" } }
+      );
 
-      const data = await response.json();
+      const data = resp.data;
 
-      if (response.ok) {
-        showNotification("Login successful!", "success");
+      if (resp.status === 200) {
+        const token = data.token;
+        localStorage.setItem("token", token);
 
-        // Save user info in localStorage
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("name", data.name);
-        localStorage.setItem("role", data.role);
-        
-        navigate(from, { replace: true });
+        // Fetch complete user data including points from /users/me
+        try {
+          const userRes = await axios.get(API_URL + "/users/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const userData = userRes.data;
+          // Save user data in context
+          setUser({
+            id: userData.id || "",
+            name: userData.name || "",
+            email: userData.email || "",
+            mobile: userData.mobile,
+            avatar: userData.avatar,
+            location: userData.location,
+            points: userData.points || 0,
+            role: userData.role,
+          });
+
+          // Save to localStorage as well
+          localStorage.setItem("name", userData.name);
+          localStorage.setItem("role", userData.role);
+          localStorage.setItem("points", String(userData.points || 0));
+          localStorage.setItem("userId", userData.id);
+
+          showNotification("Login successful!", "success");
+
+          // 2. Role-Based Navigation Logic
+          if (userData.role === "OWNER") {
+            navigate("/owner-dashboard", { replace: true });
+          } else if (userData.role === "ADMIN") {
+            navigate("/admin-dashboard", { replace: true });
+          } else {
+            if (from === "/") {
+              navigate("/", { replace: true });
+            } else {
+              navigate(from, { replace: true });
+            }
+          }
+        } catch (err) {
+          console.error("Error fetching user data:", err);
+          showNotification("Login successful but failed to fetch user data!", "error");
+        }
       } else {
         showNotification("Invalid username or password!", "error");
-      }
-      
-// 2. Role-Based Navigation Logic
-      if (data.role === "OWNER") {
-        navigate("/owner-dashboard", { replace: true });
-      } else if (data.role === "ADMIN") {
-        navigate("/admin-dashboard", { replace: true }); // Assuming you have an Admin page later
-      } else {
-        // Normal User OR redirect to where they came from
-        if (from === "/") {
-            navigate("/", { replace: true });
-        } else {
-            navigate(from, { replace: true });
-        }
       }
     } catch (error) {
       console.error(error);

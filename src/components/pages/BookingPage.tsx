@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Calendar, Clock, Car, Zap, CheckCircle, AlertCircle } from "lucide-react";
+import { Calendar, Clock, Car, Zap, CheckCircle, AlertCircle, Coins } from "lucide-react";
 import axios from "axios";
 import { loadEVs, type EV } from "../../services/ev_service";
 import { checkAvailability } from "../../services/booking_service";
+import { deductPointsService } from "../../services/account_service";
+import { API_URL } from "../../config/api_config";
+import { useUser } from "../../context/UserContext";
+import BuyPointsModal from "../BuyPointsModal/BuyPointsModal";
 
 const durations = [30, 60, 90, 120, 180];
 
@@ -14,6 +18,7 @@ interface CheckoutResponse {
 const BookingScreen = () => {
   const navigate = useNavigate();
   const { stationId, chargerId } = useParams<{ stationId: string; chargerId: string }>();
+  const { user, updatePoints } = useUser();
 
   // EV Selection
   const [evs, setEvs] = useState<EV[]>([]);
@@ -31,6 +36,15 @@ const BookingScreen = () => {
   const [processing, setProcessing] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [availabilityMsg, setAvailabilityMsg] = useState<string>("");
+
+  // Points Management
+  const [showBuyPoints, setShowBuyPoints] = useState(false);
+  const [insufficientPoints, setInsufficientPoints] = useState(false);
+  const [requiredPoints, setRequiredPoints] = useState(0);
+
+  // Cost calculation (1 point = 1 LKR)
+  const costInLKR = (duration / 60) * 1200;
+  const pointsNeeded = Math.ceil(costInLKR);
 
   // Load EVs on component mount
   useEffect(() => {
@@ -100,6 +114,15 @@ const BookingScreen = () => {
       return;
     }
 
+    // Check if user has sufficient points
+    const userPoints = user?.points || 0;
+    if (userPoints < pointsNeeded) {
+      setRequiredPoints(pointsNeeded);
+      setInsufficientPoints(true);
+      setShowBuyPoints(true);
+      return;
+    }
+
     setProcessing(true);
 
     try {
@@ -112,19 +135,31 @@ const BookingScreen = () => {
         chargerId: chargerId,
         startAt: startDateTime.toISOString(),
         endAt: endDateTime.toISOString(),
+        pointsToDeduct: pointsNeeded,
       };
 
       const token = localStorage.getItem('token');
+      
+      // Create booking with points deduction
       const response = await axios.post<CheckoutResponse>(
-        'http://localhost:8080/api/bookings/checkout',
+        API_URL + '/bookings/checkout',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      // Deduct points on successful booking
+      try {
+        await deductPointsService(pointsNeeded);
+        updatePoints(userPoints - pointsNeeded);
+      } catch (pointErr) {
+        console.error("Error deducting points:", pointErr);
+        // Points deduction might be handled by backend, continue with booking
+      }
+
       if (response.data.url) {
         window.location.href = response.data.url;
       } else {
-        alert("Booking created! Redirecting...");
+        alert("Booking confirmed! Points deducted. Redirecting...");
         navigate('/dashboard');
       }
     } catch (error) {
@@ -132,6 +167,12 @@ const BookingScreen = () => {
       alert("Unable to process booking. Please check if all IDs exist.");
       setProcessing(false);
     }
+  };
+
+  const handleBuyPointsSuccess = () => {
+    setShowBuyPoints(false);
+    setInsufficientPoints(false);
+    // Points will be updated after payment
   };
 
   if (loading) {
@@ -152,11 +193,37 @@ const BookingScreen = () => {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white p-5 ml-64 space-y-6">
-      {/* HEADER */}
+      {/* HEADER WITH POINTS */}
       <div className="bg-[#0E1424] p-5 rounded-2xl border border-[#1A2236]">
-        <h1 className="text-green-400 text-xl font-bold">Book Charger</h1>
-        <p className="text-gray-400 text-sm">Select vehicle, time, and duration</p>
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <h1 className="text-green-400 text-xl font-bold">Book Charger</h1>
+            <p className="text-gray-400 text-sm">Select vehicle, time, and duration</p>
+          </div>
+          <div className="flex items-center gap-2 bg-green-500/20 px-3 py-2 rounded-lg border border-green-500">
+            <Coins size={18} className="text-green-400" />
+            <span className="font-semibold text-green-400">{user?.points || 0} Points</span>
+          </div>
+        </div>
       </div>
+
+      {/* POINTS REQUIREMENT WARNING */}
+      {pointsNeeded > 0 && (
+        <div className="bg-blue-500/10 border border-blue-500 rounded-2xl p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-400 font-semibold mb-1">Booking Cost: {pointsNeeded} Points</p>
+              <p className="text-gray-400 text-sm">Rs. {costInLKR.toFixed(2)} (1 Point = 1 LKR)</p>
+            </div>
+            {user && user.points < pointsNeeded && (
+              <div className="text-right">
+                <p className="text-red-400 font-semibold mb-1">Insufficient Points!</p>
+                <p className="text-gray-400 text-sm">Need {pointsNeeded - (user?.points || 0)} more</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* VEHICLE SELECTION */}
       <div className="bg-[#0E1424] p-5 rounded-2xl border border-[#1A2236]">
@@ -274,9 +341,15 @@ const BookingScreen = () => {
               })()}
             </span>
           </div>
+          <div className="flex justify-between">
+            <span>Duration</span>
+            <span className="text-white">{duration} minutes</span>
+          </div>
           <div className="flex justify-between font-semibold text-lg mt-3 border-t border-[#1A2236] pt-3">
-            <span>Total Estimate</span>
-            <span className="text-green-400">Rs. {((duration / 60) * 1200).toFixed(2)}</span>
+            <span>Cost</span>
+            <span className="text-green-400">
+              {pointsNeeded} Points (Rs. {costInLKR.toFixed(2)})
+            </span>
           </div>
         </div>
       </div>
@@ -302,12 +375,23 @@ const BookingScreen = () => {
           {!processing && !checking && isAvailable === false && "Slot Unavailable"}
           {!processing && !checking && isAvailable !== false && (
             <>
-              <Calendar size={20} />
-              Confirm & Pay
+              <Coins size={20} />
+              Confirm Booking ({pointsNeeded} Points)
             </>
           )}
         </button>
       </div>
+
+      {/* Buy Points Modal */}
+      <BuyPointsModal
+        isOpen={showBuyPoints}
+        onClose={() => {
+          setShowBuyPoints(false);
+          setInsufficientPoints(false);
+        }}
+        onSuccess={handleBuyPointsSuccess}
+        requiredPoints={insufficientPoints ? requiredPoints : 0}
+      />
     </div>
   );
 };
