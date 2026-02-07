@@ -30,7 +30,7 @@ export default function About(): React.ReactElement {
       bio: "Developing intelligent IoT-driven systems for efficient and sustainable EV charging."
     },
     {
-      name: "Rashen Himakara",
+      name: "Rashen Perera",
       imageUrl: images.rashen,
       bio: "Crafting clean, user-friendly designs for a seamless EV charging experience."
     },
