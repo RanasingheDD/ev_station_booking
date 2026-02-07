@@ -102,7 +102,7 @@ const Sidebar: React.FC = () => {
             Subscriptions
           </li>
 
-          <li className="px-4 py-3 rounded-lg hover:bg-white/10">
+          <li className="px-4 py-3 rounded-lg">
             <LogoutButton />
           </li>
 
