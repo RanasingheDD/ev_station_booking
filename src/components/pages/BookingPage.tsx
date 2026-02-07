@@ -10,6 +10,15 @@ interface CheckoutResponse {
   url: string;
 }
 
+interface Slot {
+  start: string;
+  end: string;
+  available: boolean;
+}
+
+
+
+
 const BookingScreen = () => {
   const [evs, setEvs] = useState<EV[]>([]);
   const [selectedEvId, setSelectedEvId] = useState<string | null>(null);
@@ -17,6 +26,7 @@ const BookingScreen = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { stationId, chargerId } = useParams<{ stationId: string; chargerId: string }>();
+  const [slots, setSlots] = useState<Slot[]>([]);
 
   // --- NEW STATE FOR BOOKING DETAILS ---
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -37,6 +47,22 @@ const BookingScreen = () => {
     };
     fetchEVs();
   }, []);
+
+  useEffect(() => {
+  if (!chargerId) return;
+
+  axios.get<Slot[]>(
+    "http://localhost:8080/api/bookings/available-slots",
+    {
+      params: {
+        chargerId,
+        date: selectedDate
+      }
+    }
+  ).then(res => setSlots(res.data))
+   .catch(err => console.error(err));
+}, [selectedDate, chargerId]);
+
 
 
   const handleConfirmPayment = async () => {
@@ -119,6 +145,38 @@ const BookingScreen = () => {
           </div>
         </div>
       </div>
+
+      {/* AVAILABLE SLOTS */}
+<div className="bg-[#0E1424] p-5 rounded-2xl border border-[#1A2236]">
+  <h2 className="text-green-400 font-semibold mb-3">
+    Available Slots
+  </h2>
+
+  <div className="grid grid-cols-4 gap-3">
+    {slots.map((slot, i) => {
+      const time = new Date(slot.start).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      return (
+        <button
+          key={i}
+          disabled={!slot.available}
+          onClick={() => setSelectedTime(time)}
+          className={`py-2 rounded-lg text-sm font-semibold
+            ${slot.available
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-red-500/30 cursor-not-allowed"}
+          `}
+        >
+          {time}
+        </button>
+      );
+    })}
+  </div>
+</div>
+
 
       {/* DURATION */}
       <div className="bg-[#0E1424] p-5 rounded-2xl border border-[#1A2236]">

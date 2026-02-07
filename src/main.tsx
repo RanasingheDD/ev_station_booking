@@ -26,6 +26,8 @@ import PublicLayout from "./components/Layout/PublicLayout";
 import OwnerDashboard from "./components/pages/OwnerDashboard";
 import BookingPage from "./components/pages/BookingPage";
 import UnderDeveloping from "./components/underDeveloping/underDeveloping";
+import PaymentSuccess from "./components/payment/paymentSuccess";
+import PaymentCancel from "./components/payment/paymentCancel";
 
 //PrivateRoute Component
 const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
@@ -72,7 +74,9 @@ const router = createBrowserRouter([
       { path: "stations", element: <Stations /> },
       { path: "account", element: <Account /> },
       { path: "/stations/:id", element: <StationDetails /> },
-      { path:"/booking/:stationId/:chargerId", element: <BookingPage/>}
+      { path:"/booking/:stationId/:chargerId", element: <BookingPage/>},
+      { path:"/payment-success", element: <PaymentSuccess/>},
+      { path:"/cancel", element: <PaymentCancel/>},
     ],
   },
 ]);
