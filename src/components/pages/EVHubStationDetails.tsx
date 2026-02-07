@@ -81,7 +81,7 @@ const totalChargers = station.chargers?.length || 0;
 
   const handleBookNow = () => {
     if (availableChargers.length === 1) {
-      navigate(`/booking/${station.id}/${availableChargers[0].id}`);
+      navigate(`/app/booking/${station.id}/${availableChargers[0].id}`);
     } else if (availableChargers.length > 1) {
       // Show modal to select charger
       const selected = window.prompt(
@@ -90,13 +90,28 @@ const totalChargers = station.chargers?.length || 0;
           .join("\n")}`
       );
       if (selected) {
-        navigate(`/booking/${station.id}/${selected}`);
+        navigate(`/app/booking/${station.id}/${selected}`);
       }
     }
   };
 
   const handleDirections = () => {
     if (!station) return;
+    // First try session cached coords to avoid re-prompting for location
+    try {
+      const cachedCoords = sessionStorage.getItem("session_user_location");
+      if (cachedCoords) {
+        const parsed = JSON.parse(cachedCoords);
+        const userLat = parsed.lat;
+        const userLng = parsed.lng;
+        const destination = `${station.lat},${station.lng}`;
+        const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destination}&travelmode=driving`;
+        window.open(googleMapsUrl, "_blank");
+        return;
+      }
+    } catch (err) {
+      console.warn("Error reading cached coords", err);
+    }
 
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
@@ -111,6 +126,13 @@ const totalChargers = station.chargers?.length || 0;
         const destination = `${station.lat},${station.lng}`;
 
         const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destination}&travelmode=driving`;
+
+        // cache coords for session so next time we can skip prompt
+        try {
+          sessionStorage.setItem("session_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
+        } catch (err) {
+          console.warn("Failed to cache user coords", err);
+        }
 
         window.open(googleMapsUrl, "_blank");
       },
@@ -128,6 +150,8 @@ const totalChargers = station.chargers?.length || 0;
         {/* Station Image */}
         {station.images && station.images.length > 0 ? (
           <img
+            loading="lazy"
+            decoding="async"
             src={station.images[0]}
             alt={station.name}
             className="w-full h-64 object-cover"
@@ -222,7 +246,7 @@ const totalChargers = station.chargers?.length || 0;
             className="p-3 border border-[#1A2236] rounded-lg mb-2 flex justify-between cursor-pointer"
             onClick={() =>
               charger.status === "AVAILABLE" &&
-              navigate(`/booking/${station.id}/${charger.id}`)
+                navigate(`/app/booking/${station.id}/${charger.id}`)
             }
           >
             <span>

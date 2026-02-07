@@ -11,6 +11,8 @@ export const TeamMember: React.FC<TeamMemberProps> = ({ name, imageUrl, bio }) =
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 flex flex-col items-center text-center border border-gray-100">
       <div className="relative">
         <img
+          loading="lazy"
+          decoding="async"
           src={imageUrl}
           alt={name}
           className="w-36 h-36 rounded-full object-cover border-4 border-green-300 shadow-md mb-4 transition-transform duration-300 hover:scale-105"

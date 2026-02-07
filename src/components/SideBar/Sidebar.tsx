@@ -25,10 +25,10 @@ const Sidebar: React.FC = () => {
 
         <ul className="space-y-5">
         <li
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/app/dashboard")}
             className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200
               ${
-                isActive("/dashboard")
+                isActive("/app/dashboard")
                   ? "bg-green-400 text-black font-semibold"
                   : "text-white hover:bg-white/10 hover:text-green-400"
               }
@@ -38,10 +38,10 @@ const Sidebar: React.FC = () => {
         </li>
 
          <li
-            onClick={() => navigate("/stations")}
+            onClick={() => navigate("/app/stations")}
             className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200 
               ${
-                isActive("/stations")
+                isActive("/app/stations")
                   ? "bg-green-400 text-black font-semibold"
                   : "text-white hover:bg-white/10 hover:text-green-400"
               }
