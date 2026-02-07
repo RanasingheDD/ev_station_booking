@@ -303,6 +303,8 @@ const StationModal = ({
                 {formData.images?.[0] ? (
                   <div className="relative h-48 w-full">
                     <img 
+                      loading="lazy"
+                      decoding="async"
                       src={formData.images[0]} 
                       alt="Preview" 
                       className="h-full w-full object-cover rounded-lg shadow-lg ring-1 ring-white/10"
@@ -637,6 +639,8 @@ export default function OwnerDashboard() {
               <div key={station.id} className={`${styles.cardBg} border border-slate-800 rounded-2xl overflow-hidden flex flex-col group hover:border-slate-500 transition-all duration-300 shadow-lg`}>
                 <div className="relative h-48 overflow-hidden bg-slate-800">
                   <img
+                    loading="lazy"
+                    decoding="async"
                     src={station.images?.[0] || "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=1000"}
                     alt={station.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"

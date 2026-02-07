@@ -239,6 +239,8 @@ export default function StationDetailsPage() {
                   station.images.map((img, idx) => (
                     <img
                       key={idx}
+                      loading="lazy"
+                      decoding="async"
                       src={img}
                       alt={`${station.name} ${idx + 1}`}
                       className="w-full h-48 object-cover rounded-lg"

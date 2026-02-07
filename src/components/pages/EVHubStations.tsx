@@ -93,7 +93,7 @@ const Stations: React.FC = () => {
               {searchResults.map((s) => (
                 <div
                   key={s.id}
-                  onClick={() => navigate(`/stations/${s.id}`)}
+                  onClick={() => navigate(`/app/stations/${s.id}`)}
                   className="px-4 py-2 hover:bg-[#1A2236] cursor-pointer"
                 >
                   <p className="text-white text-sm font-medium">{s.name}</p>
@@ -128,7 +128,7 @@ const Stations: React.FC = () => {
           stations.map((s) => (
             <div
               key={s.id}
-              onClick={() => navigate(`/stations/${s.id}`)}
+              onClick={() => navigate(`/app/stations/${s.id}`)}
               className="cursor-pointer bg-[#161B2E] p-5 rounded-xl border
                          border-transparent hover:border-green-400 hover:shadow-lg
                          transition"

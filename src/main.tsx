@@ -26,11 +26,13 @@ import ContactUs from "./components/contactUs/contactUs";
 import PublicLayout from "./components/Layout/PublicLayout";
 import OwnerDashboard from "./components/pages/OwnerDashboard";
 import BookingPage from "./components/pages/BookingPage";
+import BookingsPage from "./components/pages/BookingsDetailsPage";
 import UnderDeveloping from "./components/underDeveloping/underDeveloping";
 import PaymentSuccess from "./components/payment/paymentSuccess";
 import PaymentCancel from "./components/payment/paymentCancel";
 import OwnerStationDetails from "./components/pages/OwnerStationDetails";
 import OAuthRedirect from "./components/auth/OAuthRedirect";
+import SubscriptionPage from "./components/pages/SubscriptionPage";
 
 const RoleProtectedRoute = ({ 
   element, 
@@ -65,69 +67,73 @@ const RoleProtectedRoute = ({
 
 // Router
 const router = createBrowserRouter([
-
-   {
+  // Public pages wrapped with PublicLayout
+  {
     path: "/",
     element: <PublicLayout />,
     children: [
-      { path: "/", element: <App /> },
-      { path: "/about", element: <AboutUs /> },
-      { path: "/contact", element: <ContactUs /> },
+      { index: true, element: <App /> },
+      { path: "about", element: <AboutUs /> },
+      { path: "contact", element: <ContactUs /> },
+      { path: "under-development", element: <UnderDeveloping /> },
     ],
   },
 
-   // Public routes without Navbar/Footer
+  // Auth pages (kept outside PublicLayout for a focused UI)
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <Login /> },
   { path: "/oauth2/redirect", element: <OAuthRedirect /> },
-  {path:"/under-development", element:<UnderDeveloping/>},
 
-  { 
-    path: "/owner-dashboard", 
-    element: (
-      <RoleProtectedRoute 
-        element={<OwnerDashboard />} 
-        allowedRoles={["OWNER"]} 
-      />
-    )
-  },
-  { 
-    path: "/owner/station/:id", 
-    element: (
-      <RoleProtectedRoute 
-        // Import OwnerStationDetails at the top of the file!
-        element={<OwnerStationDetails />} 
-        allowedRoles={["OWNER"]} 
-      />
-    )
-  },
-  
-  // Public
-  // { path: "/", element: <App /> },
-  // { path: "/signup", element: <SignUp /> },
-  // { path: "/login", element: <Login /> },
-  // { path: "/about", element: <AboutUs /> },
-  // { path: "/contact", element: <ContactUs /> },
-
-  // Private routes wrapped in Layout
+  // Owner routes grouped under /owner
   {
-    path: "/",
-    element: (
-      <RoleProtectedRoute 
-        element={<Layout />} 
-        allowedRoles={["USER"]} 
-      />
-    ),
+    path: "/owner",
     children: [
+      {
+        index: true,
+        element: (
+          <RoleProtectedRoute element={<OwnerDashboard />} allowedRoles={["OWNER"]} />
+        ),
+      },
+      {
+        path: "station/:id",
+        element: (
+          <RoleProtectedRoute element={<OwnerStationDetails />} allowedRoles={["OWNER"]} />
+        ),
+      },
+    ],
+  },
+
+  // Private user routes wrapped in Sidebar Layout
+  {
+    path: "/app",
+    element: <RoleProtectedRoute element={<Layout />} allowedRoles={["USER"]} />,
+    children: [
+      { index: true, element: <Navigate to="dashboard" replace /> },
       { path: "dashboard", element: <Dashboard /> },
       { path: "stations", element: <Stations /> },
+      { path: "stations/:id", element: <StationDetails /> },
       { path: "account", element: <Account /> },
       { path: "/stations/:id", element: <StationDetails /> },
       { path:"/booking/:stationId/:chargerId", element: <BookingPage/>},
       { path:"/payment-success", element: <PaymentSuccess/>},
       { path:"/cancel", element: <PaymentCancel/>},
+      { path: "subscriptions", element: <SubscriptionPage /> },
+      { path: "bookings", element: <BookingsPage /> },
+      { path: "booking/:stationId/:chargerId", element: <BookingPage /> },
     ],
   },
+
+  // Fallback — redirect unknown routes to home
+  // Backwards-compatible redirects for existing links
+  { path: "/dashboard", element: <Navigate to="/app/dashboard" replace /> },
+  { path: "/stations", element: <Navigate to="/app/stations" replace /> },
+  { path: "/account", element: <Navigate to="/app/account" replace /> },
+  { path: "/subscriptions", element: <Navigate to="/app/subscriptions" replace /> },
+  { path: "/stations/:id", element: <Navigate to="/app/stations/:id" replace /> },
+  { path: "/booking/:stationId/:chargerId", element: <Navigate to="/app/booking/:stationId/:chargerId" replace /> },
+  { path: "/owner-dashboard", element: <Navigate to="/owner" replace /> },
+  { path: "/owner/station/:id", element: <Navigate to="/owner/station/:id" replace /> },
+  { path: "*", element: <Navigate to="/" replace /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

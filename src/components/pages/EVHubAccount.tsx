@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Edit2, Bell, Search, Coins, CreditCard } from "lucide-react";
+import { Edit2, Coins, CreditCard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Snackbar, Alert } from "@mui/material";
 import useAuth from "../hooks/useAuth";
@@ -75,6 +75,19 @@ const EVHubAccount: React.FC = () => {
 
   // 📍 Location
   useEffect(() => {
+    // Use cached session location if available to avoid repeated geolocation prompts
+    try {
+      const cachedPlace = sessionStorage.getItem("session_user_place");
+      const cachedCoords = sessionStorage.getItem("session_user_location");
+      if (cachedPlace && cachedCoords) {
+        setUserDetails((prev) => (prev ? { ...prev, location: cachedPlace } : prev));
+        setEditForm((prev) => ({ ...prev, location: cachedPlace }));
+        return;
+      }
+    } catch (err) {
+      console.warn("Error reading cached session location", err);
+    }
+
     if (!navigator.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -92,6 +105,13 @@ const EVHubAccount: React.FC = () => {
 
         setUserDetails((prev) => (prev ? { ...prev, location: city } : prev));
         setEditForm((prev) => ({ ...prev, location: city }));
+
+        try {
+          sessionStorage.setItem("session_user_place", city);
+          sessionStorage.setItem("session_user_location", JSON.stringify({ lat: latitude, lng: longitude }));
+        } catch (err) {
+          console.warn("Failed to cache session location", err);
+        }
       } catch (err) {
         console.error("Reverse geocode error:", err);
       }
@@ -221,6 +241,8 @@ const EVHubAccount: React.FC = () => {
           <div className="border-t border-gray-700 my-3"></div>
 
           <img
+            loading="lazy"
+            decoding="async"
             src="/member.jpg"
             alt="User"
             className="w-60 h-60 rounded-full border border-gray-600 mb-4 mx-auto"
