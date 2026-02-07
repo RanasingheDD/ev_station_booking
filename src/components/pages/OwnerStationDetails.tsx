@@ -63,6 +63,8 @@ export default function OwnerStationDetails() {
       <div className="relative h-80 w-full overflow-hidden">
         {/* Background Image */}
         <img 
+          loading="lazy"
+          decoding="async"
           src={bannerImage} 
           alt={station.name} 
           className="w-full h-full object-cover"

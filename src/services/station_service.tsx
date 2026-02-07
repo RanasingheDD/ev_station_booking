@@ -22,15 +22,77 @@ export interface DisplayStation {
   slot: number;
 }
 
+// ============================================
+// CACHE HELPERS
+// ============================================
+
+const STATIONS_CACHE_KEY = "cached_stations";
+const STATIONS_CACHE_TIMESTAMP_KEY = "cached_stations_timestamp";
+
 /**
- * LEGACY: Fetch stations (kept for backward compatibility)
+ * Get cached stations from localStorage
+ */
+const getCachedStations = (): DisplayStation[] | null => {
+  try {
+    const cached = localStorage.getItem(STATIONS_CACHE_KEY);
+    if (!cached) return null;
+    return JSON.parse(cached);
+  } catch (error) {
+    console.error("Error reading cached stations:", error);
+    return null;
+  }
+};
+
+/**
+ * Save stations to localStorage cache
+ */
+const cacheStations = (stations: DisplayStation[]): void => {
+  try {
+    localStorage.setItem(STATIONS_CACHE_KEY, JSON.stringify(stations));
+    localStorage.setItem(STATIONS_CACHE_TIMESTAMP_KEY, new Date().toISOString());
+  } catch (error) {
+    console.error("Error caching stations:", error);
+  }
+};
+
+/**
+ * Clear stations cache
+ */
+export const clearStationsCache = (): void => {
+  try {
+    localStorage.removeItem(STATIONS_CACHE_KEY);
+    localStorage.removeItem(STATIONS_CACHE_TIMESTAMP_KEY);
+  } catch (error) {
+    console.error("Error clearing stations cache:", error);
+  }
+};
+
+/**
+ * Get cache timestamp
+ */
+export const getStationsCacheTimestamp = (): string | null => {
+  return localStorage.getItem(STATIONS_CACHE_TIMESTAMP_KEY);
+};
+
+/**
+ * LEGACY: Fetch stations with localStorage caching
+ * - Checks cache first
+ * - If not cached, fetches from API and saves to cache
  * Used by EVHubStations and other existing components
  */
 export const fetchStations = async (): Promise<DisplayStation[]> => {
+  // 1️⃣ Check if stations are already cached
+  const cachedStations = getCachedStations();
+  if (cachedStations && cachedStations.length > 0) {
+    console.log("📦 Returning cached stations");
+    return cachedStations;
+  }
+
+  // 2️⃣ If not cached, fetch from API
   try {
     const res = await axios.get(API_URL + "/ev_stations/all");
 
-    return res.data.map((station: Station) => {
+    const displayStations: DisplayStation[] = res.data.map((station: Station) => {
       const chargers: Charger[] = (station.chargers || []).map((c) =>
         typeof c === "string" ? JSON.parse(c) : c
       );
@@ -48,9 +110,17 @@ export const fetchStations = async (): Promise<DisplayStation[]> => {
           .length,
       };
     });
+
+    // 3️⃣ Cache the fetched stations
+    cacheStations(displayStations);
+    console.log("⬇️ Fetched and cached stations from API");
+
+    return displayStations;
   } catch (error) {
     console.error("Error fetching stations:", error);
-    return [];
+    // Fallback to cache even if it's empty
+    const cachedFallback = getCachedStations();
+    return cachedFallback || [];
   }
 };
 

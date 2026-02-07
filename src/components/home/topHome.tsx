@@ -12,6 +12,8 @@ export default function HeroLanding(): React.ReactElement {
       {/* Hero Section */}
       <section className="relative w-full h-screen flex items-center justify-center">
         <img
+          loading="lazy"
+          decoding="async"
           src={hero}
           alt="EV Charging Station"
           className="absolute inset-0 w-full h-full object-cover"
@@ -28,7 +30,7 @@ export default function HeroLanding(): React.ReactElement {
               Join with Us
             </button>
             </Link>
-            <Link to="/dashboard">
+              <Link to="/app/dashboard">
               <button className="px-10 py-4 text-lg font-semibold bg-emerald-400 text-gray-900 rounded-full hover:bg-emerald-300 transition-transform transform hover:scale-105 shadow-xl">
                Dashboard
               </button>

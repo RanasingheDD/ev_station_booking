@@ -185,6 +185,8 @@ const EVHubDashboard: React.FC = () => {
                 className="bg-[#101726] rounded-2xl w-full max-w-6xl mx-auto shadow-xl overflow-hidden"
               >
                 <img
+                  loading="lazy"
+                  decoding="async"
                   src="/car01.png"
                   alt={ev.nickname || ev.make}
                   className="w-[65%] h-96 object-cover justify-center mx-auto"

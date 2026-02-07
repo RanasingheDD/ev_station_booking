@@ -49,9 +49,11 @@ export default function About(): React.ReactElement {
         <section className="relative w-screen left-1/2 -translate-x-1/2 h-screen flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 w-full h-full">
                 <img
-                    src={coverImg}
-                    alt="EV HUB Smart Charging"
-                    className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  src={coverImg}
+                  alt="EV HUB Smart Charging"
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/40" />
             </div>
