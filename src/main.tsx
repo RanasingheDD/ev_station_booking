@@ -6,6 +6,7 @@ import {
   Navigate,
   RouterProvider,
 } from "react-router-dom";
+import { UserProvider } from "./context/UserContext";
 
 // Public pages
 import App from "./App";
@@ -28,11 +29,38 @@ import BookingPage from "./components/pages/BookingPage";
 import UnderDeveloping from "./components/underDeveloping/underDeveloping";
 import PaymentSuccess from "./components/payment/paymentSuccess";
 import PaymentCancel from "./components/payment/paymentCancel";
+import OwnerStationDetails from "./components/pages/OwnerStationDetails";
+import OAuthRedirect from "./components/auth/OAuthRedirect";
 
-//PrivateRoute Component
-const PrivateRoute = ({ element }: { element: React.ReactElement }) => {
+const RoleProtectedRoute = ({ 
+  element, 
+  allowedRoles 
+}: { 
+  element: React.ReactElement, 
+  allowedRoles: string[] 
+}) => {
   const token = localStorage.getItem("token");
-  return token ? element : <Navigate to="/login" replace />;
+  const role = localStorage.getItem("role"); // Need to save this in Login.tsx!
+
+  // 1. Not Logged In -> Go to Login
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // 2. Logged in, but wrong role?
+  if (role && !allowedRoles.includes(role)) {
+    // If an OWNER tries to go to User pages -> Send back to Owner Dashboard
+    if (role === "OWNER") {
+      return <Navigate to="/owner-dashboard" replace />;
+    }
+    // If a USER tries to go to Owner pages -> Send back to User Dashboard
+    if (role === "USER") {
+      return <Navigate to="/dashboard" replace />;
+    }
+  }
+
+  // 3. Authorized -> Show Page
+  return element;
 };
 
 // Router
@@ -51,11 +79,27 @@ const router = createBrowserRouter([
    // Public routes without Navbar/Footer
   { path: "/signup", element: <SignUp /> },
   { path: "/login", element: <Login /> },
+  { path: "/oauth2/redirect", element: <OAuthRedirect /> },
   {path:"/under-development", element:<UnderDeveloping/>},
 
   { 
     path: "/owner-dashboard", 
-    element: <PrivateRoute element={<OwnerDashboard />} /> 
+    element: (
+      <RoleProtectedRoute 
+        element={<OwnerDashboard />} 
+        allowedRoles={["OWNER"]} 
+      />
+    )
+  },
+  { 
+    path: "/owner/station/:id", 
+    element: (
+      <RoleProtectedRoute 
+        // Import OwnerStationDetails at the top of the file!
+        element={<OwnerStationDetails />} 
+        allowedRoles={["OWNER"]} 
+      />
+    )
   },
   
   // Public
@@ -68,7 +112,12 @@ const router = createBrowserRouter([
   // Private routes wrapped in Layout
   {
     path: "/",
-    element: <PrivateRoute element={<Layout />} />,
+    element: (
+      <RoleProtectedRoute 
+        element={<Layout />} 
+        allowedRoles={["USER"]} 
+      />
+    ),
     children: [
       { path: "dashboard", element: <Dashboard /> },
       { path: "stations", element: <Stations /> },
@@ -83,6 +132,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <UserProvider>
+      <RouterProvider router={router} />
+    </UserProvider>
   </React.StrictMode>
 );

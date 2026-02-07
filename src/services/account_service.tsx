@@ -1,3 +1,4 @@
+import axios from "axios";
 import { API_URL } from "../config/api_config";
 
 // 🔐 Auth header helper
@@ -7,49 +8,64 @@ const authHeader = () => ({
 
 // 👤 Get current user
 export const fetchCurrentUser = async () => {
-  const res = await fetch(`${API_URL}/users/me`, {
-    headers: authHeader(),
-  });
-  if (!res.ok) throw new Error("Failed to fetch user");
-  return res.json();
+  const res = await axios.get(`${API_URL}/users/me`, { headers: authHeader() });
+  return res.data;
 };
 
 // ✏️ Update profile
 export const updateUserProfile = async (data: any) => {
-  const res = await fetch(`${API_URL}/users/me`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      ...authHeader(),
-    },
-    body: JSON.stringify(data),
+  await axios.put(`${API_URL}/users/me`, data, {
+    headers: { "Content-Type": "application/json", ...authHeader() },
   });
-  if (!res.ok) throw new Error("Failed to update profile");
 };
 
 // 🖥 Get active sessions
-export const fetchSessions = async () => {
-  const res = await fetch(`${API_URL}/sessions`, {
-    headers: authHeader(),
+export const fetchSessions = async (username: string) => {
+  const token = localStorage.getItem("token");
+  const res = await axios.get(`${API_URL}/sessions/sessions/${username}`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Failed to fetch sessions");
-  return res.json();
+  return res.data;
 };
 
 // 🚪 Logout device
 export const logoutSession = async (sessionId: string) => {
-  const res = await fetch(`${API_URL}/sessions/${sessionId}`, {
-    method: "DELETE",
-    headers: authHeader(),
-  });
-  if (!res.ok) throw new Error("Failed to logout device");
+  await axios.delete(`${API_URL}/sessions/${sessionId}`, { headers: authHeader() });
 };
 
 // ❌ Delete account
 export const deleteAccountService = async () => {
-  const res = await fetch(`${API_URL}/users/me`, {
-    method: "DELETE",
-    headers: authHeader(),
-  });
-  if (!res.ok) throw new Error("Failed to delete account");
+  await axios.delete(`${API_URL}/users/me`, { headers: authHeader() });
+};
+
+// 💳 Get current user with points
+export const fetchUserWithPoints = async () => {
+  const res = await axios.get(`${API_URL}/users/me`, { headers: authHeader() });
+  return res.data;
+};
+
+// 🎁 Get user points balance
+export const fetchUserPoints = async () => {
+  const res = await axios.get(`${API_URL}/users/me/points`, { headers: authHeader() });
+  return res.data;
+};
+
+// ➕ Add points (for purchase)
+export const addPointsService = async (amount: number, price: number) => {
+  const res = await axios.post(
+    `${API_URL}/users/me/points/add`,
+    { amount, price },
+    { headers: { "Content-Type": "application/json", ...authHeader() } }
+  );
+  return res.data;
+};
+
+// ➖ Deduct points (for booking)
+export const deductPointsService = async (points: number) => {
+  const res = await axios.post(
+    `${API_URL}/users/me/points/deduct`,
+    { points },
+    { headers: { "Content-Type": "application/json", ...authHeader() } }
+  );
+  return res.data;
 };

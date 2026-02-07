@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Edit2, Bell, Search } from "lucide-react";
+import { Edit2, Bell, Search, Coins, CreditCard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Snackbar, Alert } from "@mui/material";
 import useAuth from "../hooks/useAuth";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSessionSocket } from "../hooks/useSessionSocket";
+import { useUser } from "../../context/UserContext";
+import BuyPointsModal from "../BuyPointsModal/BuyPointsModal";
+import { usePoints } from "../hooks/usePoints";
+
 import {
   fetchCurrentUser,
   updateUserProfile,
@@ -31,6 +37,7 @@ interface DeviceSession {
 const EVHubAccount: React.FC = () => {
   useAuth();
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [devices, setDevices] = useState<DeviceSession[]>([]);
@@ -38,12 +45,19 @@ const EVHubAccount: React.FC = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteText, setDeleteText] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [currentDeviceId, setCurrentDeviceId] = useState<string>("");
+  const [showBuyPoints, setShowBuyPoints] = useState(false);
+
+  // points
+  const {points} = usePoints();
 
   const [editForm, setEditForm] = useState({
     username: "",
     mobile: "",
     location: "",
   });
+
+  const token = localStorage.getItem("token");
   
 
   // 👤 Load user
@@ -65,35 +79,39 @@ const EVHubAccount: React.FC = () => {
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const { latitude, longitude } = pos.coords;
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-      );
-      const data = await res.json();
-      const city =
-        data.address.city ||
-        data.address.town ||
-        data.address.village ||
-        data.display_name;
+      try {
+        const res = await axios.get(
+          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+        );
+        const data = res.data;
+        const city =
+          data.address.city ||
+          data.address.town ||
+          data.address.village ||
+          data.display_name;
 
-      setUserDetails((prev) =>
-        prev ? { ...prev, location: city } : prev
-      );
-      setEditForm((prev) => ({ ...prev, location: city }));
+        setUserDetails((prev) => (prev ? { ...prev, location: city } : prev));
+        setEditForm((prev) => ({ ...prev, location: city }));
+      } catch (err) {
+        console.error("Reverse geocode error:", err);
+      }
     });
   }, []);
 
   // 🖥 Load devices
   useEffect(() => {
     const loadDevices = async () => {
+      if (!userDetails) return;
       try {
-        const data = await fetchSessions();
+        const data = await fetchSessions(userDetails.email);
         setDevices(data);
+        setCurrentDeviceId(data.currentDeviceId);
       } catch (err) {
         console.error(err);
       }
     };
     loadDevices();
-  }, []);
+  }, [userDetails]);
 
   // ✏️ Save profile
   const handleSaveProfile = async () => {
@@ -113,10 +131,19 @@ const EVHubAccount: React.FC = () => {
   };
 
   // 🚪 Logout device
+  // const logoutDevice = async (id: string) => {
+  //   try {
+  //     await logoutSession(id);
+  //     setDevices((prev) => prev.filter((d) => d.id !== id));
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
   const logoutDevice = async (id: string) => {
     try {
       await logoutSession(id);
-      setDevices((prev) => prev.filter((d) => d.id !== id));
+      // WebSocket will update devices automatically
     } catch (err) {
       console.error(err);
     }
@@ -132,6 +159,23 @@ const EVHubAccount: React.FC = () => {
       console.error(err);
     }
   };
+
+  const username = userDetails?.email || "";
+  useSessionSocket(username, token, setDevices);
+
+  const formatIP = (ip: string) => {
+      if (!ip) return "Unknown IP";
+
+      // Convert IPv6 loopback to IPv4
+      if (ip === "::1" || ip === "0:0:0:0:0:0:0:1") return "127.0.0.1";
+
+      // Optionally truncate long IPv6
+      if (ip.includes(":") && !ip.startsWith("127")) {
+        return ip.split(":").slice(-2).join(":"); // shows only last 2 blocks
+      }
+
+      return ip;
+    };
 
   if (!userDetails) {
     return (
@@ -149,7 +193,7 @@ const EVHubAccount: React.FC = () => {
           <p className="text-sm text-gray-400">Pages / Account</p>
           <h1 className="text-4xl font-bold">Account</h1>
         </div>
-        <div className="flex items-center space-x-4">
+        {/* <div className="flex items-center space-x-4">
           <div className="flex items-center bg-[#141a25] px-3 py-2 rounded-full">
             <Search size={18} className="text-gray-400 mr-2" />
             <input
@@ -159,12 +203,7 @@ const EVHubAccount: React.FC = () => {
             />
           </div>
           <Bell className="text-gray-400" />
-          <img
-            src={userDetails.avatar || "/logo.png "}
-            alt="avatar"
-            className="w-10 h-10 rounded-full border border-gray-600"
-          />
-        </div>
+        </div> */}
       </div>
 
       {/* Layout */}
@@ -182,7 +221,7 @@ const EVHubAccount: React.FC = () => {
           <div className="border-t border-gray-700 my-3"></div>
 
           <img
-            src={userDetails.avatar}
+            src="/member.jpg"
             alt="User"
             className="w-60 h-60 rounded-full border border-gray-600 mb-4 mx-auto"
           />
@@ -195,9 +234,32 @@ const EVHubAccount: React.FC = () => {
           <p className="text-gray-500">Mobile</p>
           <p className="font-semibold">{userDetails.mobile}</p>
           <p className="text-gray-500">Location</p>
-          <p className="font-semibold mb-2">
+          <p className="font-semibold mb-4">
             {userDetails?.location || "Fetching location..."}
           </p>
+
+          {/* Points Section */}
+          <div className="border-t border-gray-700 my-4 pt-4">
+            <div className="bg-green-500/10 border border-green-500 rounded-lg p-4 mb-3">
+              <p className="text-gray-500 text-sm mb-1">Available Points</p>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold text-green-400">
+                  {points || 0}
+                </span>
+                <Coins className="text-green-400" size={24} />
+              </div>
+              <p className="text-gray-500 text-xs mt-2">
+                1 Point = 1 LKR
+              </p>
+            </div>
+            <button
+              onClick={() => setShowBuyPoints(true)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            >
+              <CreditCard size={18} />
+              Buy Points
+            </button>
+          </div>
         </div>
 
         {/* Devices Logged In */}
@@ -211,21 +273,23 @@ const EVHubAccount: React.FC = () => {
                 className="flex justify-between items-center bg-[#141a25] p-4 rounded-lg"
               >
                 <div>
-                  <p className="font-semibold">{device.device}</p>
                   <p className="text-sm text-gray-400">
-                    {device.os} • {device.ip}
+                    {device.os} • {formatIP(device.ip)}
                   </p>
                   <p className="text-xs text-gray-500">
-                    Last active: {device.lastActive}
+                    Last active: {new Date(device.lastActive).toLocaleString()}
                   </p>
                 </div>
 
-                <button
-                  onClick={() => logoutDevice(device.id)}
-                  className="text-red-400 hover:text-red-500 text-sm"
-                >
-                  Logout
-                </button>
+                {/* Hide logout button for current device */}
+                {device.id !== currentDeviceId && (
+                  <button
+                    className="bg-red-500 text-white text-xs px-3 py-1 rounded hover:bg-red-600"
+                    onClick={() => logoutDevice(device.id)}
+                  >
+                    Logout
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -349,6 +413,7 @@ const EVHubAccount: React.FC = () => {
                 className="w-full bg-[#141a25] p-2 mt-3 rounded"
                 value={deleteText}
                 onChange={(e) => setDeleteText(e.target.value)}
+                placeholder="Type DELETE to confirm"
               />
 
               <div className="flex justify-end mt-4 gap-3">
@@ -383,6 +448,13 @@ const EVHubAccount: React.FC = () => {
           Profile updated successfully!
         </Alert>
       </Snackbar>
+
+      {/* Buy Points Modal */}
+      <BuyPointsModal
+        isOpen={showBuyPoints}
+        onClose={() => setShowBuyPoints(false)}
+        onSuccess={() => setShowBuyPoints(false)}
+      />
     </div>
   );
 };
