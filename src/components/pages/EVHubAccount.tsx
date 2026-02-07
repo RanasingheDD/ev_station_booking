@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Edit2, Bell, Search } from "lucide-react";
+import { Edit2, Bell, Search, Coins, CreditCard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Snackbar, Alert } from "@mui/material";
 import useAuth from "../hooks/useAuth";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSessionSocket } from "../hooks/useSessionSocket";
+import { useUser } from "../../context/UserContext";
+import BuyPointsModal from "../BuyPointsModal/BuyPointsModal";
 
 import {
   fetchCurrentUser,
@@ -33,6 +36,7 @@ interface DeviceSession {
 const EVHubAccount: React.FC = () => {
   useAuth();
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [devices, setDevices] = useState<DeviceSession[]>([]);
@@ -41,6 +45,7 @@ const EVHubAccount: React.FC = () => {
   const [deleteText, setDeleteText] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [currentDeviceId, setCurrentDeviceId] = useState<string>("");
+  const [showBuyPoints, setShowBuyPoints] = useState(false);
 
   const [editForm, setEditForm] = useState({
     username: "",
@@ -70,20 +75,22 @@ const EVHubAccount: React.FC = () => {
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const { latitude, longitude } = pos.coords;
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-      );
-      const data = await res.json();
-      const city =
-        data.address.city ||
-        data.address.town ||
-        data.address.village ||
-        data.display_name;
+      try {
+        const res = await axios.get(
+          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+        );
+        const data = res.data;
+        const city =
+          data.address.city ||
+          data.address.town ||
+          data.address.village ||
+          data.display_name;
 
-      setUserDetails((prev) =>
-        prev ? { ...prev, location: city } : prev
-      );
-      setEditForm((prev) => ({ ...prev, location: city }));
+        setUserDetails((prev) => (prev ? { ...prev, location: city } : prev));
+        setEditForm((prev) => ({ ...prev, location: city }));
+      } catch (err) {
+        console.error("Reverse geocode error:", err);
+      }
     });
   }, []);
 
@@ -223,9 +230,32 @@ const EVHubAccount: React.FC = () => {
           <p className="text-gray-500">Mobile</p>
           <p className="font-semibold">{userDetails.mobile}</p>
           <p className="text-gray-500">Location</p>
-          <p className="font-semibold mb-2">
+          <p className="font-semibold mb-4">
             {userDetails?.location || "Fetching location..."}
           </p>
+
+          {/* Points Section */}
+          <div className="border-t border-gray-700 my-4 pt-4">
+            <div className="bg-green-500/10 border border-green-500 rounded-lg p-4 mb-3">
+              <p className="text-gray-500 text-sm mb-1">Available Points</p>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold text-green-400">
+                  {user?.points || 0}
+                </span>
+                <Coins className="text-green-400" size={24} />
+              </div>
+              <p className="text-gray-500 text-xs mt-2">
+                1 Point = 1 LKR
+              </p>
+            </div>
+            <button
+              onClick={() => setShowBuyPoints(true)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            >
+              <CreditCard size={18} />
+              Buy Points
+            </button>
+          </div>
         </div>
 
         {/* Devices Logged In */}
@@ -414,6 +444,13 @@ const EVHubAccount: React.FC = () => {
           Profile updated successfully!
         </Alert>
       </Snackbar>
+
+      {/* Buy Points Modal */}
+      <BuyPointsModal
+        isOpen={showBuyPoints}
+        onClose={() => setShowBuyPoints(false)}
+        onSuccess={() => setShowBuyPoints(false)}
+      />
     </div>
   );
 };

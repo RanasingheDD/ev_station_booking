@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock, User } from "lucide-react";
 import { API_URL } from "../../config/api_config";
+import axios from "axios";
 
 import { useNavigate } from "react-router-dom";
 
@@ -57,13 +58,13 @@ const Registration: React.FC = () => {
     };
 
     try {
-      const response = await fetch(API_URL + "/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await axios.post(
+        API_URL + "/users/register",
+        payload,
+        { headers: { "Content-Type": "application/json" } }
+      );
 
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         showNotification("Registration successful!", "success");
         navigate("/login");
       } else if (response.status === 409) {
@@ -71,9 +72,13 @@ const Registration: React.FC = () => {
       } else {
         showNotification("Registration failed!", "error");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      showNotification("Server error!", "error");
+      if (error?.response?.status === 409) {
+        showNotification("Email already exists!", "error");
+      } else {
+        showNotification("Server error!", "error");
+      }
     } finally {
       setLoading(false);
     }

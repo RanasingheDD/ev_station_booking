@@ -1,15 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
+import { Coins } from "lucide-react";
 
 export default function Navbar(): React.ReactElement {
   const username = localStorage.getItem("name");
+  const { user } = useUser();
+  const points = user?.points || 0;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("name");
-    // navigate("/login", { replace: true });
-     // quick hack to update navbar
-      window.location.reload();
+    localStorage.removeItem("role");
+    localStorage.removeItem("points");
+    localStorage.removeItem("userId");
+    // quick hack to update navbar
+     window.location.reload();
   };
 
   return (
@@ -51,10 +57,15 @@ export default function Navbar(): React.ReactElement {
         <div className="flex items-center gap-4 text-white/90">
           {username ? (
             <>
+              {/* Points Display */}
+              <div className="flex items-center gap-2 bg-green-500/20 px-3 py-2 rounded-lg border border-green-500">
+                <Coins size={18} className="text-green-400" />
+                <span className="font-semibold text-green-400">{points} Points</span>
+              </div>
               <span className="font-semibold text-emerald-400">{username}</span>
               <button
                 onClick={handleLogout}
-                className="px-2 py-1 bg-red-600 rounded text-white"
+                className="px-3 py-2 bg-red-600 rounded text-white hover:bg-red-700 transition-colors"
               >
                 Logout
               </button>
