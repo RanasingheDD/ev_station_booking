@@ -50,6 +50,19 @@ const Sidebar: React.FC = () => {
             Stations
           </li>
 
+          <li
+            onClick={() => navigate("/app/bookings")}
+            className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200
+              ${
+                isActive("/app/bookings")
+                  ? "bg-green-400 text-black font-semibold"
+                  : "text-white hover:bg-white/10 hover:text-green-400"
+              }
+            `}
+          >
+            Bookings
+          </li>
+
           {/* <li
             onClick={() => navigate("/trips")}
             className={`cursor-pointer px-4 py-3 rounded-lg transition-all duration-200

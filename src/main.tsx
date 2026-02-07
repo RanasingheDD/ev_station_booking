@@ -26,9 +26,12 @@ import ContactUs from "./components/contactUs/contactUs";
 import PublicLayout from "./components/Layout/PublicLayout";
 import OwnerDashboard from "./components/pages/OwnerDashboard";
 import BookingPage from "./components/pages/BookingPage";
+import BookingsPage from "./components/pages/BookingsDetailsPage";
 import UnderDeveloping from "./components/underDeveloping/underDeveloping";
 import OwnerStationDetails from "./components/pages/OwnerStationDetails";
-import OAuthRedirect from "./components/auth/OAuthRedirect";import SubscriptionPage from "./components/pages/SubscriptionPage";
+import OAuthRedirect from "./components/auth/OAuthRedirect";
+import SubscriptionPage from "./components/pages/SubscriptionPage";
+
 const RoleProtectedRoute = ({ 
   element, 
   allowedRoles 
@@ -109,6 +112,7 @@ const router = createBrowserRouter([
       { path: "stations/:id", element: <StationDetails /> },
       { path: "account", element: <Account /> },
       { path: "subscriptions", element: <SubscriptionPage /> },
+      { path: "bookings", element: <BookingsPage /> },
       { path: "booking/:stationId/:chargerId", element: <BookingPage /> },
     ],
   },
