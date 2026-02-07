@@ -28,6 +28,8 @@ import OwnerDashboard from "./components/pages/OwnerDashboard";
 import BookingPage from "./components/pages/BookingPage";
 import BookingsPage from "./components/pages/BookingsDetailsPage";
 import UnderDeveloping from "./components/underDeveloping/underDeveloping";
+import PaymentSuccess from "./components/payment/paymentSuccess";
+import PaymentCancel from "./components/payment/paymentCancel";
 import OwnerStationDetails from "./components/pages/OwnerStationDetails";
 import OAuthRedirect from "./components/auth/OAuthRedirect";
 import SubscriptionPage from "./components/pages/SubscriptionPage";
@@ -111,6 +113,10 @@ const router = createBrowserRouter([
       { path: "stations", element: <Stations /> },
       { path: "stations/:id", element: <StationDetails /> },
       { path: "account", element: <Account /> },
+      { path: "/stations/:id", element: <StationDetails /> },
+      { path:"/booking/:stationId/:chargerId", element: <BookingPage/>},
+      { path:"/payment-success", element: <PaymentSuccess/>},
+      { path:"/cancel", element: <PaymentCancel/>},
       { path: "subscriptions", element: <SubscriptionPage /> },
       { path: "bookings", element: <BookingsPage /> },
       { path: "booking/:stationId/:chargerId", element: <BookingPage /> },

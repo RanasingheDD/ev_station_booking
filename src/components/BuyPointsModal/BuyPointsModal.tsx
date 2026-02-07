@@ -58,7 +58,7 @@ const BuyPointsModal: React.FC<BuyPointsModalProps> = ({
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `${API_URL}/payments/initiate-points-purchase`,
+        `${API_URL}/bookings/checkouts`,
         { points: pointsToBuy, price },
         { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } }
       );
@@ -87,6 +87,8 @@ const BuyPointsModal: React.FC<BuyPointsModalProps> = ({
   };
 
   if (!isOpen) return null;
+
+
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
