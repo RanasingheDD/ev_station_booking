@@ -6,7 +6,7 @@ import useAuth from "../hooks/useAuth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSessionSocket } from "../hooks/useSessionSocket";
-import { useUser } from "../../context/UserContext";
+// import { useUser } from "../../context/UserContext";
 import BuyPointsModal from "../BuyPointsModal/BuyPointsModal";
 import { usePoints } from "../hooks/usePoints";
 
@@ -37,7 +37,7 @@ interface DeviceSession {
 const EVHubAccount: React.FC = () => {
   useAuth();
   const navigate = useNavigate();
-  const { user } = useUser();
+  // const { user } = useUser();
 
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [devices, setDevices] = useState<DeviceSession[]>([]);
