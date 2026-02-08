@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Edit2, Bell, Search, Coins, CreditCard } from "lucide-react";
+import { Edit2, Coins, CreditCard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Snackbar, Alert } from "@mui/material";
 import useAuth from "../hooks/useAuth";
@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useSessionSocket } from "../hooks/useSessionSocket";
 import { useUser } from "../../context/UserContext";
 import BuyPointsModal from "../BuyPointsModal/BuyPointsModal";
+import { usePoints } from "../hooks/usePoints";
 
 import {
   fetchCurrentUser,
@@ -46,6 +47,9 @@ const EVHubAccount: React.FC = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [currentDeviceId, setCurrentDeviceId] = useState<string>("");
   const [showBuyPoints, setShowBuyPoints] = useState(false);
+
+  // points
+  const {points} = usePoints();
 
   const [editForm, setEditForm] = useState({
     username: "",
@@ -262,7 +266,7 @@ const EVHubAccount: React.FC = () => {
               <p className="text-gray-500 text-sm mb-1">Available Points</p>
               <div className="flex items-center justify-between">
                 <span className="text-2xl font-bold text-green-400">
-                  {user?.points || 0}
+                  {points || 0}
                 </span>
                 <Coins className="text-green-400" size={24} />
               </div>

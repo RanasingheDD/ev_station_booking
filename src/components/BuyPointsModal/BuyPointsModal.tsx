@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Coins, CreditCard } from "lucide-react";
 import { useUser } from "../../context/UserContext";
 import { API_URL } from "../../config/api_config";
+import { BUY_POINT_PACKAGES } from "../../config/pricing";
 import axios from "axios";
 
 interface BuyPointsModalProps {
@@ -24,12 +25,7 @@ const BuyPointsModal: React.FC<BuyPointsModalProps> = ({
   const [error, setError] = useState("");
 
   // Predefined point packages: points -> price (in LKR)
-  const pointPackages = [
-    { points: 100, price: 100, discount: 0 },
-    { points: 500, price: 450, discount: 10 },
-    { points: 1000, price: 850, discount: 15 },
-    { points: 5000, price: 4000, discount: 20 },
-  ];
+  const pointPackages = BUY_POINT_PACKAGES;
 
   const handleSelectPackage = (points: number) => {
     setSelectedPackage(points);
@@ -62,7 +58,7 @@ const BuyPointsModal: React.FC<BuyPointsModalProps> = ({
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `${API_URL}/payments/initiate-points-purchase`,
+        `${API_URL}/bookings/checkouts`,
         { points: pointsToBuy, price },
         { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } }
       );
@@ -91,6 +87,8 @@ const BuyPointsModal: React.FC<BuyPointsModalProps> = ({
   };
 
   if (!isOpen) return null;
+
+
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -131,7 +129,7 @@ const BuyPointsModal: React.FC<BuyPointsModalProps> = ({
           <h3 className="text-white font-semibold mb-3">Select Package</h3>
           <div className="space-y-2">
             {pointPackages.map((pkg) => {
-              const isDeal = pkg.discount > 0;
+              const isDeal = (pkg.discount ?? 0) > 0;
               return (
                 <button
                   key={pkg.points}

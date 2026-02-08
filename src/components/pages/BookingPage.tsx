@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Calendar, Clock, Car, Zap, CheckCircle, AlertCircle, Coins } from "lucide-react";
+import { Clock, Car, Zap, CheckCircle, AlertCircle, Coins } from "lucide-react";
 import axios from "axios";
 import { loadEVs, type EV } from "../../services/ev_service";
 import { checkAvailability } from "../../services/booking_service";
@@ -8,12 +8,22 @@ import { deductPointsService } from "../../services/account_service";
 import { API_URL } from "../../config/api_config";
 import { useUser } from "../../context/UserContext";
 import BuyPointsModal from "../BuyPointsModal/BuyPointsModal";
+import { usePoints } from "../hooks/usePoints";
 
 const durations = [30, 60, 90, 120, 180];
 
 interface CheckoutResponse {
   url: string;
 }
+
+interface Slot {
+  start: string;
+  end: string;
+  available: boolean;
+}
+
+
+
 
 const BookingScreen = () => {
   const navigate = useNavigate();
@@ -32,6 +42,8 @@ const BookingScreen = () => {
   // Loading & Error States
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [slots, setSlots] = useState<Slot[]>([]);
   const [checking, setChecking] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
@@ -45,6 +57,9 @@ const BookingScreen = () => {
   // Cost calculation (1 point = 1 LKR)
   const costInLKR = (duration / 60) * 1200;
   const pointsNeeded = Math.ceil(costInLKR);
+
+  // Fetch user points using custom hook
+  const { points } = usePoints();
 
   // Load EVs on component mount
   useEffect(() => {
@@ -66,6 +81,22 @@ const BookingScreen = () => {
     };
     fetchEVs();
   }, []);
+
+  useEffect(() => {
+  if (!chargerId) return;
+
+  axios.get<Slot[]>(
+    "http://localhost:8080/api/bookings/available-slots",
+    {
+      params: {
+        chargerId,
+        date: date
+      }
+    }
+  ).then(res => setSlots(res.data))
+   .catch(err => console.error(err));
+}, [date, chargerId]);
+
 
   // Check availability whenever time/date/duration changes
   useEffect(() => {
@@ -142,7 +173,7 @@ const BookingScreen = () => {
       
       // Create booking with points deduction
       const response = await axios.post<CheckoutResponse>(
-        API_URL + '/bookings/checkout',
+        API_URL + '/bookings/checkout//',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -202,7 +233,7 @@ const BookingScreen = () => {
           </div>
           <div className="flex items-center gap-2 bg-green-500/20 px-3 py-2 rounded-lg border border-green-500">
             <Coins size={18} className="text-green-400" />
-            <span className="font-semibold text-green-400">{user?.points || 0} Points</span>
+            <span className="font-semibold text-green-400">{points || 0} Points</span>
           </div>
         </div>
       </div>
@@ -299,6 +330,38 @@ const BookingScreen = () => {
           )}
         </div>
       </div>
+
+      {/* AVAILABLE SLOTS */}
+<div className="bg-[#0E1424] p-5 rounded-2xl border border-[#1A2236]">
+  <h2 className="text-green-400 font-semibold mb-3">
+    Available Slots
+  </h2>
+
+  <div className="grid grid-cols-4 gap-3">
+    {slots.map((slot, i) => {
+      const time = new Date(slot.start).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      return (
+        <button
+          key={i}
+          disabled={!slot.available}
+          onClick={() => setTime(time)}
+          className={`py-2 rounded-lg text-sm font-semibold
+            ${slot.available
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-red-500/30 cursor-not-allowed"}
+          `}
+        >
+          {time}
+        </button>
+      );
+    })}
+  </div>
+</div>
+
 
       {/* DURATION */}
       <div className="bg-[#0E1424] p-5 rounded-2xl border border-[#1A2236]">
