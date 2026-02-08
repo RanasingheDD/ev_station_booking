@@ -73,7 +73,7 @@ export const checkAvailability = async (
     chargerId: string,
     startTime: string,
     endTime: string
-): Promise<{ available: boolean; message?: string }> => {
+): Promise<any> => {
     try {
         const res = await axios.get(`${API_URL}/bookings/check`, {
             params: { stationId, chargerId, startTime, endTime },

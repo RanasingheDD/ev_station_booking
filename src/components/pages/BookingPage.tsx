@@ -42,7 +42,6 @@ const BookingScreen = () => {
   // Loading & Error States
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // const [isLoading, setIsLoading] = useState(false);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [checking, setChecking] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -53,10 +52,15 @@ const BookingScreen = () => {
   const [showBuyPoints, setShowBuyPoints] = useState(false);
   const [insufficientPoints, setInsufficientPoints] = useState(false);
   const [requiredPoints, setRequiredPoints] = useState(0);
+  
+  // Validation & Success States
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   // Cost calculation (1 point = 1 LKR)
-  const costInLKR = (duration / 60) * 1200;
-  const pointsNeeded = Math.ceil(costInLKR);
+  const [costInLKR, setCostInLKR] = useState<number>((duration / 60) * 1200);
+  const [pointsNeeded, setPointsNeeded] = useState<number>(Math.ceil((duration / 60) * 1200));
+  const [availabilityDetails, setAvailabilityDetails] = useState<any | null>(null);
 
   // Fetch user points using custom hook
   const { points } = usePoints();
@@ -86,7 +90,7 @@ const BookingScreen = () => {
   if (!chargerId) return;
 
   axios.get<Slot[]>(
-    "http://localhost:8080/api/bookings/available-slots",
+    API_URL+"/api/bookings/available-slots",
     {
       params: {
         chargerId,
@@ -97,6 +101,13 @@ const BookingScreen = () => {
    .catch(err => console.error(err));
 }, [date, chargerId]);
 
+  // Update default cost/points when duration changes
+  useEffect(() => {
+    const defaultCost = (duration / 60) * 1200;
+    setCostInLKR(defaultCost);
+    setPointsNeeded(Math.ceil(defaultCost));
+  }, [duration]);
+
 
   // Check availability whenever time/date/duration changes
   useEffect(() => {
@@ -106,6 +117,11 @@ const BookingScreen = () => {
       setChecking(true);
       setAvailabilityMsg("");
       setIsAvailable(null);
+      setAvailabilityDetails(null);
+      // reset estimated cost to default based on duration
+      const defaultCost = (duration / 60) * 1200;
+      setCostInLKR(defaultCost);
+      setPointsNeeded(Math.ceil(defaultCost));
 
       try {
         const startDateTime = new Date(`${date}T${time}`);
@@ -119,8 +135,14 @@ const BookingScreen = () => {
         );
 
         setIsAvailable(res.available);
+        setAvailabilityDetails(res);
+        // If API returned an estimated cost, use it as points to deduct
+        if (res && typeof res.estimatedCost === 'number') {
+          setCostInLKR(res.estimatedCost);
+          setPointsNeeded(Math.ceil(res.estimatedCost));
+        }
         if (!res.available) {
-          setAvailabilityMsg(res.message || "Time slot unavailable");
+          setAvailabilityMsg(res.unavailableReason || res.message || "Time slot unavailable");
         }
       } catch (err) {
         console.error("Availability check error:", err);
@@ -135,13 +157,15 @@ const BookingScreen = () => {
 
   // Handle payment & booking
   const handleConfirmBooking = async () => {
+    setValidationError(null);
+    
     if (!selectedEvId || !stationId || !chargerId) {
-      alert("Please select a vehicle and ensure station/charger IDs are present!");
+      setValidationError("Please select a vehicle and ensure all booking details are present.");
       return;
     }
 
     if (!isAvailable) {
-      alert("This time slot is not available!");
+      setValidationError("The selected time slot is not available. Please choose another time.");
       return;
     }
 
@@ -173,7 +197,7 @@ const BookingScreen = () => {
       
       // Create booking with points deduction
       const response = await axios.post<CheckoutResponse>(
-        API_URL + '/bookings/checkout//',
+        API_URL + '/bookings/checkout',
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -188,14 +212,21 @@ const BookingScreen = () => {
       }
 
       if (response.data.url) {
-        window.location.href = response.data.url;
+        setBookingSuccess(true);
+        // Redirect after showing success animation
+        setTimeout(() => {
+          window.location.href = response.data.url;
+        }, 1500);
       } else {
-        alert("Booking confirmed! Points deducted. Redirecting...");
-        navigate('/dashboard');
+        setBookingSuccess(true);
+        // Redirect after showing success animation
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
       }
     } catch (error) {
       console.error("Booking Error:", error);
-      alert("Unable to process booking. Please check if all IDs exist.");
+      setValidationError("Unable to process booking. Please verify your details and try again.");
       setProcessing(false);
     }
   };
@@ -224,6 +255,29 @@ const BookingScreen = () => {
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white p-5 ml-64 space-y-6">
+      {/* VALIDATION ERROR ALERT */}
+      {validationError && (
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 z-40 max-w-md w-full">
+          <div className="bg-red-500/10 border border-red-500 rounded-2xl p-4 backdrop-blur-sm">
+            <div className="flex items-start gap-3">
+              <div className="text-red-400 mt-0.5">
+                <AlertCircle size={20} />
+              </div>
+              <div className="flex-1">
+                <p className="text-red-400 font-semibold">Booking Error</p>
+                <p className="text-red-300 text-sm mt-1">{validationError}</p>
+              </div>
+              <button
+                onClick={() => setValidationError(null)}
+                className="text-red-400/70 hover:text-red-400 mt-0.5"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* HEADER WITH POINTS */}
       <div className="bg-[#0E1424] p-5 rounded-2xl border border-[#1A2236]">
         <div className="flex justify-between items-start mb-2">
@@ -318,15 +372,23 @@ const BookingScreen = () => {
         {/* Availability Status */}
         <div className="mt-4">
           {checking && <p className="text-yellow-400 text-sm">Checking availability...</p>}
-          {!checking && isAvailable === true && (
-            <p className="text-green-400 text-sm flex items-center gap-2">
-              <CheckCircle size={16} /> Slot Available
-            </p>
+          {!checking && isAvailable === true && availabilityDetails && (
+            <div className="text-green-400 text-sm">
+              <div className="flex items-center gap-2 mb-1"><CheckCircle size={16} /> Slot Available</div>
+              <div className="text-gray-300 text-xs space-y-1">
+                <div>Estimated energy: <span className="text-white">{availabilityDetails.estimatedEnergy ?? '-'} kWh</span></div>
+                <div>Estimated cost: <span className="text-white">{availabilityDetails.estimatedCost ?? costInLKR} {availabilityDetails.currency ?? 'LKR'}</span> <span className="text-gray-400">({pointsNeeded} points)</span></div>
+                <div>From <span className="text-white">{new Date(availabilityDetails.startAt).toLocaleString()}</span> to <span className="text-white">{new Date(availabilityDetails.endAt).toLocaleString()}</span></div>
+              </div>
+            </div>
           )}
           {!checking && isAvailable === false && (
-            <p className="text-red-400 text-sm flex items-center gap-2">
-              <AlertCircle size={16} /> {availabilityMsg}
-            </p>
+            <div className="text-red-400 text-sm">
+              <div className="flex items-center gap-2 mb-1"><AlertCircle size={16} /> {availabilityMsg}</div>
+              {availabilityDetails && availabilityDetails.unavailableReason && (
+                <div className="text-gray-300 text-xs">Reason: <span className="text-white">{availabilityDetails.unavailableReason}</span></div>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -455,6 +517,38 @@ const BookingScreen = () => {
         onSuccess={handleBuyPointsSuccess}
         requiredPoints={insufficientPoints ? requiredPoints : 0}
       />
+
+      {/* Booking Success Modal */}
+      {bookingSuccess && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 ml-64">
+          <div className="bg-[#161B2E] p-12 rounded-2xl border border-green-400/30 max-w-md w-full mx-4 text-center">
+            <div className="mb-6 flex justify-center">
+              <div className="animate-bounce">
+                <CheckCircle size={64} className="text-green-400" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Booking Confirmed!</h2>
+            <p className="text-gray-400 mb-6">
+              Your charging session has been successfully booked. Points have been deducted from your account.
+            </p>
+            <div className="bg-[#0E1424] p-4 rounded-lg mb-6 text-left space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Vehicle:</span>
+                <span className="text-white font-semibold">{selectedEvId}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Duration:</span>
+                <span className="text-white font-semibold">{duration} minutes</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">Points Deducted:</span>
+                <span className="text-green-400 font-semibold">{pointsNeeded}</span>
+              </div>
+            </div>
+            <p className="text-gray-500 text-xs">Redirecting in a moment...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
