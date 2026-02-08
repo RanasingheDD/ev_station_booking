@@ -52,7 +52,7 @@ const EVHubAccount: React.FC = () => {
   const {points} = usePoints();
 
   const [editForm, setEditForm] = useState({
-    username: "",
+    name: "",
     mobile: "",
     location: "",
   });
@@ -144,21 +144,21 @@ const EVHubAccount: React.FC = () => {
     setOpenSnackbar(true);
 
     try {
-      await updateUserProfile(editForm);
+      await updateUserProfile(updated);
     } catch (err) {
       console.error(err);
     }
   };
 
-  // 🚪 Logout device
-  // const logoutDevice = async (id: string) => {
-  //   try {
-  //     await logoutSession(id);
-  //     setDevices((prev) => prev.filter((d) => d.id !== id));
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
+  useEffect(() => {
+    if (isEditOpen && userDetails) {
+      setEditForm({
+        name: userDetails.name || "",
+        mobile: userDetails.mobile || "",
+        location: userDetails.location || "",
+      });
+    }
+  }, [isEditOpen, userDetails]);
 
   const logoutDevice = async (id: string) => {
     try {
@@ -169,7 +169,7 @@ const EVHubAccount: React.FC = () => {
     }
   };
 
-  // ❌ Delete account
+  // Delete account
   const deleteAccount = async () => {
     try {
       await deleteAccountService();
@@ -180,7 +180,7 @@ const EVHubAccount: React.FC = () => {
     }
   };
 
-  const username = userDetails?.email || "";
+  const username = userDetails?.name || "";
   useSessionSocket(username, token, setDevices);
 
   const formatIP = (ip: string) => {
@@ -213,19 +213,7 @@ const EVHubAccount: React.FC = () => {
           <p className="text-sm text-gray-400">Pages / Account</p>
           <h1 className="text-4xl font-bold">Account</h1>
         </div>
-        {/* <div className="flex items-center space-x-4">
-          <div className="flex items-center bg-[#141a25] px-3 py-2 rounded-full">
-            <Search size={18} className="text-gray-400 mr-2" />
-            <input
-              type="text"
-              placeholder="Search"
-              className="bg-transparent text-sm focus:outline-none"
-            />
-          </div>
-          <Bell className="text-gray-400" />
-        </div> */}
       </div>
-
       {/* Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* My Account */}
@@ -256,7 +244,7 @@ const EVHubAccount: React.FC = () => {
           <p className="text-gray-500">Mobile</p>
           <p className="font-semibold">{userDetails.mobile}</p>
           <p className="text-gray-500">Location</p>
-          <p className="font-semibold mb-4">
+          <p className="font-semibold mb-4" aria-disabled ={!userDetails.location}>
             {userDetails?.location || "Fetching location..."}
           </p>
 
@@ -358,22 +346,12 @@ const EVHubAccount: React.FC = () => {
                   type="text"
                   name="username"
                   placeholder="Enter your name"
-                  value={editForm.username}
+                  value={editForm.name}
                   onChange={(e) =>
-                    setEditForm({ ...editForm, username: e.target.value })
+                    setEditForm({ ...editForm, name: e.target.value })
                   }
                   className="w-full bg-[#141a25] p-2 rounded text-gray-200 placeholder-gray-500 focus:outline-none"
                 />
-
-                {/* Email (usually readonly) */}
-                {/* <input
-                  type="email"
-                  name="email"
-                  placeholder="Email address"
-                  value={editForm.email}
-                  disabled
-                  className="w-full bg-[#141a25] p-2 rounded text-gray-400 cursor-not-allowed focus:outline-none"
-                /> */}
 
                 {/* Mobile */}
                 <input

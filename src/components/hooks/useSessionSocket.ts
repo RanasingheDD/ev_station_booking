@@ -2,13 +2,13 @@
 import { useEffect } from "react";
 import { Client, type Message } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { API_URL } from "../../config/api_config";
+import {SOCKET_URL } from "../../config/api_config";
 
 export const useSessionSocket = (username: string, token: string | null, onUpdate: (sessions: any[]) => void) => {
   useEffect(() => {
     if (!username || !token) return;
 
-    const socket = new SockJS(`${API_URL}/ws`); // change if using production
+    const socket = new SockJS(`${SOCKET_URL}/ws`); // change if using production
     const client = new Client({
       webSocketFactory: () => socket,
       connectHeaders: {
