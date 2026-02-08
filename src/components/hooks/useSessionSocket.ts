@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { Client, type Message } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { API_URL, SOCKET_URL } from "../../config/api_config";
+import {SOCKET_URL } from "../../config/api_config";
 
 export const useSessionSocket = (username: string, token: string | null, onUpdate: (sessions: any[]) => void) => {
   useEffect(() => {
