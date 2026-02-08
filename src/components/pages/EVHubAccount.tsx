@@ -169,7 +169,6 @@ const EVHubAccount: React.FC = () => {
     }
   };
 
-  // Delete account
   const deleteAccount = async () => {
     try {
       await deleteAccountService();
@@ -177,6 +176,7 @@ const EVHubAccount: React.FC = () => {
       navigate("/register");
     } catch (err) {
       console.error(err);
+      alert("Failed to delete account!");
     }
   };
 
