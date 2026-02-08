@@ -17,5 +17,8 @@ export default defineConfig({
   //     '/api': 'http://localhost:8080',
   //   },
   // },
+  build: {
+    sourcemap: false,   // disables source mapping
+  },
 })
 
