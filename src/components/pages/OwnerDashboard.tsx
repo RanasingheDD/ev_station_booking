@@ -605,7 +605,7 @@ export default function OwnerDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {[
             { label: "Total Stations", value: stats.totalStations, icon: Zap, color: "text-indigo-400", bg: "bg-indigo-500/10" },
-            { label: "Total Earnings", value: `$${stats.totalEarnings.toFixed(2)}`, icon: DollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+            { label: "Total Earnings", value: `LKR ${stats.totalEarnings.toFixed(2)}`, icon: DollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10" },
             { label: "Active Bookings", value: stats.activeBookings, icon: Calendar, color: "text-blue-400", bg: "bg-blue-500/10" },
             { label: "Available Chargers", value: `${stats.availableChargers}/${stats.totalChargers}`, icon: Power, color: "text-amber-400", bg: "bg-amber-500/10" },
           ].map((stat, idx) => (

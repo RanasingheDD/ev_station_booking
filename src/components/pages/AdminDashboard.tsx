@@ -11,7 +11,6 @@ import {
   fetchMessages, deleteMessage 
 } from "../../services/admin_service";
 
-// --- 🎨 THEME: SLATE & ROSE (CRIMSON AUTHORITY) ---
 const styles = {
   pageBg: "bg-[#020617]", 
   cardBg: "bg-[#0f172a]", 
@@ -27,7 +26,7 @@ const styles = {
   detailRow: "flex justify-between border-b border-slate-800 py-2 last:border-0",
 };
 
-// ... [AdminMap Component - No Changes] ...
+
 const AdminMap = ({ stations }: { stations: any[] }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
