@@ -84,7 +84,7 @@ export default function Login(): React.ReactElement {
 
           // Save to localStorage as well
           localStorage.setItem("name", userData.name);
-          localStorage.setItem("role", userData.role);
+          //localStorage.setItem("role", userData.role);
           localStorage.setItem("points", String(userData.points || 0));
           localStorage.setItem("userId", userData.id);
 
