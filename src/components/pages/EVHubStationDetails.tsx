@@ -34,7 +34,7 @@ const StationDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showChargerModal, setShowChargerModal] = useState(false);
-  const [selectedCharger, setSelectedCharger] = useState<Charger | null>(null);
+  const [,setSelectedCharger] = useState<Charger | null>(null);
 
   useEffect(() => {
     loadStation();

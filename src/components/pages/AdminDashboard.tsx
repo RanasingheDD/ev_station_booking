@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css"; 
 import { 
-  Users, Zap, DollarSign, Activity, Menu, X, Plus, Trash2, CheckCircle, XCircle, AlertTriangle, MapPin, MessageSquare, Calendar, Eye, Search, Bell, Coins // 👈 Added Coins Icon
+  Users, Zap, DollarSign, Activity, Menu, X, Plus, Trash2, AlertTriangle, MapPin, MessageSquare, Calendar, Search, Coins // 👈 Added Coins Icon
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [ ,setLoading] = useState(false);
 
   // Data States
   const [stats, setStats] = useState<any>({});
