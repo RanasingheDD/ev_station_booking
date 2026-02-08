@@ -22,7 +22,7 @@ const ChatBot = ({ stations, onClose }: Props) => {
     const userMsg: Message = { from: "user", text: input };
     const botMsg: Message = {
       from: "bot",
-      text: "For assistance, contact the administrator at admin@nextgen.com",
+      text: "For assistance, contact the administrator at info@nextgensolutions.com",
     };
 
     setMessages((prev) => [...prev, userMsg, botMsg]);

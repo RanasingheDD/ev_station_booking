@@ -3,6 +3,8 @@ import useAuth from '../hooks/useAuth';
 import { fetchUserBookings, cancelBooking} from '../../services/booking_service';
 import { Loader, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRef } from "react";
+
 
 const BookingsPage: React.FC = () => {
   useAuth();
@@ -11,8 +13,12 @@ const BookingsPage: React.FC = () => {
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+const fetchedRef = useRef(false);
 
   useEffect(() => {
+      if (fetchedRef.current) return;
+  fetchedRef.current = true;
+  
     const load = async () => {
       setLoading(true);
       try {
