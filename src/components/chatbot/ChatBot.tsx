@@ -67,7 +67,7 @@ const ChatBot = ({ stations, onClose }: Props) => {
     setInput("");
 
     setTimeout(() => {
-      let botReply = "For assistance, contact the administrator at info@nextgensolutions.com";
+      let botReply = "For assistance, contact the administrator at admin@evhub.com";
 
       if (userText.includes("hi") || userText.includes("hello")) {
         botReply = "Hi 👋 I'm GhostBot 🤖, your EV station assistant. How can I help you today?";
