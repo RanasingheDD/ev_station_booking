@@ -1,51 +1,6 @@
-// import { useEffect, useState } from "react";
-// import botImg from "/chatbot.png";
-// import ChatBot from "./chatbot";
-// import type { Station } from "../../models/station_model";
-
-// interface Props {
-//   stations: (Station & { distance: number })[];
-// }
-
-// const ChatbotToggle = ({ stations }: Props) => {
-//   const [open, setOpen] = useState(false);
-
-//   // ✅ Auto open when stations are received
-//   useEffect(() => {
-//     if (stations.length > 0) {
-//       setOpen(true);
-//     }
-//   }, [stations]);
-
-//   return (
-//     <>
-//       {/* Robot Icon */}
-//       <div
-//         className="fixed bottom-5 left-5 cursor-pointer z-50"
-//         onClick={() => setOpen(!open)}
-//       >
-//         <img
-//           src={botImg}
-//           alt="chatbot"
-//           className="w-16 h-16 animate-bounce"
-//         />
-//       </div>
-
-//       {/* Chatbot Window */}
-//       {open && (
-//         <div className="fixed bottom-24 left-5 w-[320px] h-[400px] bg-slate-900 rounded-xl shadow-xl z-50">
-//           <ChatBot stations={stations} onClose={() => setOpen(false)} />
-//         </div>
-//       )}
-//     </>
-//   );
-// };
-
-// export default ChatbotToggle;
-
 import { useEffect, useMemo, useState } from "react";
 import botImg from "/chatbot.png";
-import ChatBot from "./chatbot";
+import ChatBot from "./ChatBot";
 import type { Station } from "../../models/station_model";
 
 interface Props {
@@ -53,9 +8,10 @@ interface Props {
 }
 
 const ChatbotToggle = ({ stations }: Props) => {
-  const [open, setOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);       // For manual chat window
+  const [popupOpen, setPopupOpen] = useState(false);     // For automatic nearest station popup
 
-  // find nearest station
+  // Find nearest station
   const nearestStation = useMemo(() => {
     if (!stations.length) return null;
     return stations.reduce((prev, curr) =>
@@ -63,41 +19,39 @@ const ChatbotToggle = ({ stations }: Props) => {
     );
   }, [stations]);
 
-  // auto open + auto close after few seconds
+  // Auto-show nearest station popup
   useEffect(() => {
     if (!nearestStation) return;
 
-    setOpen(true);
+    setPopupOpen(true); // show popup automatically
 
-    // auto close after 5 seconds
-    const timer = setTimeout(() => {
-      setOpen(false);
-    }, 5000); // 👈 change time (ms)
-
+    const timer = setTimeout(() => setPopupOpen(false), 5000); // hide after 5s
     return () => clearTimeout(timer);
   }, [nearestStation]);
 
   return (
     <>
-      {/* Robot Icon */}
+      {/* Robot Icon for manual chat */}
       <div
         className="fixed bottom-5 left-5 cursor-pointer z-50"
-        onClick={() => setOpen(!open)}
+        onClick={() => setChatOpen(!chatOpen)}
       >
-        <img
-          src={botImg}
-          alt="chatbot"
-          className="w-16 h-16 animate-bounce"
-        />
+        <img src={botImg} alt="chatbot" className="w-16 h-16 animate-bounce" />
       </div>
 
-      {/* Chatbot Window */}
-      {open && nearestStation && (
-        <div className="fixed bottom-55 left-5 w-[200px] h-[20px] bg-black-100 rounded-xl shadow-xl z-50 transition-all duration-300">
-          <ChatBot
-            stations={[nearestStation]}
-            onClose={() => setOpen(false)}
-          />
+      {/* Automatic Nearest Station Popup */}
+      {popupOpen && nearestStation && (
+        <div className="fixed bottom-24 left-5 w-[300px] p-4 bg-slate-700 bg-opacity-90 text-green-200 rounded-2xl shadow-lg z-50">
+          <p className="text-sm mb-1">📍 Nearest EV Station</p>
+          <p className="font-bold text-lg">⚡ {nearestStation.name}</p>
+          <p className="text-sm">📏 {nearestStation.distance.toFixed(2)} km away</p>
+        </div>
+      )}
+
+      {/* Manual Chat Interface */}
+      {chatOpen && (
+        <div className="fixed bottom-24 left-5 w-[320px] h-[400px] bg-slate-900 rounded-xl shadow-xl z-50 transition-all duration-300">
+          <ChatBot stations={stations} onClose={() => setChatOpen(false)} />
         </div>
       )}
     </>

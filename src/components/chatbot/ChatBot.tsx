@@ -1,111 +1,4 @@
-// import type { Station } from "../../models/station_model";
-
-// interface Props {
-//   onClose: () => void;
-//   stations: (Station & { distance: number })[];
-// }
-
-// const ChatBot = ({ onClose, stations }: Props) => {
-//   return (
-//     <div className="flex flex-col h-full text-white">
-//       {/* Header */}
-//       <div className="flex justify-between items-center p-3 bg-slate-800 rounded-t-xl">
-//         <span>🤖 EV Echo Bot</span>
-//         <button onClick={onClose}>✖</button>
-//       </div>
-
-//       {/* Messages */}
-//       <div className="flex-1 p-3 overflow-y-auto space-y-2">
-//         <p>Hello! Here are nearby EV stations:</p>
-//         {stations.length === 0 && <p>No stations found.</p>}
-//         {stations
-//           .sort((a, b) => a.distance - b.distance) // nearest first
-//           .map((station) => (
-//             <div
-//               key={station.id}
-//               className="bot-message bg-slate-700 p-2 rounded-md"
-//             >
-//               ⚡ {station.name} — {station.distance.toFixed(2)} km away
-//             </div>
-//           ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ChatBot;
-
-// import { useEffect, useMemo, useState } from "react";
-// import type { Station } from "../../models/station_model";
-
-// interface Props {
-//   onClose: () => void;
-//   stations: (Station & { distance: number })[];
-// }
-
-// const ChatBot = ({ onClose, stations }: Props) => {
-//   const [showResult, setShowResult] = useState(false);
-
-//   // Find nearest station
-//   const nearestStation = useMemo(() => {
-//     if (!stations || stations.length === 0) return null;
-
-//     return stations.reduce((nearest, station) =>
-//       station.distance < nearest.distance ? station : nearest
-//     );
-//   }, [stations]);
-
-//   // Simulate chatbot delay
-//   useEffect(() => {
-//     setShowResult(false);
-
-//     const timer = setTimeout(() => {
-//       setShowResult(true);
-//     }, 1000); // 1 second delay
-
-//     return () => clearTimeout(timer);
-//   }, [stations]);
-
-//   return (
-//     <div className="flex flex-col h-full text-white">
-//       {/* Header */}
-//       <div className="flex justify-between items-center p-3 bg-slate-800 rounded-t-xl">
-//         <span>🤖 EV Echo Bot</span>
-//         <button onClick={onClose}>✖</button>
-//       </div>
-
-//       {/* Messages */}
-//       <div className="flex-1 p-3 overflow-y-auto space-y-2">
-//         <div className="bot-message bg-slate-700 p-2 rounded-md">
-//           👋 Hi! Let me find the nearest EV charging station for you...
-//         </div>
-
-//         {!showResult && (
-//           <div className="bot-message bg-slate-600 p-2 rounded-md animate-pulse">
-//             🔍 Searching nearby stations...
-//           </div>
-//         )}
-
-//         {showResult && !nearestStation && (
-//           <div className="bot-message bg-red-600 p-2 rounded-md">
-//             ❌ Sorry, I couldn't find any nearby EV stations.
-//           </div>
-//         )}
-
-//         {showResult && nearestStation && (
-//           <div className="bot-message bg-green-600 p-2 rounded-md">
-//             📍 <b>Nearest EV Station:</b><br />
-//             ⚡ {nearestStation.name}<br />
-//             📏 {nearestStation.distance.toFixed(2)} km away
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ChatBot;
-
+import { useEffect, useState } from "react";
 import type { Station } from "../../models/station_model";
 
 interface Props {
@@ -113,35 +6,104 @@ interface Props {
   stations: (Station & { distance: number })[];
 }
 
-const ChatBot = ({ onClose, stations }: Props) => {
-  const station = stations[0]; // only nearest one
+interface Message {
+  from: "user" | "bot";
+  text: string;
+}
+
+const ChatBot = ({ stations, onClose }: Props) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+
+    // Add user message
+    const userMsg: Message = { from: "user", text: input };
+    const botMsg: Message = {
+      from: "bot",
+      text: "For assistance, contact the administrator at admin@nextgen.com",
+    };
+
+    setMessages((prev) => [...prev, userMsg, botMsg]);
+    setInput(""); // clear input
+  };
+
+  const nearestStation = stations.length
+    ? stations.reduce((prev, curr) =>
+        curr.distance < prev.distance ? curr : prev
+      )
+    : null;
+
+  const [popupOpen, setPopupOpen] = useState(!!nearestStation);
+
+  // Auto open popup when nearest station changes
+  useEffect(() => {
+    if (nearestStation) {
+      setPopupOpen(true);
+
+      // Auto close after 5 seconds
+      const timer = setTimeout(() => setPopupOpen(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [nearestStation]);
 
   return (
-    <div className="flex flex-col h-full text-white">
-      {/* Header
-      <div className="flex justify-between items-center p-3 bg-green-200 rounded-t-xl">
-        <span>🤖 EV Echo Bot</span>
+    <div className="flex flex-col h-full text-white p-3 bg-slate-900 rounded-xl">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-2">
+        <span>🤖 Bot Ghost</span>
         <button onClick={onClose}>✖</button>
-      </div> */}
+      </div>
 
-      {/* Message */}
-      <div className="flex-1 p-3 space-y-2">
-        {!station && <p>No stations found.</p>}
+      {/* Chat messages */}
+      <div className="flex-1 overflow-y-auto mb-2 space-y-2">
+        {/* Nearest station info */}
+        {nearestStation && (
+          <div className="p-3 bg-slate-700 bg-opacity-20 rounded-2xl shadow-lg">
+            <p className="text-sm">📍 Nearest EV Station</p>
+            <p className="font-bold text-lg">⚡ {nearestStation.name}</p>
+            <p className="text-sm">📏 {nearestStation.distance.toFixed(2)} km away</p>
 
-        {station && (
-          <div className="relative w-[300px] h-[120px] bg-slate-700 text-green-200 bg-opacity-10 p-4 rounded-2xl shadow-lg max-w-xs">
             {/* Little cloud pointer */}
-            <div className="absolute -bottom-2 left-6 w-4 h-4 bg-slate-700 bg-opacity-20 rotate-45"></div>
-
-            <p className="text-sm mb-1">📍 Nearest EV Station</p>
-            <p className="font-bold text-lg">⚡ {station.name}</p>
-            <p className="text-sm">📏 {station.distance.toFixed(2)} km away</p>
-            </div>
+           <div className="absolute -bottom-2 left-6 w-4 h-4 bg-slate-900 bg-opacity-20 rotate-45"></div>
+          </div>
         )}
+
+        {/* User and bot messages */}
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`p-2 rounded-lg max-w-xs ${
+              msg.from === "user"
+                ? "bg-green-600 self-end text-white"
+                : "bg-slate-700 self-start text-green-200"
+            }`}
+          >
+            {msg.text}
+          </div>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className="flex gap-2">
+        <input
+          type="text"
+          className="flex-1 p-2 rounded-lg text-white bg-slate-700 bg-opacity-20 focus:outline-none"
+          placeholder="Ask a question..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
+        />
+        <button
+          onClick={handleSend}
+          className="bg-green-600 text-white px-3 rounded-lg"
+        >
+          Send
+        </button>
       </div>
     </div>
   );
 };
 
 export default ChatBot;
-
