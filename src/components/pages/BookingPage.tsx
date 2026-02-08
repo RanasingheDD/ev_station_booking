@@ -42,7 +42,7 @@ const BookingScreen = () => {
   // Loading & Error States
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [checking, setChecking] = useState(false);
   const [processing, setProcessing] = useState(false);
