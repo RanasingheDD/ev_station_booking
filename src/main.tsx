@@ -7,7 +7,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
-
+import {getUserRole, isTokenValid} from "./components/utils/authUtils";
 // Public pages
 import App from "./App";
 import AboutUs from "./components/home/about";
@@ -33,6 +33,7 @@ import PaymentCancel from "./components/payment/paymentCancel";
 import OwnerStationDetails from "./components/pages/OwnerStationDetails";
 import OAuthRedirect from "./components/auth/OAuthRedirect";
 import SubscriptionPage from "./components/pages/SubscriptionPage";
+import AdminDashboard from "./components/pages/AdminDashboard";
 
 const RoleProtectedRoute = ({ 
   element, 
@@ -41,24 +42,26 @@ const RoleProtectedRoute = ({
   element: React.ReactElement, 
   allowedRoles: string[] 
 }) => {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role"); // Need to save this in Login.tsx!
-
-  // 1. Not Logged In -> Go to Login
-  if (!token) {
+  if (!isTokenValid()) {
+    localStorage.removeItem("token"); // Cleanup invalid token
     return <Navigate to="/login" replace />;
   }
-
+  const role = getUserRole();
   // 2. Logged in, but wrong role?
-  if (role && !allowedRoles.includes(role)) {
-    // If an OWNER tries to go to User pages -> Send back to Owner Dashboard
+  if (!role || !allowedRoles.includes(role)) {
+    // Smart Redirects: Send them to their actual home if they are lost
     if (role === "OWNER") {
-      return <Navigate to="/owner-dashboard" replace />;
+      return <Navigate to="/owner" replace />;
     }
-    // If a USER tries to go to Owner pages -> Send back to User Dashboard
-    if (role === "USER") {
-      return <Navigate to="/dashboard" replace />;
+    if (role === "USER") { 
+       return <Navigate to="/app/dashboard" replace />;
     }
+    if(role === "ADMIN"){
+      return <Navigate to="/admin-dashboard" replace />;
+    }
+    
+    // Default Deny: If role is missing or unknown, kick to login
+    return <Navigate to="/login" replace />;
   }
 
   // 3. Authorized -> Show Page
@@ -85,6 +88,16 @@ const router = createBrowserRouter([
   { path: "/oauth2/redirect", element: <OAuthRedirect /> },
 
   // Owner routes grouped under /owner
+  // Admin Routes
+  {
+    path: "/admin-dashboard",
+    element: (
+      <RoleProtectedRoute 
+        element={<AdminDashboard />} 
+        allowedRoles={["ADMIN"]} 
+      />
+    ),
+  },
   {
     path: "/owner",
     children: [
