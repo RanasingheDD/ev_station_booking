@@ -51,6 +51,13 @@ export default function useLocation() {
 
           setCoords({ lat, lng });
 
+          // Check if user is online before Axios request
+          if (!navigator.onLine) {
+            setError("No internet connection");
+            setPlace("Offline");
+            return;
+          }
+          
           const response = await axios.get(
             `https://api.bigdatacloud.net/data/reverse-geocode-client`,
             {

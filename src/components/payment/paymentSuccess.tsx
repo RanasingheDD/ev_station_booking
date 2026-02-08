@@ -1,10 +1,13 @@
 import React from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { CheckCircle, ArrowRight, LayoutDashboard, FileText } from 'lucide-react';
+import { CheckCircle, LayoutDashboard, FileText } from 'lucide-react';
 
 const PaymentSuccess: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const bookingId = searchParams.get('id');
+  const paymentId = searchParams.get('id');
+  console.log("Query params:", Object.fromEntries(searchParams.entries()));
+
+
 
   return (
     <div className="min-h-screen bg-[#0B0F19] text-white flex items-center justify-center p-5 ml-64">
@@ -25,11 +28,11 @@ const PaymentSuccess: React.FC = () => {
         {/* BOOKING DETAILS CARD */}
         <div className="bg-[#0B0F19] border border-[#1A2236] rounded-xl p-4 mb-8 text-left">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Booking ID</span>
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Payment ID</span>
             <FileText size={14} className="text-gray-500" />
           </div>
           <p className="text-green-400 font-mono font-bold tracking-wider">
-            {bookingId || "N/A"}
+            {paymentId || "N/A"}
           </p>
         </div>
 

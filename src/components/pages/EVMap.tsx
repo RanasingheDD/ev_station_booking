@@ -16,7 +16,7 @@ export default function EVMap() {
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
   
-  // const { setEvStations } = useOutletContext<{ setEvStations: React.Dispatch<React.SetStateAction<(Station & { distance: number })[]>> }>();
+  //const { setEvStations } = useOutletContext<{ setEvStations: React.Dispatch<React.SetStateAction<(Station & { distance: number })[]>> }>();
 
   const outletContext = useOutletContext<{ setEvStations: Function }>();
   const setEvStations = outletContext.setEvStations;

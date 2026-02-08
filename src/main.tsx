@@ -126,9 +126,9 @@ const router = createBrowserRouter([
       { path: "stations", element: <Stations /> },
       { path: "stations/:id", element: <StationDetails /> },
       { path: "account", element: <Account /> },
-     // { path: "/stations/:id", element: <StationDetails /> },
-     // { path:"/booking/:stationId/:chargerId", element: <BookingPage/>},
-      { path:"payment-success", element: <PaymentSuccess/>},
+      { path: "stations/:id", element: <StationDetails /> },
+      { path:"booking/:stationId/:chargerId", element: <BookingPage/>},
+      { path:"payment-success/", element: <PaymentSuccess/>},
       { path:"cancel", element: <PaymentCancel/>},
       { path: "subscriptions", element: <SubscriptionPage /> },
       { path: "bookings", element: <BookingsPage /> },
@@ -147,6 +147,8 @@ const router = createBrowserRouter([
   { path: "/owner-dashboard", element: <Navigate to="/owner" replace /> },
   { path: "/owner/station/:id", element: <Navigate to="/owner/station/:id" replace /> },
   { path: "*", element: <Navigate to="/" replace /> },
+   { path: "/cancel", element: <Navigate to="/app/cancel" replace /> },
+   { path: "/payment-success", element: <Navigate to="/app/payment-success" replace /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
