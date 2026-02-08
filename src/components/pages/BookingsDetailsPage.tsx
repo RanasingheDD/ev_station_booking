@@ -18,7 +18,7 @@ const fetchedRef = useRef(false);
   useEffect(() => {
       if (fetchedRef.current) return;
   fetchedRef.current = true;
-  
+
     const load = async () => {
       setLoading(true);
       try {
@@ -79,7 +79,7 @@ const fetchedRef = useRef(false);
                 <div className="text-right">
                   <p className={`text-sm font-semibold ${b.status === 'CANCELLED' ? 'text-red-400' : b.status === 'COMPLETED' ? 'text-gray-400' : 'text-green-400'}`}>{b.status}</p>
                   <p className="text-xs mt-1">
-                    {b.paymentId ? <span className="text-green-300">Paid</span> : <span className="text-yellow-300">Payment Pending</span>}
+                    {b.paymentId ? <span className="text-green-300">Paid</span> : <span className="text-yellow-300">Payment Done</span>}
                   </p>
                 </div>
               </div>
