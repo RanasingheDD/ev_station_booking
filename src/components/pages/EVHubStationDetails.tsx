@@ -33,6 +33,8 @@ const StationDetails: React.FC = () => {
   const [station, setStation] = useState<Station | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showChargerModal, setShowChargerModal] = useState(false);
+  const [selectedCharger, setSelectedCharger] = useState<Charger | null>(null);
 
   useEffect(() => {
     loadStation();
@@ -83,16 +85,14 @@ const totalChargers = station.chargers?.length || 0;
     if (availableChargers.length === 1) {
       navigate(`/app/booking/${station.id}/${availableChargers[0].id}`);
     } else if (availableChargers.length > 1) {
-      // Show modal to select charger
-      const selected = window.prompt(
-        `Select charger ID:\n${availableChargers
-          .map((c) => `${c.id}: ${c.connectorType}`)
-          .join("\n")}`
-      );
-      if (selected) {
-        navigate(`/app/booking/${station.id}/${selected}`);
-      }
+      setShowChargerModal(true);
     }
+  };
+
+  const handleChargerSelect = (charger: Charger) => {
+    setSelectedCharger(charger);
+    navigate(`/app/booking/${station.id}/${charger.id}`);
+    setShowChargerModal(false);
   };
 
   const handleDirections = () => {
@@ -312,6 +312,50 @@ const totalChargers = station.chargers?.length || 0;
           </button>
         </div>
       </div>
+
+      {/* Charger Selection Modal */}
+      {showChargerModal && availableChargers.length > 1 && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 ml-64">
+          <div className="bg-[#161B2E] p-8 rounded-2xl border border-green-400/30 max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold text-white mb-6">Select a Charger</h2>
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {availableChargers.map((charger) => (
+                <button
+                  key={charger.id}
+                  onClick={() => handleChargerSelect(charger)}
+                  className="w-full p-4 bg-[#0E1424] hover:bg-[#1A2236] border border-green-400/20 hover:border-green-400 rounded-lg text-left transition-all group"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-white font-semibold text-lg group-hover:text-green-400 transition">
+                      {charger.name || `Charger ${charger.id}`}
+                    </h3>
+                    <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded">
+                      Available
+                    </span>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    <span className="font-medium">Type:</span> {charger.connectorType}
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    <span className="font-medium">Power:</span> {charger.maxPowerKw} kW
+                  </p>
+                  {charger.portNumber && (
+                    <p className="text-gray-400 text-sm">
+                      <span className="font-medium">Port:</span> {charger.portNumber}
+                    </p>
+                  )}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowChargerModal(false)}
+              className="w-full mt-6 px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-gray-500 hover:text-gray-300 transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

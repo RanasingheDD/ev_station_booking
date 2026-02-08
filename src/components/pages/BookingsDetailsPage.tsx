@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
-import { fetchUserBookings, cancelBooking, type Booking } from '../../services/booking_service';
+import { fetchUserBookings, cancelBooking} from '../../services/booking_service';
 import { Loader, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
