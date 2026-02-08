@@ -11,12 +11,14 @@ const Layout: React.FC = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
+      {/* Chatbot always floats on left-hand side */}
+      <ChatbotToggle stations={evStations} />
+      
       <main className="flex-1 p-6 bg-[#0A0F1C]">
         <Outlet context={{setEvStations}}/> {/* Renders Dashboard, Stations, etc. */}
       </main>
       
-      {/* Chatbot always floats on left-hand side */}
-      <ChatbotToggle stations={evStations} />
+      
 
     </div>
     
