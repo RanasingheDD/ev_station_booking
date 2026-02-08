@@ -35,7 +35,7 @@ const SubscriptionPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [showBuyPoints, setShowBuyPoints] = useState(false);
-  const [insufficientFor, setInsufficientFor] = useState<string | null>(null);
+  const [, setInsufficientFor] = useState<string | null>(null);
   const [confirmPlan, setConfirmPlan] = useState<SubscriptionPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);

@@ -35,7 +35,7 @@ const ChatBot = ({ stations, onClose }: Props) => {
       )
     : null;
 
-  const [popupOpen, setPopupOpen] = useState(!!nearestStation);
+  const [ ,setPopupOpen] = useState(!!nearestStation);
 
   // Auto open popup when nearest station changes
   useEffect(() => {
