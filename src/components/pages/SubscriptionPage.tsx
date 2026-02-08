@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import {
   Check,
-  X,
   Zap,
   Coins,
   AlertCircle,
@@ -28,7 +27,7 @@ interface UserSubscription {
 
 const SubscriptionPage: React.FC = () => {
   useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { user, deductPoints } = useUser();
 
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
@@ -371,6 +370,7 @@ const SubscriptionPage: React.FC = () => {
       {/* Buy Points Modal */}
       {showBuyPoints && (
         <BuyPointsModal
+                  isOpen={showBuyPoints} 
                   onClose={() => {
                       setShowBuyPoints(false);
                       setInsufficientFor(null);
@@ -378,7 +378,7 @@ const SubscriptionPage: React.FC = () => {
                   onSuccess={() => {
                       setShowBuyPoints(false);
                       // If they were trying to buy a subscription, allow retry
-                  } } isOpen={false}        />
+                  } }        />
       )}
 
       {/* Confirm Purchase Modal */}
