@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css"; 
 import { 
-  Users, Zap, DollarSign, Activity, Menu, X, Plus, Trash2, CheckCircle, XCircle, AlertTriangle, MapPin, MessageSquare, Calendar, Eye, Search, Bell
+  Users, Zap, DollarSign, Activity, Menu, X, Plus, Trash2, CheckCircle, XCircle, AlertTriangle, MapPin, MessageSquare, Calendar, Eye, Search, Bell, Coins // 👈 Added Coins Icon
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -13,39 +13,27 @@ import {
 
 // --- 🎨 THEME: SLATE & ROSE (CRIMSON AUTHORITY) ---
 const styles = {
-  pageBg: "bg-[#020617]", // Deep Slate (almost black)
-  cardBg: "bg-[#0f172a]", // Slate-900
-  sidebarBg: "bg-[#0B0F19]", // Darker sidebar for contrast
+  pageBg: "bg-[#020617]", 
+  cardBg: "bg-[#0f172a]", 
+  sidebarBg: "bg-[#0B0F19]",
   
-  // Primary Action (Rose)
   buttonPrimary: "px-4 py-2 bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition-all shadow-lg shadow-rose-900/20 font-medium flex items-center gap-2",
-  
-  // Destructive Action (Red)
   buttonDanger: "px-3 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2",
-  
-  // Success Action (Emerald)
   buttonSuccess: "px-3 py-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg hover:bg-emerald-500 hover:text-white transition-colors flex items-center justify-center gap-2",
-  
-  // Review Action (Indigo)
   buttonReview: "px-3 py-2 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-lg hover:bg-indigo-500 hover:text-white transition-colors flex items-center justify-center gap-2",
   
-  // Inputs
   input: "w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white focus:ring-2 focus:ring-rose-500/50 outline-none transition-all placeholder-slate-500",
-  
   label: "block text-sm font-medium text-slate-400 mb-1",
   detailRow: "flex justify-between border-b border-slate-800 py-2 last:border-0",
 };
 
-// ----------------------------------------------------------------------
-// 1. ADMIN MAP COMPONENT
-// ----------------------------------------------------------------------
+// ... [AdminMap Component - No Changes] ...
 const AdminMap = ({ stations }: { stations: any[] }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
-
     if (!mapInstanceRef.current) {
       mapInstanceRef.current = L.map(mapContainerRef.current).setView([7.8731, 80.7718], 8);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -53,55 +41,35 @@ const AdminMap = ({ stations }: { stations: any[] }) => {
         maxZoom: 19
       }).addTo(mapInstanceRef.current);
     }
-
     const map = mapInstanceRef.current;
-
-    map.eachLayer((layer) => {
-      if (layer instanceof L.CircleMarker || layer instanceof L.Marker) map.removeLayer(layer);
-    });
+    map.eachLayer((layer) => { if (layer instanceof L.CircleMarker || layer instanceof L.Marker) map.removeLayer(layer); });
 
     if (stations && stations.length > 0) {
       const group = L.featureGroup();
       stations.forEach((station) => {
         if (station.lat && station.lng) {
           const color = station.isOpen ? "#10b981" : "#ef4444";
-          const marker = L.circleMarker([station.lat, station.lng], {
-            radius: 8, fillColor: color, color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.8
-          }).addTo(map);
-          
-          marker.bindPopup(`
-            <div style="font-family: sans-serif; color: #333;">
-              <strong>${station.name}</strong><br/>${station.address}<br/>
-              <span style="color: ${color}; font-weight: bold;">${station.isOpen ? "● Open" : "● Closed"}</span>
-            </div>
-          `);
+          const marker = L.circleMarker([station.lat, station.lng], { radius: 8, fillColor: color, color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.8 }).addTo(map);
+          marker.bindPopup(`<div style="font-family: sans-serif; color: #333;"><strong>${station.name}</strong><br/>${station.address}<br/><span style="color: ${color}; font-weight: bold;">${station.isOpen ? "● Open" : "● Closed"}</span></div>`);
           marker.addTo(group);
         }
       });
       if (group.getLayers().length > 0) map.fitBounds(group.getBounds(), { padding: [50, 50] });
     }
   }, [stations]);
-
   return <div ref={mapContainerRef} className="w-full h-full rounded-xl z-0" style={{ filter: "brightness(0.9) contrast(1.1) saturate(0.8)" }} />;
 };
 
-// ----------------------------------------------------------------------
-// 2. STATION REVIEW MODAL
-// ----------------------------------------------------------------------
+// ... [StationReviewModal Component - No Changes] ...
 const StationReviewModal = ({ station, onClose, onConfirm, onReject }: any) => {
   if (!station) return null;
-
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
       <div className={`${styles.cardBg} border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col`}>
         <div className="p-6 border-b border-slate-800 flex justify-between items-center sticky top-0 bg-[#0f172a] z-10">
-          <div>
-            <h3 className="text-xl font-bold text-white flex items-center gap-2"><AlertTriangle className="text-rose-500" size={24} /> Review Request</h3>
-            <p className="text-slate-400 text-sm mt-1">Station: <span className="text-white font-medium">{station.name}</span></p>
-          </div>
+          <div><h3 className="text-xl font-bold text-white flex items-center gap-2"><AlertTriangle className="text-rose-500" size={24} /> Review Request</h3><p className="text-slate-400 text-sm mt-1">Station: <span className="text-white font-medium">{station.name}</span></p></div>
           <button onClick={onClose} title="Close Modal" className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white"><X size={24} /></button>
         </div>
-
         <div className="p-6 space-y-6">
           <div className="flex flex-col md:flex-row gap-6">
             <img src={station.images?.[0] || "https://via.placeholder.com/300"} alt="Station" className="w-full md:w-1/3 h-40 object-cover rounded-xl border border-slate-700 shadow-md"/>
@@ -111,7 +79,6 @@ const StationReviewModal = ({ station, onClose, onConfirm, onReject }: any) => {
                <div className={styles.detailRow}><span className="text-slate-500">Total Bookings</span><span className="text-white font-medium">{station.reviewCount || 0}</span></div>
             </div>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-slate-800/30 p-4 rounded-xl border border-slate-800">
               <h4 className="text-rose-400 font-bold mb-2 flex items-center gap-2 text-xs uppercase tracking-wide"><Users size={14}/> Owner</h4>
@@ -125,7 +92,6 @@ const StationReviewModal = ({ station, onClose, onConfirm, onReject }: any) => {
             </div>
           </div>
         </div>
-
         <div className="p-6 border-t border-slate-800 bg-slate-900/50 rounded-b-2xl sticky bottom-0">
           <div className="flex gap-4">
              <button onClick={onReject} className="flex-1 py-3 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white font-medium">Reject</button>
@@ -152,8 +118,6 @@ export default function AdminDashboard() {
   const [stations, setStations] = useState<any[]>([]);
   const [deleteRequests, setDeleteRequests] = useState<any[]>([]);
   const [messages, setMessages] = useState<any[]>([]);
-  
-  // 🔔 Notification Badge State
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Filters & Modals
@@ -164,24 +128,17 @@ export default function AdminDashboard() {
   const [newOwner, setNewOwner] = useState({ name: "", email: "", password: "", mobile: "" });
   const [reviewStation, setReviewStation] = useState<any>(null);
 
-  // 1️⃣ Initial Load (Get Message Count)
-  useEffect(() => {
-    fetchInitialData();
-  }, []);
+  useEffect(() => { fetchInitialData(); }, []);
 
-  // 2️⃣ Tab Change Logic
   useEffect(() => {
     loadTabData();
-    // Clear badge if opening messages
-    if (activeTab === "messages") {
-      setUnreadCount(0);
-    }
+    if (activeTab === "messages") setUnreadCount(0);
   }, [activeTab]);
 
   const fetchInitialData = async () => {
     try {
       const msgs = await fetchMessages();
-      setUnreadCount(msgs ? msgs.length : 0); // Assuming all fetched are unread initially
+      setUnreadCount(msgs ? msgs.length : 0);
     } catch (e) { console.error("Background fetch failed", e); }
   };
 
@@ -192,25 +149,19 @@ export default function AdminDashboard() {
         const [statsData, stationData] = await Promise.all([fetchAdminStats(), fetchAllStations()]);
         setStats(statsData || {});
         setStations(stationData || []);
-      } 
-      else if (activeTab === "users") {
+      } else if (activeTab === "users") {
         const data = await fetchAllUsers();
         setUsers(data || []);
-      } 
-      else if (activeTab === "stations") {
+      } else if (activeTab === "stations") {
         const [allStations, requests] = await Promise.all([fetchAllStations(), fetchDeleteRequests()]);
         setStations(allStations || []);
         setDeleteRequests(requests || []);
-      }
-      else if (activeTab === "messages") {
+      } else if (activeTab === "messages") {
         const data = await fetchMessages();
         setMessages(data || []);
       }
-    } catch (error) {
-      console.error("Error loading tab data:", error);
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error("Error loading tab data:", error); } 
+    finally { setLoading(false); }
   };
 
   // Filter Logic
@@ -267,14 +218,7 @@ export default function AdminDashboard() {
           <SidebarItem icon={Activity} label="Overview" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} isOpen={isSidebarOpen} />
           <SidebarItem icon={Users} label="Users" active={activeTab === "users"} onClick={() => setActiveTab("users")} isOpen={isSidebarOpen} />
           <SidebarItem icon={Zap} label="Stations" active={activeTab === "stations"} onClick={() => setActiveTab("stations")} isOpen={isSidebarOpen} />
-          <SidebarItem 
-            icon={MessageSquare} 
-            label="Messages" 
-            active={activeTab === "messages"} 
-            onClick={() => setActiveTab("messages")} 
-            isOpen={isSidebarOpen} 
-            badge={unreadCount > 0 ? unreadCount : null} // 🔴 Pass the badge count here
-          />
+          <SidebarItem icon={MessageSquare} label="Messages" active={activeTab === "messages"} onClick={() => setActiveTab("messages")} isOpen={isSidebarOpen} badge={unreadCount > 0 ? unreadCount : null} />
         </nav>
 
         <div className="p-4 border-t border-slate-800">
@@ -310,7 +254,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* 2. USERS */}
+        {/* 2. USERS TAB (UPDATED WITH POINTS) */}
         {activeTab === "users" && (
           <div className={`${styles.cardBg} border border-slate-800 rounded-xl p-6 shadow-xl`}>
             <div className="flex justify-between mb-6">
@@ -325,13 +269,34 @@ export default function AdminDashboard() {
               </div>
               <div className="relative flex-1 max-w-sm"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} /><input placeholder="Search users..." value={userSearch} onChange={e => setUserSearch(e.target.value)} className="w-full bg-slate-900 border border-slate-700 text-white pl-10 pr-4 py-2 rounded-lg focus:ring-1 focus:ring-rose-500 outline-none text-sm"/></div>
             </div>
+            
+            {/* --- USER TABLE WITH POINTS --- */}
             <table className="w-full text-left border-collapse">
-              <thead><tr className="text-slate-500 border-b border-slate-800 text-xs uppercase tracking-wider"><th className="p-4">User</th><th className="p-4">Role</th><th className="p-4">Contact</th></tr></thead>
+              <thead>
+                <tr className="text-slate-500 border-b border-slate-800 text-xs uppercase tracking-wider">
+                  <th className="p-4">User</th>
+                  <th className="p-4">Role</th>
+                  <th className="p-4">Points</th> {/* 👈 Added Header */}
+                  <th className="p-4">Contact</th>
+                </tr>
+              </thead>
               <tbody>
                 {filteredUsers.map((u, i) => (
                   <tr key={i} className="hover:bg-slate-800/50 transition-colors border-b border-slate-800 last:border-0">
                     <td className="p-4"><div className="font-medium text-white">{u.name}</div><div className="text-sm text-slate-500">{u.email}</div></td>
                     <td className="p-4"><span className={`px-2.5 py-1 rounded-md text-xs font-bold border ${u.role === "ADMIN" ? "bg-rose-500/10 text-rose-400 border-rose-500/20" : u.role === "OWNER" ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"}`}>{u.role}</span></td>
+                    
+                    {/* 👈 POINTS COLUMN */}
+                    <td className="p-4">
+                        {u.role === "USER" ? (
+                        <div className="flex items-center gap-2 bg-amber-500/10 w-fit px-2 py-1 rounded-lg border border-amber-500/20">
+                            <Coins size={14} className="text-amber-400" />
+                            <span className="text-amber-400 font-mono font-bold">{u.points || 0}</span>
+                        </div>
+                    ) : (
+                        <span className="text-slate-600 pl-4">-</span>
+                    )}
+                    </td>
                     <td className="p-4 text-slate-400 text-sm font-mono">{u.mobile}</td>
                   </tr>
                 ))}
