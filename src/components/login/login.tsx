@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Mail, Lock } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { API_URL } from "../../config/api_config";
+import { API_URL, GOOGLE_AUTH_URL } from "../../config/api_config";
+import { getPublicIP } from "../hooks/getPublicIP";
+import { getOSInfo } from "../hooks/getOSInfo";
+import { useUser } from "../../context/UserContext";
+import axios from "axios";
 
 export default function Login(): React.ReactElement {
   const [email, setEmail] = useState("");
@@ -10,12 +14,13 @@ export default function Login(): React.ReactElement {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const from = location.state?.from?.pathname || "/";
   
   const handleGoogleLogin = () => {
-  console.log("Google login clicked");
-};
+    window.location.href = GOOGLE_AUTH_URL;
+  };
 
   function showNotification(message: string | null, type: string) {
     const box = document.createElement("div");
@@ -30,7 +35,7 @@ export default function Login(): React.ReactElement {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password.length < 8) {
+    if (password.length < 1) {
     alert("Password must be at least 8 characters long.");
     return; // stop login
     }
@@ -38,37 +43,71 @@ export default function Login(): React.ReactElement {
     setLoading(true);
 
     try {
-      const response = await fetch(API_URL + "/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      // get device and OS info
+      const deviceName = navigator.userAgent;
 
-      if (response.ok) {
-        showNotification("Login successful!", "success");
-        navigate("/login");
+      // get public IP
+      const ip = await getPublicIP();
+      const os = getOSInfo();
+
+      // Send login request via axios
+      const resp = await axios.post(
+        API_URL + "/users/login",
+        { email, password, deviceName, os, ip },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      const data = resp.data;
+
+      if (resp.status === 200) {
+        const token = data.token;
+        localStorage.setItem("token", token);
+
+        // Fetch complete user data including points from /users/me
+        try {
+          const userRes = await axios.get(API_URL + "/users/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const userData = userRes.data;
+          // Save user data in context
+          setUser({
+            id: userData.id || "",
+            name: userData.name || "",
+            email: userData.email || "",
+            mobile: userData.mobile,
+            avatar: userData.avatar,
+            location: userData.location,
+            points: userData.points || 0,
+            role: userData.role,
+          });
+
+          // Save to localStorage as well
+          localStorage.setItem("name", userData.name);
+          //localStorage.setItem("role", userData.role);
+          localStorage.setItem("points", String(userData.points || 0));
+          localStorage.setItem("userId", userData.id);
+
+          showNotification("Login successful!", "success");
+
+          // 2. Role-Based Navigation Logic
+          if (userData.role === "OWNER") {
+            navigate("/owner-dashboard", { replace: true });
+          } else if (userData.role === "ADMIN") {
+            navigate("/admin-dashboard", { replace: true });
+          } else {
+            if (from === "/") {
+              navigate("/", { replace: true });
+            } else {
+              navigate(from, { replace: true });
+            }
+          }
+        } catch (err) {
+          console.error("Error fetching user data:", err);
+          showNotification("Login successful but failed to fetch user data!", "error");
+        }
       } else {
         showNotification("Invalid username or password!", "error");
-      }
-
-      const data = await response.json();
-      // Save user info in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("name", data.name);
-
-      
-// 2. Role-Based Navigation Logic
-      if (data.role === "OWNER") {
-        navigate("/owner-dashboard", { replace: true });
-      } else if (data.role === "ADMIN") {
-        navigate("/admin-dashboard", { replace: true }); // Assuming you have an Admin page later
-      } else {
-        // Normal User OR redirect to where they came from
-        if (from === "/") {
-            navigate("/", { replace: true });
-        } else {
-            navigate(from, { replace: true });
-        }
       }
     } catch (error) {
       console.error(error);
@@ -177,6 +216,8 @@ export default function Login(): React.ReactElement {
               className="w-full flex items-center justify-center border border-gray-500 hover:bg-gray-700 transition-colors text-white py-3 rounded-lg font-semibold"
             >
               <img
+                loading="lazy"
+                decoding="async"
                 src="/google-icon.svg"
                 alt="Google"
                 className="w-5 h-5 mr-2"

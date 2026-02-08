@@ -1,26 +1,43 @@
 import React from "react";
 import Navbar from "../navbar/navbar";
 import coverImg from "../../assets/about/ImageWithFallback.png";
-import memberImg from "../../assets/about/member.jpg";
-import { TeamMember } from "../../components/teamMembers/teamMembers"; 
+//import memberImg from "../../assets/about/member.jpg";
+import { TeamMember } from "../../components/teamMembers/teamMembers";
 import { Briefcase, Lightbulb, Zap } from 'lucide-react';
+import dishanImg from "../../assets/about/dishanwithborder.png";
+import kushithaImg from "../../assets/about/kushithawithborder.png";
+import rashenImg from "../../assets/about/rashenwithborder.png";
+import madushanImg from "../../assets/about/madushanwithborder.png";
 
 export default function About(): React.ReactElement {
+
+  const images = {
+    dishan: dishanImg,
+    kushitha: kushithaImg,
+    rashen: rashenImg,
+    madushan: madushanImg
+  };
+
   const teamMembers = [
     {
-      name: "Ruwan Perera",
-      imageUrl: memberImg,
-      bio: "Driving innovation to simplify EV charging and create a connected, sustainable future."
+      name: "Dishan Ranasinghe",
+      imageUrl: images.dishan,
+      bio: "Focused on building innovative solutions that make EV charging smarter and more reliable."
     },
     {
-      name: "Nisha Fernando",
-      imageUrl: memberImg,
-      bio: "Leading IoT and data-driven solutions for smart and efficient EV charging systems."
+      name: "Kushitha Wickramasinghe",
+      imageUrl: images.kushitha,
+      bio: "Developing intelligent IoT-driven systems for efficient and sustainable EV charging."
     },
     {
-      name: "Dilan Silva",
-      imageUrl: memberImg,
-      bio: "Designing intuitive and eco-friendly experiences for EV owners worldwide."
+      name: "Rashen Perera",
+      imageUrl: images.rashen,
+      bio: "Crafting clean, user-friendly designs for a seamless EV charging experience."
+    },
+    {
+      name: "Madushan Ranasinghe",
+      imageUrl: images.madushan,
+      bio: "Building scalable and secure solutions to power the future of smart mobility."
     }
   ];
 
@@ -32,15 +49,16 @@ export default function About(): React.ReactElement {
         <section className="relative w-screen left-1/2 -translate-x-1/2 h-screen flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 w-full h-full">
                 <img
-                    src={coverImg}
-                    alt="EV HUB Smart Charging"
-                    className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  src={coverImg}
+                  alt="EV HUB Smart Charging"
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/40" />
             </div>
 
-            <div className="relative z-10 text-center px-8 py-12 max-w-4xl mx-4 
-                          bg-black/50 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
+            <div className="relative z-10 text-center px-8 py-12 max-w-4xl mx-4 bg-black/50 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
                 
                 <p className="text-green-400 font-bold tracking-widest uppercase text-sm mb-4">
                     About EV HUB
@@ -119,7 +137,7 @@ export default function About(): React.ReactElement {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {teamMembers.map((member, index) => (
                 <TeamMember
                   key={index}

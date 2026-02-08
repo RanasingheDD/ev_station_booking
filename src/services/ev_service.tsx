@@ -37,3 +37,25 @@ export const addEV = async (ev: Omit<EV, "id">): Promise<EV | null> => {
     return null;
   }
 };
+
+export const deleteEV = async (evId: string): Promise<boolean> => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await axios.post(
+      `${API_URL}/users/evs/delete/${evId}`,
+      null, // no request body
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return res.status >= 200 && res.status < 300;
+  } catch (err) {
+    console.error("deleteEV error:", err);
+    return false;
+  }
+};
+

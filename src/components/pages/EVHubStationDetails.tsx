@@ -33,10 +33,12 @@ const StationDetails: React.FC = () => {
   const [station, setStation] = useState<Station | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showChargerModal, setShowChargerModal] = useState(false);
+  const [selectedCharger, setSelectedCharger] = useState<Charger | null>(null);
 
   useEffect(() => {
     loadStation();
-  }, []);
+  }, [id]);
 
   const loadStation = async () => {
     try {
@@ -76,22 +78,69 @@ const StationDetails: React.FC = () => {
   }
 
   const availableChargers =
-    station.chargers?.filter((c) => c.status === "AVAILABLE") || [];
+station.chargers?.filter((c) => c.status === "AVAILABLE") || [];
+const totalChargers = station.chargers?.length || 0;
 
   const handleBookNow = () => {
     if (availableChargers.length === 1) {
-      navigate(`/booking/${station.id}/${availableChargers[0].id}`);
+      navigate(`/app/booking/${station.id}/${availableChargers[0].id}`);
     } else if (availableChargers.length > 1) {
-      // Show modal to select charger
-      const selected = window.prompt(
-        `Select charger ID:\n${availableChargers
-          .map((c) => `${c.id}: ${c.connectorType}`)
-          .join("\n")}`
-      );
-      if (selected) {
-        navigate(`/booking/${station.id}/${selected}`);
-      }
+      setShowChargerModal(true);
     }
+  };
+
+  const handleChargerSelect = (charger: Charger) => {
+    setSelectedCharger(charger);
+    navigate(`/app/booking/${station.id}/${charger.id}`);
+    setShowChargerModal(false);
+  };
+
+  const handleDirections = () => {
+    if (!station) return;
+    // First try session cached coords to avoid re-prompting for location
+    try {
+      const cachedCoords = sessionStorage.getItem("session_user_location");
+      if (cachedCoords) {
+        const parsed = JSON.parse(cachedCoords);
+        const userLat = parsed.lat;
+        const userLng = parsed.lng;
+        const destination = `${station.lat},${station.lng}`;
+        const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destination}&travelmode=driving`;
+        window.open(googleMapsUrl, "_blank");
+        return;
+      }
+    } catch (err) {
+      console.warn("Error reading cached coords", err);
+    }
+
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+
+        const destination = `${station.lat},${station.lng}`;
+
+        const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destination}&travelmode=driving`;
+
+        // cache coords for session so next time we can skip prompt
+        try {
+          sessionStorage.setItem("session_user_location", JSON.stringify({ lat: userLat, lng: userLng }));
+        } catch (err) {
+          console.warn("Failed to cache user coords", err);
+        }
+
+        window.open(googleMapsUrl, "_blank");
+      },
+      (error) => {
+        alert("Failed to get your location. Please allow location access.");
+        console.error(error);
+      }
+    );
   };
 
   return (
@@ -101,6 +150,8 @@ const StationDetails: React.FC = () => {
         {/* Station Image */}
         {station.images && station.images.length > 0 ? (
           <img
+            loading="lazy"
+            decoding="async"
             src={station.images[0]}
             alt={station.name}
             className="w-full h-64 object-cover"
@@ -122,10 +173,10 @@ const StationDetails: React.FC = () => {
             <h1 className="text-green-400 font-bold text-xl">{station.name}</h1>
             <span
               className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                station.open ? "bg-green-500" : "bg-gray-600"
+                station.isOpen ? "bg-green-500" : "bg-gray-600"
               }`}
             >
-              {station.open ? "Open Now" : "Closed"}
+              {station.isOpen ? "Open Now" : "Closed"}
             </span>
           </div>
 
@@ -138,7 +189,7 @@ const StationDetails: React.FC = () => {
                   : "bg-red-100 text-red-500"
               }`}
             >
-              {availableChargers.length}/{station.chargers.length} Available
+              {availableChargers.length}/{totalChargers} Available
             </span>
           </div>
 
@@ -186,13 +237,16 @@ const StationDetails: React.FC = () => {
       {/* Chargers */}
       <div className="bg-[#0E1424] p-4 rounded-2xl border border-[#1A2236]">
         <h2 className="text-green-400 font-semibold mb-3">Chargers</h2>
-        {station.chargers.map((charger: Charger) => (
+        {!station.chargers || station.chargers.length === 0 ? (
+          <p className="text-gray-400">No chargers available</p>
+        ) : (
+        station.chargers.map((charger: Charger) => (
           <div
             key={charger.id}
             className="p-3 border border-[#1A2236] rounded-lg mb-2 flex justify-between cursor-pointer"
             onClick={() =>
               charger.status === "AVAILABLE" &&
-              navigate(`/booking/${station.id}/${charger.id}`)
+                navigate(`/app/booking/${station.id}/${charger.id}`)
             }
           >
             <span>
@@ -207,7 +261,7 @@ const StationDetails: React.FC = () => {
             >
               {charger.status}
             </span>
-          </div>
+          </div>)
         ))}
       </div>
 
@@ -239,7 +293,10 @@ const StationDetails: React.FC = () => {
       {/* Bottom Actions */}
       <div className="fixed ml-64 bottom-0 left-0 right-0 p-5 bg-[#0E1424] flex justify-center border-t border-[#1A2236]">
         <div className="w-full max-w-3xl flex gap-3">
-          <button className="flex-1 px-4 py-3 border border-green-500 text-green-400 rounded-lg flex items-center justify-center gap-2">
+          <button 
+            className="flex-1 px-4 py-3 border border-green-500 text-green-400 rounded-lg flex items-center justify-center gap-2"
+            onClick={handleDirections}
+            >
             <Navigation size={18} /> Directions
           </button>
           <button
@@ -255,6 +312,50 @@ const StationDetails: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Charger Selection Modal */}
+      {showChargerModal && availableChargers.length > 1 && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 ml-64">
+          <div className="bg-[#161B2E] p-8 rounded-2xl border border-green-400/30 max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold text-white mb-6">Select a Charger</h2>
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {availableChargers.map((charger) => (
+                <button
+                  key={charger.id}
+                  onClick={() => handleChargerSelect(charger)}
+                  className="w-full p-4 bg-[#0E1424] hover:bg-[#1A2236] border border-green-400/20 hover:border-green-400 rounded-lg text-left transition-all group"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-white font-semibold text-lg group-hover:text-green-400 transition">
+                      {charger.name || `Charger ${charger.id}`}
+                    </h3>
+                    <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded">
+                      Available
+                    </span>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    <span className="font-medium">Type:</span> {charger.connectorType}
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    <span className="font-medium">Power:</span> {charger.maxPowerKw} kW
+                  </p>
+                  {charger.portNumber && (
+                    <p className="text-gray-400 text-sm">
+                      <span className="font-medium">Port:</span> {charger.portNumber}
+                    </p>
+                  )}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowChargerModal(false)}
+              className="w-full mt-6 px-4 py-2 border border-gray-600 text-gray-400 rounded-lg hover:border-gray-500 hover:text-gray-300 transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,9 +2,9 @@ import { useEffect ,useState, useRef} from "react";
 import L from "leaflet";
 import axios from "axios";
 import useLocation from "../hooks/useLocation";
-
 import { API_URL } from "../../config/api_config";
 import type { Station } from "../../models/station_model";
+import { useOutletContext } from "react-router-dom";
 
 export default function EVMap() {
 
@@ -15,6 +15,11 @@ export default function EVMap() {
 
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+  
+  //const { setEvStations } = useOutletContext<{ setEvStations: React.Dispatch<React.SetStateAction<(Station & { distance: number })[]>> }>();
+
+  const outletContext = useOutletContext<{ setEvStations: Function }>();
+  const setEvStations = outletContext.setEvStations;
 
   // 1️⃣ Init map when coords available
   useEffect(() => {
@@ -56,6 +61,8 @@ export default function EVMap() {
       const stations = response.data;
       // setEvStations(stations);
 
+      const stationsWithDistance: (Station & { distance: number })[] = [];
+
       stations.forEach((station) => {
         const distance = getDistance(
           userLat,
@@ -72,8 +79,11 @@ export default function EVMap() {
               📏 ${distance.toFixed(2)} km away
             `);
             console.log("Station:", station.lat, "Distance:", distance.toFixed(2), "km");
+            stationsWithDistance.push({ ...station, distance });
         }
       });
+      setEvStations(stationsWithDistance);
+      console.log("Stations sent to chatbot:", stationsWithDistance);
     } catch (err) {
       console.error("Error fetching EV stations:", err);
       alert("Failed to load EV stations. Check your backend server.");
@@ -99,17 +109,28 @@ export default function EVMap() {
     return R * c;
   };
 
+  // return (
+  //   <div className="w-full h-screen">
+  //      <ul>
+  //       {/* {evStations.map((station) => (
+  //         <li key={station.id}>
+  //           {station.name} — ({station.latitude}, {station.longitude})
+  //         </li>
+  //       ))} */}
+  //     </ul>
+  //     <p></p>
+  //     <div id="map" className="w-full h-full rounded-lg shadow-lg"></div>
+
+  //     <div className="w-1/4 p-4 bg-gray-900 text-white overflow-y-auto">
+  //       <ChatBot stations={evStations} />
+  //     </div>
+  //   </div>
+  // );
   return (
-    <div className="w-full h-screen">
-       <ul>
-        {/* {evStations.map((station) => (
-          <li key={station.id}>
-            {station.name} — ({station.latitude}, {station.longitude})
-          </li>
-        ))} */}
-      </ul>
-      <p></p>
-      <div id="map" className="w-full h-full rounded-lg shadow-lg"></div>
+    <div className="w-full h-screen flex">
+      <div className="w-full h-full">
+        <div id="map" className="w-full h-full rounded-lg shadow-lg"></div>
+      </div>
     </div>
   );
 }
