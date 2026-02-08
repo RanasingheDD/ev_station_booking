@@ -5,7 +5,6 @@ export interface PointPackage {
 }
 
 export const BUY_POINT_PACKAGES: PointPackage[] = [
-  { points: 100, price: 100, discount: 0 },
   { points: 500, price: 450, discount: 10 },
   { points: 1000, price: 850, discount: 15 },
   { points: 5000, price: 4000, discount: 20 },
