@@ -15,6 +15,7 @@ import {
   X,
   Image as ImageIcon,
   LogOut,
+  Send,
   LayoutDashboard
 } from "lucide-react";
 import {
@@ -359,7 +360,7 @@ const StationModal = ({
 };
 
 // ----------------------------------------------------------------------
-// 2. DELETE CONFIRMATION MODAL
+// 2. DELETE REQUEST CONFIRMATION MODAL (UPDATED) 🚨
 // ----------------------------------------------------------------------
 const DeleteConfirmModal = ({
   isOpen,
@@ -380,18 +381,19 @@ const DeleteConfirmModal = ({
     <div className={styles.modalOverlay}>
       <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl ring-1 ring-white/10">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 bg-red-900/30 text-red-500 rounded-full flex items-center justify-center shrink-0">
-            <AlertCircle size={24} />
+          <div className="w-12 h-12 bg-amber-900/30 text-amber-500 rounded-full flex items-center justify-center shrink-0">
+            <Send size={24} />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white">Delete Station?</h3>
-            <p className="text-sm text-slate-400">This action is permanent.</p>
+            <h3 className="text-xl font-bold text-white">Request Deletion?</h3>
+            <p className="text-sm text-slate-400">Admin approval required.</p>
           </div>
         </div>
 
         <p className="text-slate-300 mb-6 leading-relaxed">
-          Are you sure you want to delete <strong className="text-white">{stationName}</strong>? 
-          All chargers and history will be wiped out.
+          You are about to request the deletion of <strong className="text-white">{stationName}</strong>. 
+          <br/><br/>
+          This request will be sent to the Admin for review. The station will remain visible until approved.
         </p>
 
         <div className="flex gap-3">
@@ -399,7 +401,7 @@ const DeleteConfirmModal = ({
             Cancel
           </button>
           <button onClick={onConfirm} disabled={loading} className={styles.buttonDanger}>
-            {loading ? "Deleting..." : "Delete Station"}
+            {loading ? "Sending Request..." : "Send Delete Request"}
           </button>
         </div>
       </div>
@@ -503,17 +505,34 @@ export default function OwnerDashboard() {
     }
   };
 
+  // 🚨 UPDATED: Fixed TypeScript Error
   const handleDeleteStation = async () => {
-    if (!deletingStation) return;
+    // Safety check: Ensure station and ID exist
+    if (!deletingStation || !deletingStation.id) return;
+    
     setDeleteLoading(true);
     try {
-      await deleteStation(deletingStation.id!);
-      await loadStations();
+      // Cast response to 'any' so TypeScript allows accessing .message
+      const response = await deleteStation(deletingStation.id) as any;
+      
+      // Now TS won't complain about .message
+      const msg = response?.message || "Delete request sent to Admin successfully.";
+      alert(msg);
+      
       setShowDeleteModal(false);
       setDeletingStation(null);
-    } catch (error) {
-      console.error("Error deleting station:", error);
-      alert("Failed to delete.");
+      
+      // Reload stations
+      await loadStations();
+      
+    } catch (error: any) {
+      console.error("Error requesting delete:", error);
+      
+      if (error.response && error.response.status === 400) {
+        alert("⚠️ Request already pending for this station.");
+      } else {
+        alert("Failed to send delete request.");
+      }
     } finally {
       setDeleteLoading(false);
     }

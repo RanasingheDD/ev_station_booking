@@ -33,6 +33,7 @@ import PaymentCancel from "./components/payment/paymentCancel";
 import OwnerStationDetails from "./components/pages/OwnerStationDetails";
 import OAuthRedirect from "./components/auth/OAuthRedirect";
 import SubscriptionPage from "./components/pages/SubscriptionPage";
+import AdminDashboard from "./components/pages/AdminDashboard";
 
 const RoleProtectedRoute = ({ 
   element, 
@@ -54,6 +55,9 @@ const RoleProtectedRoute = ({
     }
     if (role === "USER") { 
        return <Navigate to="/app/dashboard" replace />;
+    }
+    if(role === "ADMIN"){
+      return <Navigate to="/admin-dashboard" replace />;
     }
     
     // Default Deny: If role is missing or unknown, kick to login
@@ -84,6 +88,16 @@ const router = createBrowserRouter([
   { path: "/oauth2/redirect", element: <OAuthRedirect /> },
 
   // Owner routes grouped under /owner
+  // Admin Routes
+  {
+    path: "/admin-dashboard",
+    element: (
+      <RoleProtectedRoute 
+        element={<AdminDashboard />} 
+        allowedRoles={["ADMIN"]} 
+      />
+    ),
+  },
   {
     path: "/owner",
     children: [
@@ -112,10 +126,10 @@ const router = createBrowserRouter([
       { path: "stations", element: <Stations /> },
       { path: "stations/:id", element: <StationDetails /> },
       { path: "account", element: <Account /> },
-      { path: "/stations/:id", element: <StationDetails /> },
-      { path:"/booking/:stationId/:chargerId", element: <BookingPage/>},
-      { path:"/payment-success", element: <PaymentSuccess/>},
-      { path:"/cancel", element: <PaymentCancel/>},
+     // { path: "/stations/:id", element: <StationDetails /> },
+     // { path:"/booking/:stationId/:chargerId", element: <BookingPage/>},
+      { path:"payment-success", element: <PaymentSuccess/>},
+      { path:"cancel", element: <PaymentCancel/>},
       { path: "subscriptions", element: <SubscriptionPage /> },
       { path: "bookings", element: <BookingsPage /> },
       { path: "booking/:stationId/:chargerId", element: <BookingPage /> },
