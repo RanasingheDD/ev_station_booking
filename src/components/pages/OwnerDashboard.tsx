@@ -10,7 +10,7 @@ import {
   DollarSign,
   Calendar,
   Power,
-  AlertCircle,
+  //AlertCircle,
   Search,
   X,
   Image as ImageIcon,
